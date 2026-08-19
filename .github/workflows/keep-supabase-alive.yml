@@ -49,9 +49,9 @@ jobs:
             try {
               console.log('🏓 Haciendo ping a Supabase...');
 
-              // Intentar hacer un SELECT simple en la tabla de usuarios
+              // Intentar hacer un SELECT simple en la tabla de diagnosticos
               const { data, error } = await supabase
-                .from('users')
+                .from('diagnosticos')
                 .select('id')
                 .limit(1);
 

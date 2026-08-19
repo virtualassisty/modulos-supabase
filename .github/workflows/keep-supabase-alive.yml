@@ -1,0 +1,75 @@
+name: Keep Supabase Database Alive
+
+on:
+  schedule:
+    # Ejecutar 2 veces por semana: Lunes y Jueves a las 10:00 UTC
+    - cron: '0 10 * * 1,4'
+  workflow_dispatch: # Permite ejecutar manualmente desde GitHub
+
+jobs:
+  ping-database:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm install @supabase/supabase-js
+
+      - name: Ping Supabase Database
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+        run: |
+          node -e "
+          const { createClient } = require('@supabase/supabase-js');
+
+          const supabaseUrl = process.env.SUPABASE_URL;
+          const supabaseKey = process.env.SUPABASE_ANON_KEY;
+
+          if (!supabaseUrl || !supabaseKey) {
+            console.error('❌ Error: SUPABASE_URL o SUPABASE_ANON_KEY no están configurados');
+            process.exit(1);
+          }
+
+          const supabase = createClient(supabaseUrl, supabaseKey);
+
+          (async () => {
+            try {
+              console.log('🏓 Haciendo ping a Supabase...');
+
+              // Intentar hacer un SELECT simple en la tabla de usuarios
+              const { data, error } = await supabase
+                .from('users')
+                .select('id')
+                .limit(1);
+
+              if (error) {
+                console.error('❌ Error al hacer ping:', error.message);
+                process.exit(1);
+              }
+
+              console.log('✅ Ping exitoso! Base de datos activa.');
+              console.log('📊 Respuesta:', data ? 'Datos recibidos' : 'Sin datos');
+
+            } catch (err) {
+              console.error('❌ Error inesperado:', err.message);
+              process.exit(1);
+            }
+          })();
+          "
+
+      - name: Report Status
+        if: always()
+        run: |
+          if [ $? -eq 0 ]; then
+            echo "✅ Database ping successful at $(date)"
+          else
+            echo "❌ Database ping failed at $(date)"
+          fi

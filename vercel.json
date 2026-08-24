@@ -9,8 +9,8 @@
       "destination": "/login.html"
     },
     {
-      "source": "/modulo1",
-      "destination": "/diagnostico_assistify_modulo1.html"
+      "source": "/paso1",
+      "destination": "/diagnostico_assistify_paso1.html"
     },
     {
       "source": "/paso2",

@@ -146,7 +146,7 @@
 <div class="header">
   <div>
     <div class="header-logo">Assistify<span>.</span></div>
-    <div class="header-tag">Diagnóstico Módulo 1</div>
+    <div class="header-tag">Diagnóstico Paso 1</div>
   </div>
 </div>
 
@@ -500,7 +500,7 @@ async function renderResult() {
     }
   };
 
-  const saveResult = await guardarDiagnostico('modulo1', userData, answers, ALL_Q, blockScores, resultData);
+  const saveResult = await guardarDiagnostico('paso1', userData, answers, ALL_Q, blockScores, resultData);
   if (saveResult.success) {
     console.log('✅ Datos guardados en Supabase. ID:', saveResult.id);
   } else {

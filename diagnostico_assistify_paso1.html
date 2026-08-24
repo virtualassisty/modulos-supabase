@@ -419,11 +419,20 @@ function selectOpt(i) {
 
 async function goNext() {
   if (answers[current] === null) return;
+
+  // Calcular puntaje ANTES de incrementar current
   const q = ALL_Q[current];
   blockScores[q.bi] += q.pts[answers[current]];
   current++;
-  if (current === 8) { await renderResult(); showScreen('screen-result'); }
-  else renderQuestion();
+
+  // Verificar si terminamos DESPUÉS de incrementar
+  if (current === 8) {
+    await renderResult();
+    showScreen('screen-result');
+  }
+  else {
+    renderQuestion();
+  }
 }
 
 function goBack() {

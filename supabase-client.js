@@ -19,26 +19,25 @@ function sanitizeHTML(str) {
 }
 
 /**
- * Valida formato de email
+ * Valida formato de email (validación simple)
  * @param {string} email - Email a validar
  * @returns {boolean} true si es válido
  */
 function isValidEmail(email) {
   if (!email || typeof email !== 'string') return false;
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  return emailRegex.test(email.trim()) && email.length <= 254;
+  // Validación simple: solo chequea que tenga @ y algo antes y después
+  return email.trim().includes('@') && email.trim().length >= 5;
 }
 
 /**
- * Valida nombre (solo letras, espacios, acentos)
+ * Valida nombre (validación simple)
  * @param {string} nombre - Nombre a validar
  * @returns {boolean} true si es válido
  */
 function isValidNombre(nombre) {
   if (!nombre || typeof nombre !== 'string') return false;
-  // Permite letras (con acentos), espacios, guiones, apóstrofes y puntos
-  const nombreRegex = /^[a-záéíóúñüA-ZÁÉÍÓÚÑÜ\s\-'.]{2,100}$/;
-  return nombreRegex.test(nombre.trim());
+  // Validación simple: solo chequea que no esté vacío y tenga entre 2 y 100 caracteres
+  return nombre.trim().length >= 2 && nombre.trim().length <= 100;
 }
 
 /**
@@ -52,12 +51,12 @@ function isValidNombre(nombre) {
  */
 async function guardarDiagnostico(tipo, userData, answers, questions, blockScores, result) {
   try {
-    // Validaciones de seguridad
+    // Validaciones simples
     if (!isValidEmail(userData.email)) {
-      return { success: false, error: 'Email inválido' };
+      return { success: false, error: 'Por favor ingresá un email válido' };
     }
     if (!isValidNombre(userData.nombre)) {
-      return { success: false, error: 'Nombre inválido (solo letras y espacios)' };
+      return { success: false, error: 'Por favor ingresá tu nombre' };
     }
     
     if (!['paso1', 'paso2'].includes(tipo)) {

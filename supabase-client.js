@@ -36,7 +36,8 @@ function isValidEmail(email) {
  */
 function isValidNombre(nombre) {
   if (!nombre || typeof nombre !== 'string') return false;
-  const nombreRegex = /^[a-záéíóúñüA-ZÁÉÍÓÚÑÜ\s]{2,100}$/;
+  // Permite letras (con acentos), espacios, guiones, apóstrofes y puntos
+  const nombreRegex = /^[a-záéíóúñüA-ZÁÉÍÓÚÑÜ\s\-'.]{2,100}$/;
   return nombreRegex.test(nombre.trim());
 }
 
@@ -59,7 +60,7 @@ async function guardarDiagnostico(tipo, userData, answers, questions, blockScore
       return { success: false, error: 'Nombre inválido (solo letras y espacios)' };
     }
     
-    if (!['modulo1', 'paso2'].includes(tipo)) {
+    if (!['paso1', 'paso2'].includes(tipo)) {
       return { success: false, error: 'Tipo de diagnóstico inválido' };
     }
 

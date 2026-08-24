@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Diagnóstico — ¿Dónde estás atrapado? Ejecutor, Gestor o Dueño</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-client.js"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --olive-dark: #2B2F1D;
+    --olive-med: #3F4323;
+    --olive-light: #C7CCA8;
+    --gold: #9A9959;
+    --cream-dark: #ECE7D6;
+    --cream: #F6F3EA;
+    --white: #ffffff;
+    --black-soft: #1A1A17;
+    --gray-200: #e8e6e0;
+    --gray-400: #9c9a94;
+    --gray-600: #5c5a56;
+    --red-bg: #fff0f0;
+    --red-text: #c0392b;
+    --green-bg: #eefaf6;
+    --green-text: #0f6e56;
+  }
+  html { scroll-behavior: smooth; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(--black-soft); min-height: 100vh; display: flex; flex-direction: column; align-items: center; }
+
+  .header { width: 100%; background: var(--olive-dark); padding: 1rem 2rem; display: flex; align-items: center; justify-content: space-between; }
+  .header-logo { font-family: 'DM Serif Display', serif; font-size: 1.1rem; color: var(--white); letter-spacing: 0.02em; }
+  .header-logo span { color: var(--gold); }
+  .header-tag { font-size: 0.7rem; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(255,255,255,0.45); }
+
+  .container { width: 100%; max-width: 680px; padding: 2.5rem 2rem 4rem; }
+
+  .screen { display: none; }
+  .screen.active { display: block; animation: fadeIn 0.3s ease; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* PROGRESS */
+  .progress-wrap { margin-bottom: 2rem; }
+  .progress-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+  .progress-label { font-size: 0.75rem; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--gray-400); }
+  .progress-count { font-size: 0.75rem; font-weight: 600; color: var(--olive-dark); }
+  .progress-track { height: 3px; background: var(--gray-200); border-radius: 2px; overflow: hidden; }
+  .progress-fill { height: 100%; background: linear-gradient(90deg, var(--gold), var(--olive-light)); border-radius: 2px; transition: width 0.4s cubic-bezier(0.4,0,0.2,1); }
+
+  /* INTRO */
+  .intro-eyebrow { font-size: 0.7rem; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--olive-med); margin-bottom: 1rem; }
+  .intro-title { font-family: 'DM Serif Display', serif; font-size: clamp(2rem, 5vw, 2.8rem); line-height: 1.15; color: var(--black-soft); margin-bottom: 1.25rem; }
+  .intro-title em { font-style: italic; color: var(--gold); }
+  .intro-desc { font-size: 1rem; line-height: 1.7; color: var(--gray-600); margin-bottom: 2rem; max-width: 520px; }
+  .level-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 2rem; }
+  .level-card { background: var(--white); border: 1px solid var(--gray-200); border-radius: 12px; padding: 1.1rem 1rem; text-align: center; }
+  .level-dot { width: 10px; height: 10px; border-radius: 50%; margin: 0 auto 0.6rem; }
+  .level-name { font-size: 0.8rem; font-weight: 600; color: var(--olive-dark); margin-bottom: 0.35rem; letter-spacing: 0.03em; }
+  .level-desc { font-size: 0.72rem; color: var(--gray-400); line-height: 1.45; }
+  .intro-meta { font-size: 0.78rem; color: var(--gray-400); margin-bottom: 1.75rem; display: flex; align-items: center; gap: 1.25rem; }
+  .intro-meta span::before { content: '·'; margin-right: 0.5rem; opacity: 0.4; }
+  .intro-meta span:first-child::before { content: none; }
+  .btn-start { display: inline-flex; align-items: center; gap: 10px; background: var(--olive-dark); color: var(--white); border: none; border-radius: 10px; padding: 0.9rem 1.75rem; font-family: 'DM Sans', sans-serif; font-size: 0.95rem; font-weight: 500; cursor: pointer; transition: background 0.2s, transform 0.15s; }
+  .btn-start:hover { background: var(--olive-med); transform: translateY(-1px); }
+  .btn-start svg { width: 16px; height: 16px; }
+
+  /* FORM */
+  .form-eyebrow { font-size: 0.7rem; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--olive-med); margin-bottom: 1rem; }
+  .form-title { font-family: 'DM Serif Display', serif; font-size: clamp(1.6rem, 4vw, 2.2rem); line-height: 1.2; color: var(--black-soft); margin-bottom: 0.75rem; }
+  .form-desc { font-size: 0.9rem; line-height: 1.65; color: var(--gray-600); margin-bottom: 2rem; }
+
+  /* QUESTION */
+  .block-tag { display: inline-block; font-size: 0.68rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--olive-med); background: rgba(159, 153, 89, 0.1); padding: 4px 10px; border-radius: 20px; margin-bottom: 1.25rem; }
+  .q-text { font-family: 'DM Serif Display', serif; font-size: clamp(1.15rem, 3vw, 1.45rem); line-height: 1.35; color: var(--black-soft); margin-bottom: 0.6rem; }
+  .q-hint { font-size: 0.78rem; color: var(--gray-400); line-height: 1.5; margin-bottom: 1.5rem; font-style: italic; }
+  .opts { display: flex; flex-direction: column; gap: 10px; margin-bottom: 2rem; }
+  .opt { padding: 1rem 1.25rem; border: 1.5px solid var(--gray-200); border-radius: 10px; cursor: pointer; font-size: 0.9rem; font-family: 'DM Sans', sans-serif; color: var(--gray-600); background: var(--white); text-align: left; transition: all 0.18s ease; line-height: 1.45; display: flex; align-items: center; gap: 12px; }
+  .opt:hover { border-color: var(--gold); color: var(--black-soft); background: rgba(159, 153, 89, 0.05); }
+  .opt.selected { border-color: var(--gold); color: var(--black-soft); background: rgba(159, 153, 89, 0.1); }
+  .opt-radio { width: 18px; height: 18px; border-radius: 50%; border: 2px solid var(--gray-200); flex-shrink: 0; display: flex; align-items: center; justify-content: center; transition: all 0.18s; }
+  .opt.selected .opt-radio { border-color: var(--gold); background: var(--gold); }
+  .opt.selected .opt-radio::after { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--white); }
+  .nav { display: flex; align-items: center; gap: 10px; }
+  .btn-nav { padding: 0.7rem 1.4rem; border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 0.88rem; font-weight: 500; cursor: pointer; transition: all 0.18s; border: 1.5px solid var(--gray-200); background: var(--white); color: var(--gray-600); }
+  .btn-nav:hover:not(:disabled) { border-color: var(--olive-dark); color: var(--olive-dark); }
+  .btn-nav.primary { background: var(--olive-dark); border-color: var(--olive-dark); color: var(--white); }
+  .btn-nav.primary:hover:not(:disabled) { background: var(--olive-med); }
+  .btn-nav:disabled { opacity: 0.35; cursor: not-allowed; }
+
+  /* RESULT */
+  .result-header { background: var(--olive-dark); border-radius: 16px; padding: 2rem; margin-bottom: 1.75rem; position: relative; overflow: hidden; }
+  .result-header::before { content: ''; position: absolute; top: -40px; right: -40px; width: 180px; height: 180px; border-radius: 50%; background: rgba(159, 153, 89, 0.08); }
+  .result-eyebrow { font-size: 0.68rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--gold); margin-bottom: 0.6rem; }
+  .result-level { font-family: 'DM Serif Display', serif; font-size: clamp(1.8rem,4vw,2.4rem); color: var(--white); margin-bottom: 0.5rem; line-height: 1.2; }
+  .result-range { font-size: 0.8rem; color: rgba(255,255,255,0.45); margin-bottom: 1.25rem; }
+  .result-diag { font-size: 0.9rem; line-height: 1.65; color: rgba(255,255,255,0.75); border-left: 2px solid var(--gold); padding-left: 1rem; }
+
+  .score-section { margin-bottom: 1.75rem; }
+  .score-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 6px; }
+  .score-title { font-size: 0.75rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--gray-400); }
+  .score-value { font-size: 0.85rem; font-weight: 600; color: var(--olive-dark); }
+  .score-track-outer { height: 8px; background: var(--gray-200); border-radius: 4px; overflow: hidden; }
+  .score-fill-bar { height: 100%; border-radius: 4px; transition: width 0.8s cubic-bezier(0.4,0,0.2,1); }
+  .score-labels { display: flex; justify-content: space-between; margin-top: 5px; }
+  .score-label-text { font-size: 0.68rem; color: var(--gray-400); }
+
+  .block-scores { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 1.75rem; }
+  .block-score-card { background: var(--white); border: 1px solid var(--gray-200); border-radius: 10px; padding: 1rem; text-align: center; }
+  .block-score-name { font-size: 0.7rem; color: var(--gray-400); margin-bottom: 0.5rem; font-weight: 500; line-height: 1.3; }
+  .block-score-num { font-family: 'DM Serif Display', serif; font-size: 1.6rem; color: var(--olive-dark); line-height: 1; margin-bottom: 0.3rem; }
+  .block-score-bar { height: 3px; background: var(--gray-200); border-radius: 2px; overflow: hidden; margin-top: 0.5rem; }
+  .block-score-fill { height: 100%; border-radius: 2px; transition: width 0.8s ease; }
+
+  .roles-chart { margin-bottom: 2rem; background: var(--white); border: 1px solid var(--gray-200); border-radius: 12px; padding: 1.5rem; }
+  .roles-title { font-size: 0.75rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--gray-400); margin-bottom: 1.25rem; }
+  .roles-bars { display: flex; flex-direction: column; gap: 1.25rem; }
+  .role-row { display: flex; align-items: center; gap: 1rem; }
+  .role-label { font-size: 0.85rem; font-weight: 500; color: var(--olive-dark); min-width: 90px; }
+  .role-bar-wrap { flex: 1; height: 28px; background: var(--cream-dark); border-radius: 8px; overflow: hidden; position: relative; }
+  .role-bar-fill { height: 100%; border-radius: 8px; transition: width 0.8s ease; display: flex; align-items: center; justify-content: flex-end; padding-right: 0.75rem; }
+  .role-pct { font-size: 0.8rem; font-weight: 600; color: var(--white); }
+
+  .section-head { font-size: 0.7rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--gray-400); margin-bottom: 1rem; margin-top: 1.75rem; }
+
+  .cta-box { background: var(--cream-dark); border-left: 3px solid var(--gold); border-radius: 8px; padding: 1.5rem; margin-top: 2rem; }
+  .cta-title { font-size: 0.9rem; font-weight: 600; color: var(--olive-dark); margin-bottom: 0.5rem; }
+  .cta-desc { font-size: 0.85rem; line-height: 1.6; color: var(--gray-600); margin-bottom: 1rem; }
+  .cta-btns { display: flex; gap: 10px; flex-wrap: wrap; }
+  .btn-cta-primary { padding: 0.65rem 1.4rem; border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 0.85rem; font-weight: 500; cursor: pointer; background: var(--olive-dark); border: 1.5px solid var(--olive-dark); color: var(--white); transition: all 0.18s; }
+  .btn-cta-primary:hover { background: var(--olive-med); }
+  .btn-cta-secondary { padding: 0.65rem 1.4rem; border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 0.85rem; font-weight: 500; cursor: pointer; background: var(--white); border: 1.5px solid var(--olive-dark); color: var(--olive-dark); transition: all 0.18s; }
+  .btn-cta-secondary:hover { background: var(--olive-dark); color: var(--white); }
+
+  @media (max-width: 640px) {
+    .container { padding: 1.5rem 1rem 3rem; }
+    .level-grid { grid-template-columns: 1fr; }
+    .block-scores { grid-template-columns: 1fr; }
+    .roles-bars { gap: 1rem; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div>
+    <div class="header-logo">Assistify<span>.</span></div>
+    <div class="header-tag">Diagnóstico Módulo 1</div>
+  </div>
+</div>
+
+<div class="container">
+  <!-- INTRO -->
+  <div class="screen active" id="screen-intro">
+    <p class="intro-eyebrow">Inventario de Tiempo + Dinero</p>
+    <h1 class="intro-title">¿Dónde estás <em>atrapado?</em></h1>
+    <p class="intro-desc">En 8 preguntas descubrís en qué rol estás invirtiendo más tiempo y energía: Ejecutor, Gestor o Dueño.</p>
+    
+    <div class="level-grid">
+      <div class="level-card">
+        <div class="level-dot" style="background: #c0392b;"></div>
+        <div class="level-name">Ejecutor</div>
+        <div class="level-desc">Hacés el trabajo que vendes</div>
+      </div>
+      <div class="level-card">
+        <div class="level-dot" style="background: #b45309;"></div>
+        <div class="level-name">Gestor</div>
+        <div class="level-desc">Coordinás gente y procesos</div>
+      </div>
+      <div class="level-card">
+        <div class="level-dot" style="background: #0f6e56;"></div>
+        <div class="level-name">Dueño</div>
+        <div class="level-desc">Pensás estrategia y números</div>
+      </div>
+    </div>
+
+    <p class="intro-meta">
+      <span>8 preguntas</span>
+      <span>5 minutos</span>
+      <span>Resultado visual</span>
+    </p>
+
+    <button class="btn-start" onclick="startDiag()">
+      Empezar diagnóstico →
+    </button>
+  </div>
+
+  <!-- FORM -->
+  <div class="screen" id="screen-form">
+    <p class="form-eyebrow">Antes de empezar</p>
+    <h2 class="form-title">Contanos un poco sobre vos</h2>
+    <p class="form-desc">Con estos datos personalizamos tu resultado y te mandamos el acceso al Sheet de Inventario.</p>
+    
+    <div style="display: flex; flex-direction: column; gap: 12px;">
+      <div style="display: flex; flex-direction: column; gap: 6px;">
+        <label style="font-size: 0.75rem; font-weight: 600; color: var(--olive-dark);">Nombre <span style="color: var(--gold);">*</span></label>
+        <input type="text" id="f-nombre" placeholder="Tu nombre completo" style="padding: 0.7rem 1rem; border: 1.5px solid var(--gray-200); border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 0.88rem; outline: none;" />
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 6px;">
+        <label style="font-size: 0.75rem; font-weight: 600; color: var(--olive-dark);">Email <span style="color: var(--gold);">*</span></label>
+        <input type="email" id="f-email" placeholder="tu@email.com" style="padding: 0.7rem 1rem; border: 1.5px solid var(--gray-200); border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 0.88rem; outline: none;" />
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 6px;">
+        <label style="font-size: 0.75rem; font-weight: 600; color: var(--olive-dark);">¿Cuántos años lleva tu negocio?</label>
+        <select id="f-antiguedad" style="padding: 0.7rem 1rem; border: 1.5px solid var(--gray-200); border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 0.88rem; outline: none; appearance: none; background: var(--white);">
+          <option value="">Seleccioná una opción</option>
+          <option>Menos de 1 año</option>
+          <option>1 a 3 años</option>
+          <option>3 a 5 años</option>
+          <option>Más de 5 años</option>
+        </select>
+      </div>
+    </div>
+
+    <button class="btn-start" style="margin-top: 1.5rem; width: 100%;" onclick="submitForm()">
+      Empezar el diagnóstico →
+    </button>
+  </div>
+  <div class="screen" id="screen-questions">
+    <div class="progress-wrap">
+      <div class="progress-top">
+        <span class="progress-label">Progreso</span>
+        <span class="progress-count"><span id="progress-current">1</span>/8</span>
+      </div>
+      <div class="progress-track">
+        <div class="progress-fill" id="progress-fill"></div>
+      </div>
+    </div>
+
+    <p class="block-tag" id="block-tag"></p>
+    <h2 class="q-text" id="q-text"></h2>
+    <p class="q-hint" id="q-hint"></p>
+    <div class="opts" id="opts-container"></div>
+
+    <div class="nav">
+      <button class="btn-nav" id="btn-back" onclick="goBack()">← Atrás</button>
+      <button class="btn-nav primary" id="btn-next" onclick="goNext()" disabled>Siguiente →</button>
+    </div>
+  </div>
+
+  <!-- RESULT -->
+  <div class="screen" id="screen-result"></div>
+</div>
+
+<script>
+const BLOCK_NAMES = ["Distribución de Tiempo", "Dependencia", "Visibilidad Financiera", "Documentación"];
+
+const ALL_Q = [
+  // BLOQUE 0: Distribución de Tiempo
+  {
+    bi: 0,
+    block: "Distribución de Tiempo",
+    text: "Cuando termina tu semana, ¿qué es lo que más te consume energía?",
+    hint: "Pensá en energía mental, no solo horas.",
+    opts: [
+      "Hacer el trabajo día a día (consulta, producción, servicio)",
+      "Coordinar gente, reuniones, herramientas",
+      "Pensar en números y estrategia del negocio",
+      "No sabría decir, todo me consume igual"
+    ],
+    pts: [2, 1, 0, 1]
+  },
+  {
+    bi: 0,
+    block: "Distribución de Tiempo",
+    text: "Un cliente urgente te llama ahora. ¿Qué probabilidad hay de que vos directamente resuelvas el problema?",
+    hint: null,
+    opts: [
+      "Seguro, siempre lo resuelvo yo",
+      "Generalmente lo hago, pero a veces delego",
+      "A veces delego, pero muchas me llaman de nuevo",
+      "Casi siempre lo resuelve el equipo"
+    ],
+    pts: [2, 1, 1, 0]
+  },
+  // BLOQUE 1: Dependencia
+  {
+    bi: 1,
+    block: "Dependencia",
+    text: "¿Qué pasaría si te tomaras una semana de vacaciones sin estar disponible?",
+    hint: null,
+    opts: [
+      "Se para todo, los clientes se quejarían",
+      "Funciona mal, aparecen problemas operativos",
+      "Funciona pero con algunos problemas",
+      "Funciona normal, el equipo se maneja bien"
+    ],
+    pts: [2, 1, 1, 0]
+  },
+  {
+    bi: 1,
+    block: "Dependencia",
+    text: "¿Cuáles son los procesos que solo vos sabés cómo se hacen?",
+    hint: "Procesos clave para que el negocio funcione.",
+    opts: [
+      "La mayoría de los procesos",
+      "Algunos procesos clave",
+      "Muy pocos, la mayoría está documentado",
+      "No hay procesos que dependan solo de mí"
+    ],
+    pts: [2, 1, 0, 0]
+  },
+  // BLOQUE 2: Visibilidad Financiera
+  {
+    bi: 2,
+    block: "Visibilidad Financiera",
+    text: "Si te pregunto 'cuál es tu rentabilidad real', ¿qué tan rápido podés contestar?",
+    hint: "Rentabilidad = ingresos - gastos reales.",
+    opts: [
+      "No tengo ni idea, nunca lo calculé",
+      "Tengo números pero no confío del todo",
+      "Tengo idea aproximada pero no es exacto",
+      "Tengo claridad, lo reviso regularmente"
+    ],
+    pts: [2, 1, 1, 0]
+  },
+  {
+    bi: 2,
+    block: "Visibilidad Financiera",
+    text: "¿Conocés el margen de cada proyecto o cliente que vendés?",
+    hint: null,
+    opts: [
+      "No, facturación nada más",
+      "Algunos, pero no es sistemático",
+      "Más o menos, tengo una idea",
+      "Sí, lo tengo mapeado"
+    ],
+    pts: [2, 1, 1, 0]
+  },
+  // BLOQUE 3: Documentación
+  {
+    bi: 3,
+    block: "Documentación",
+    text: "Si alguien nuevo entra al equipo, ¿qué tan fácil es que entienda cómo se hacen las cosas?",
+    hint: null,
+    opts: [
+      "Muy difícil, todo está en mi cabeza",
+      "Les tengo que explicar casi todo personalmente",
+      "Hay algunos procesos escritos, pero no todos",
+      "Está todo documentado, pueden empezar solos"
+    ],
+    pts: [2, 1, 1, 0]
+  },
+  {
+    bi: 3,
+    block: "Documentación",
+    text: "¿Dónde guardás el conocimiento operativo? (cómo se hace cada cosa)",
+    hint: "Notion, Asana, ERP, CRM, Sheets, Drive, etc.",
+    opts: [
+      "En mi cabeza, en mensajes, en mi experiencia",
+      "Un poco en Sheets, un poco en mi cabeza",
+      "Tengo un sistema (Notion, Asana, ERP) pero incompleto",
+      "Sistema completo y actualizado"
+    ],
+    pts: [2, 1, 1, 0]
+  }
+];
+
+let current = 0;
+let answers = new Array(8).fill(null);
+let blockScores = [0, 0, 0, 0];
+let userData = {};
+
+function startDiag() { 
+  showScreen('screen-form'); 
+}
+
+function submitForm() {
+  const nombre = document.getElementById('f-nombre').value.trim();
+  const email = document.getElementById('f-email').value.trim();
+  
+  if (!nombre || !email || !email.includes('@')) {
+    alert('Por favor completá nombre y email válido.');
+    return;
+  }
+  
+  userData = {
+    nombre: nombre,
+    email: email,
+    antiguedad: document.getElementById('f-antiguedad').value || 'No especificado'
+  };
+  
+  showScreen('screen-questions');
+  renderQuestion();
+}
+
+function showScreen(id) { 
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); 
+  document.getElementById(id).classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function renderQuestion() {
+  const q = ALL_Q[current];
+  document.getElementById('progress-current').textContent = current + 1;
+  const pct = ((current + 1) / 8) * 100;
+  document.getElementById('progress-fill').style.width = pct + '%';
+  document.getElementById('block-tag').textContent = q.block;
+  document.getElementById('q-text').textContent = q.text;
+  const hintEl = document.getElementById('q-hint');
+  if (q.hint) { hintEl.textContent = q.hint; hintEl.style.display = 'block'; }
+  else { hintEl.style.display = 'none'; }
+  document.getElementById('btn-back').style.display = current === 0 ? 'none' : 'inline-flex';
+  document.getElementById('btn-next').textContent = current === 7 ? 'Ver mi resultado →' : 'Siguiente →';
+  document.getElementById('btn-next').disabled = answers[current] === null;
+  const container = document.getElementById('opts-container');
+  container.innerHTML = q.opts.map((o, i) => `
+    <button class="opt${answers[current] === i ? ' selected' : ''}" onclick="selectOpt(${i})">
+      <span class="opt-radio"></span>${o}
+    </button>`).join('');
+}
+
+function selectOpt(i) {
+  answers[current] = i;
+  document.querySelectorAll('.opt').forEach((el, idx) => el.classList.toggle('selected', idx === i));
+  document.getElementById('btn-next').disabled = false;
+}
+
+async function goNext() {
+  if (answers[current] === null) return;
+  const q = ALL_Q[current];
+  blockScores[q.bi] += q.pts[answers[current]];
+  current++;
+  if (current === 8) { await renderResult(); showScreen('screen-result'); }
+  else renderQuestion();
+}
+
+function goBack() {
+  if (current === 0) return;
+  const prev = ALL_Q[current - 1];
+  if (answers[current - 1] !== null) blockScores[prev.bi] -= prev.pts[answers[current - 1]];
+  current--; renderQuestion();
+}
+
+function downloadPDF() {
+  const element = document.getElementById('screen-result');
+  const opt = {
+    margin: 10,
+    filename: 'diagnostico-assistify.pdf',
+    image: { type: 'jpeg', quality: 0.98 },
+    html2canvas: { scale: 2 },
+    jsPDF: { orientation: 'portrait', unit: 'mm', format: 'a4' }
+  };
+  
+  // Fallback: descargar como PNG si html2pdf no está disponible
+  if (typeof html2pdf === 'undefined') {
+    alert('Descargá tu resultado capturando la pantalla o guardando como PDF desde tu navegador (Ctrl+P / Cmd+P).');
+    return;
+  }
+  
+  html2pdf().set(opt).from(element).save();
+}
+
+async function renderResult() {
+  const total = answers.reduce((s, a, i) => s + (a !== null ? ALL_Q[i].pts[a] : 0), 0);
+
+  // Calcular distribución de roles
+  const maxScore = 16; // 8 preguntas * 2 puntos max
+  const ejecutorScore = blockScores[0] + blockScores[1]; // Distribución + Dependencia
+  const gestorScore = blockScores[1] + blockScores[3]; // Dependencia + Documentación
+  const duenioScore = blockScores[2]; // Visibilidad Financiera
+
+  const totalRoles = ejecutorScore + gestorScore + duenioScore;
+  const ejecutorPct = Math.round((ejecutorScore / totalRoles) * 100) || 0;
+  const gestorPct = Math.round((gestorScore / totalRoles) * 100) || 0;
+  const duenioPct = Math.round((duenioScore / totalRoles) * 100) || 0;
+
+  // Colores para roles
+  const ejecutorColor = '#c0392b';
+  const gestorColor = '#b45309';
+  const duenioColor = '#0f6e56';
+
+  let insight = '';
+  if (ejecutorScore > gestorScore && ejecutorScore > duenioScore) {
+    insight = 'Estás atrapado en el rol de Ejecutor. Tu tiempo se va en hacer el trabajo día a día, pero no tenés espacio para estrategia ni control.';
+  } else if (gestorScore > ejecutorScore && gestorScore > duenioScore) {
+    insight = 'Estás atrapado en el rol de Gestor. Coordinás mucho pero el conocimiento sigue en tu cabeza, lo que hace que todo dependa de vos.';
+  } else if (duenioScore > ejecutorScore && duenioScore > gestorScore) {
+    insight = 'Te falta visibilidad financiera. No conocés bien tus márgenes ni rentabilidad por proyecto, lo que frena decisiones estratégicas.';
+  } else {
+    insight = 'Estás balanceado entre los 3 roles, pero hay oportunidades de mejora en cada uno.';
+  }
+
+  // 🔥 Guardar en Supabase
+  const resultData = {
+    total: total,
+    nivel: ejecutorScore > Math.max(gestorScore, duenioScore) ? 'Ejecutor' :
+           gestorScore > Math.max(ejecutorScore, duenioScore) ? 'Gestor' :
+           duenioScore > Math.max(ejecutorScore, gestorScore) ? 'Dueño' : 'Balanceado',
+    insight: insight,
+    blockNames: BLOCK_NAMES,
+    extra: {
+      ejecutorScore,
+      gestorScore,
+      duenioScore,
+      ejecutorPct,
+      gestorPct,
+      duenioPct
+    }
+  };
+
+  const saveResult = await guardarDiagnostico('modulo1', userData, answers, ALL_Q, blockScores, resultData);
+  if (saveResult.success) {
+    console.log('✅ Datos guardados en Supabase. ID:', saveResult.id);
+  } else {
+    console.error('❌ Error al guardar:', saveResult.error);
+  }
+
+  document.getElementById('screen-result').innerHTML = `
+    <div class="result-header">
+      <p class="result-eyebrow">Tu distribución actual</p>
+      <h2 class="result-level">¿Dónde estás atrapado?</h2>
+      <p class="result-diag">${insight}</p>
+    </div>
+
+    <div class="roles-chart">
+      <p class="roles-title">Distribución de Roles (%)</p>
+      <div class="roles-bars">
+        <div class="role-row">
+          <div class="role-label">Ejecutor</div>
+          <div class="role-bar-wrap">
+            <div class="role-bar-fill" id="bar-ejecutor" style="width:0%;background:${ejecutorColor}">
+              <span class="role-pct" id="pct-ejecutor"></span>
+            </div>
+          </div>
+        </div>
+        <div class="role-row">
+          <div class="role-label">Gestor</div>
+          <div class="role-bar-wrap">
+            <div class="role-bar-fill" id="bar-gestor" style="width:0%;background:${gestorColor}">
+              <span class="role-pct" id="pct-gestor"></span>
+            </div>
+          </div>
+        </div>
+        <div class="role-row">
+          <div class="role-label">Dueño</div>
+          <div class="role-bar-wrap">
+            <div class="role-bar-fill" id="bar-duenio" style="width:0%;background:${duenioColor}">
+              <span class="role-pct" id="pct-duenio"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="block-scores">
+      ${blockScores.map((s, i) => {
+        const colors = ['#c0392b', '#b45309', '#0f6e56', '#6b7a3a'];
+        const pct = Math.round((s / 8) * 100);
+        return `<div class="block-score-card">
+          <div class="block-score-name">${BLOCK_NAMES[i]}</div>
+          <div class="block-score-num">${s}<span style="font-size:0.9rem;color:#9c9a94">/8</span></div>
+          <div class="block-score-bar"><div class="block-score-fill" style="width:0%;background:${colors[i]}" data-w="${pct}"></div></div>
+        </div>`;
+      }).join('')}
+    </div>
+
+    <!-- COMENTADO: Próximo paso y Comparate en 6 semanas
+    <div class="cta-box">
+      <p class="cta-title">Próximo paso: El Sheet de Inventario</p>
+      <p class="cta-desc">Este diagnóstico te da una foto rápida. Ahora viene lo profundo: descargá el Sheet de Inventario y registrá una semana real de tu trabajo. Ahí verás exactamente dónde se te va el tiempo y la plata.</p>
+      <div class="cta-btns">
+        <button class="btn-cta-primary" onclick="downloadPDF()">⬇ Descargar mi resultado</button>
+        <button class="btn-cta-secondary" onclick="startDiag()">Hacer el diagnóstico de nuevo</button>
+      </div>
+    </div>
+
+    <div style="background: rgba(159, 153, 89, 0.05); border-radius: 8px; padding: 1.5rem; margin-top: 1.75rem; border-left: 3px solid var(--gold);">
+      <p style="font-size: 0.75rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--gray-400); margin-bottom: 0.5rem;">Comparate en 6 semanas</p>
+      <p style="font-size: 0.85rem; line-height: 1.6; color: var(--gray-600);">Guardá este resultado. Al terminar el Sistema C.E.O, volvé acá y repetí el diagnóstico. Vas a ver cómo cambió la distribución de tus roles — esa es la prueba de que el sistema funciona.</p>
+    </div>
+    -->`;
+
+  setTimeout(() => {
+    document.getElementById('bar-ejecutor').style.width = ejecutorPct + '%';
+    document.getElementById('pct-ejecutor').textContent = ejecutorPct + '%';
+    document.getElementById('bar-gestor').style.width = gestorPct + '%';
+    document.getElementById('pct-gestor').textContent = gestorPct + '%';
+    document.getElementById('bar-duenio').style.width = duenioPct + '%';
+    document.getElementById('pct-duenio').textContent = duenioPct + '%';
+    document.querySelectorAll('[data-w]').forEach(el => {
+      el.style.width = el.getAttribute('data-w') + '%';
+    });
+  }, 150);
+}
+</script>
+</body>
+</html>

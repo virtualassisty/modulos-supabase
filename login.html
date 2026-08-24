@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Login - Admin Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-client.js"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --olive-dark: #2B2F1D;
+    --olive-med: #3F4323;
+    --olive-light: #C7CCA8;
+    --gold: #9A9959;
+    --cream-dark: #ECE7D6;
+    --cream: #F6F3EA;
+    --white: #ffffff;
+    --black-soft: #1A1A17;
+    --gray-200: #e8e6e0;
+    --gray-400: #9c9a94;
+    --gray-600: #5c5a56;
+    --red-bg: #fff0f0;
+    --red-text: #c0392b;
+    --green-bg: #eefaf6;
+    --green-text: #0f6e56;
+  }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--cream);
+    color: var(--black-soft);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+  }
+
+  .login-container {
+    background: var(--white);
+    border: 1px solid var(--gray-200);
+    border-radius: 16px;
+    padding: 3rem 2.5rem;
+    max-width: 420px;
+    width: 100%;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  }
+
+  .logo {
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+
+  .logo-text {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.8rem;
+    color: var(--olive-dark);
+  }
+
+  .logo-text span {
+    color: var(--gold);
+  }
+
+  .logo-subtitle {
+    font-size: 0.7rem;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--gray-400);
+    margin-top: 0.5rem;
+  }
+
+  h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.6rem;
+    color: var(--olive-dark);
+    margin-bottom: 0.5rem;
+    text-align: center;
+  }
+
+  .subtitle {
+    font-size: 0.88rem;
+    color: var(--gray-600);
+    text-align: center;
+    margin-bottom: 2rem;
+    line-height: 1.5;
+  }
+
+  .form-group {
+    margin-bottom: 1.5rem;
+  }
+
+  label {
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--olive-dark);
+    margin-bottom: 0.5rem;
+    letter-spacing: 0.03em;
+  }
+
+  input[type="email"] {
+    width: 100%;
+    padding: 0.85rem 1rem;
+    border: 1.5px solid var(--gray-200);
+    border-radius: 10px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.9rem;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  input[type="email"]:focus {
+    border-color: var(--gold);
+  }
+
+  button {
+    width: 100%;
+    padding: 0.9rem;
+    background: var(--olive-dark);
+    color: var(--white);
+    border: none;
+    border-radius: 10px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  button:hover:not(:disabled) {
+    background: var(--olive-med);
+    transform: translateY(-1px);
+  }
+
+  button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .alert {
+    padding: 0.85rem 1rem;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    margin-bottom: 1.5rem;
+    display: none;
+  }
+
+  .alert.show {
+    display: block;
+  }
+
+  .alert-error {
+    background: var(--red-bg);
+    color: var(--red-text);
+    border-left: 3px solid var(--red-text);
+  }
+
+  .alert-success {
+    background: var(--green-bg);
+    color: var(--green-text);
+    border-left: 3px solid var(--green-text);
+  }
+
+  .alert-info {
+    background: rgba(159, 153, 89, 0.1);
+    color: var(--olive-dark);
+    border-left: 3px solid var(--gold);
+  }
+
+  .loading-spinner {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    border: 2px solid var(--white);
+    border-top-color: transparent;
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+    margin-right: 8px;
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+  .divider {
+    height: 1px;
+    background: var(--gray-200);
+    margin: 2rem 0;
+  }
+
+  .info-box {
+    background: rgba(159, 153, 89, 0.05);
+    border-radius: 8px;
+    padding: 1rem;
+    font-size: 0.8rem;
+    color: var(--gray-600);
+    line-height: 1.5;
+  }
+
+  .info-box strong {
+    color: var(--olive-dark);
+  }
+</style>
+</head>
+<body>
+
+<div class="login-container">
+  <div class="logo">
+    <div class="logo-text">Assistify<span>.</span></div>
+    <div class="logo-subtitle">Admin Dashboard</div>
+  </div>
+
+  <h1>Acceso Restringido</h1>
+  <p class="subtitle">Ingresá tu email para recibir un link de acceso</p>
+
+  <div class="alert alert-error" id="alert-error"></div>
+  <div class="alert alert-success" id="alert-success"></div>
+
+  <form id="login-form">
+    <div class="form-group">
+      <label>Email Autorizado</label>
+      <input
+        type="email"
+        id="email-input"
+        placeholder="virtualassist@assistify365.com"
+        required
+      />
+    </div>
+
+    <button type="submit" id="submit-btn">
+      Enviar Magic Link
+    </button>
+  </form>
+
+  <div class="divider"></div>
+
+  <div class="info-box">
+    <strong>🔐 Solo email autorizado:</strong><br>
+    virtualassist@assistify365.com
+  </div>
+</div>
+
+<script>
+const AUTHORIZED_EMAIL = 'virtualassist@assistify365.com';
+
+// Verificar si ya está autenticado
+async function checkAuth() {
+  const { data: { session } } = await supabaseClient.auth.getSession();
+
+  if (session && session.user.email === AUTHORIZED_EMAIL) {
+    // Ya está autenticado, redirigir al dashboard
+    window.location.href = 'admin-dashboard.html';
+  }
+}
+
+// Manejar el formulario de login
+document.getElementById('login-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+
+  const email = document.getElementById('email-input').value.trim().toLowerCase();
+  const submitBtn = document.getElementById('submit-btn');
+  const errorAlert = document.getElementById('alert-error');
+  const successAlert = document.getElementById('alert-success');
+
+  // Limpiar alertas
+  errorAlert.classList.remove('show');
+  successAlert.classList.remove('show');
+
+  // Validar email autorizado
+  if (email !== AUTHORIZED_EMAIL) {
+    errorAlert.textContent = '❌ Email no autorizado. Solo virtualassist@assistify365.com tiene acceso.';
+    errorAlert.classList.add('show');
+    return;
+  }
+
+  // Deshabilitar botón
+  submitBtn.disabled = true;
+  submitBtn.innerHTML = '<span class="loading-spinner"></span>Enviando...';
+
+  try {
+    const { error } = await supabaseClient.auth.signInWithOtp({
+      email: email,
+      options: {
+        emailRedirectTo: window.location.origin + '/admin-dashboard.html'
+      }
+    });
+
+    if (error) throw error;
+
+    successAlert.textContent = '✅ Magic Link enviado! Revisá tu email (también spam) y hacé clic en el link.';
+    successAlert.classList.add('show');
+
+    submitBtn.innerHTML = 'Link enviado ✓';
+
+  } catch (error) {
+    console.error('Error:', error);
+    errorAlert.textContent = '❌ Error al enviar el link: ' + error.message;
+    errorAlert.classList.add('show');
+
+    submitBtn.disabled = false;
+    submitBtn.innerHTML = 'Enviar Magic Link';
+  }
+});
+
+// Verificar autenticación al cargar
+checkAuth();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,17 @@
+{
+  "name": "diagnosticos-assistify",
+  "version": "1.0.0",
+  "description": "Diagnósticos interactivos con Supabase - Assistify",
+  "main": "index.html",
+  "scripts": {
+    "dev": "npx serve .",
+    "deploy": "vercel --prod"
+  },
+  "keywords": [
+    "diagnosticos",
+    "assistify",
+    "supabase"
+  ],
+  "author": "Assistify",
+  "license": "MIT"
+}

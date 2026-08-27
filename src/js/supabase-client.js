@@ -1,7 +1,13 @@
 // Configuración de Supabase Client
-// Las credenciales se pueden configurar via variables de entorno en producción
-const SUPABASE_URL = window.SUPABASE_URL || 'https://wzimcsxlpfkzvdieicil.supabase.co';
-const SUPABASE_ANON_KEY = window.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind6aW1jc3hscGZrenZkaWVpY2lsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQyOTQyNjQsImV4cCI6MjA5OTg3MDI2NH0.A3sll8ldkWSEzvtVtoHvm4c-3YtBa1nL1IVyXXp7mTQ';
+// Las credenciales se inyectan desde /api/config.js
+const SUPABASE_URL = window.SUPABASE_URL;
+const SUPABASE_ANON_KEY = window.SUPABASE_ANON_KEY;
+
+// Validar que las credenciales estén disponibles
+if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
+  console.error('⚠️ Error: Credenciales de Supabase no configuradas. Asegúrate de cargar /api/config.js antes de este script.');
+  throw new Error('Supabase credentials not configured');
+}
 
 // Inicializar cliente de Supabase
 const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);

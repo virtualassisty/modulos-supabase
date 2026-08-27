@@ -1,0 +1,22 @@
+# Environment files
+.env*
+!.env.example
+
+# Configuration files
+.vercel/
+.claude/
+.mcp.json
+package.json
+package-lock.json
+vercel.json
+
+# Git
+.git/
+.gitignore
+
+# Node modules
+node_modules/
+
+# Development files
+*.md
+!README.md

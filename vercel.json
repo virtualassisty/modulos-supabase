@@ -6,6 +6,46 @@
       "source": "/src/pages/:path*",
       "destination": "/",
       "permanent": false
+    },
+    {
+      "source": "/.env*",
+      "destination": "/",
+      "permanent": false
+    },
+    {
+      "source": "/package.json",
+      "destination": "/",
+      "permanent": false
+    },
+    {
+      "source": "/package-lock.json",
+      "destination": "/",
+      "permanent": false
+    },
+    {
+      "source": "/.vercel/:path*",
+      "destination": "/",
+      "permanent": false
+    },
+    {
+      "source": "/vercel.json",
+      "destination": "/",
+      "permanent": false
+    },
+    {
+      "source": "/.git/:path*",
+      "destination": "/",
+      "permanent": false
+    },
+    {
+      "source": "/.claude/:path*",
+      "destination": "/",
+      "permanent": false
+    },
+    {
+      "source": "/.mcp.json",
+      "destination": "/",
+      "permanent": false
     }
   ],
   "rewrites": [

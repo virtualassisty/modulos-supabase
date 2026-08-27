@@ -3,6 +3,11 @@
   "outputDirectory": ".",
   "redirects": [
     {
+      "source": "/src/js/:path*",
+      "destination": "/",
+      "permanent": false
+    },
+    {
       "source": "/src/pages/:path*",
       "destination": "/",
       "permanent": false

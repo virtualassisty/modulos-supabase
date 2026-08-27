@@ -1,20 +1,28 @@
 {
   "rewrites": [
     {
+      "source": "/",
+      "destination": "/src/pages/index.html"
+    },
+    {
       "source": "/admin",
-      "destination": "/admin-dashboard.html"
+      "destination": "/src/pages/admin-dashboard.html"
     },
     {
       "source": "/login",
-      "destination": "/login.html"
+      "destination": "/src/pages/login.html"
     },
     {
       "source": "/paso1",
-      "destination": "/diagnostico_assistify_paso1.html"
+      "destination": "/src/pages/diagnostico_assistify_paso1.html"
     },
     {
       "source": "/paso2",
-      "destination": "/diagnostico_assistify_paso2.html"
+      "destination": "/src/pages/diagnostico_assistify_paso2.html"
+    },
+    {
+      "source": "/operaciones-saludables",
+      "destination": "/src/pages/diagnostico_operacionesSaludables.html"
     }
   ],
   "headers": [

@@ -42,8 +42,8 @@ function isValidNombre(nombre) {
 
 /**
  * Guarda un diagnóstico completo en Supabase
- * @param {string} tipo - 'modulo1' o 'paso2'
- * @param {object} userData - {nombre, email, antiguedad}
+ * @param {string} tipo - 'paso1', 'paso2', 'operaciones_saludables'
+ * @param {object} userData - {nombre, email, antiguedad, profesion?, tipo?, equipo?}
  * @param {array} answers - Array de respuestas seleccionadas
  * @param {array} questions - Array de preguntas del diagnóstico
  * @param {array} blockScores - Puntajes por bloque
@@ -58,8 +58,8 @@ async function guardarDiagnostico(tipo, userData, answers, questions, blockScore
     if (!isValidNombre(userData.nombre)) {
       return { success: false, error: 'Por favor ingresá tu nombre' };
     }
-    
-    if (!['paso1', 'paso2'].includes(tipo)) {
+
+    if (!['paso1', 'paso2', 'operaciones_saludables'].includes(tipo)) {
       return { success: false, error: 'Tipo de diagnóstico inválido' };
     }
 
@@ -75,6 +75,10 @@ async function guardarDiagnostico(tipo, userData, answers, questions, blockScore
         blockScores: Array.isArray(blockScores) ? blockScores : [],
         blockNames: Array.isArray(result.blockNames) ? result.blockNames : [],
         insight: sanitizeHTML(result.insight || ''),
+        // Campos adicionales para operaciones_saludables
+        profesion: userData.profesion ? sanitizeHTML(userData.profesion.trim()) : undefined,
+        tipoPractica: userData.tipo ? sanitizeHTML(userData.tipo.trim()) : undefined,
+        tieneEquipo: userData.equipo ? sanitizeHTML(userData.equipo.trim()) : undefined,
         ...result.extra
       }
     };

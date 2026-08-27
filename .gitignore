@@ -35,3 +35,13 @@ yarn-error.log*
 # Temp files
 *.tmp
 .cache/
+
+# Documentation archive (old docs, not needed in repo)
+docs/archive/
+
+# SQL migration files (already applied in Supabase)
+sql/
+
+# Claude AI config
+.claude/
+.mcp.json

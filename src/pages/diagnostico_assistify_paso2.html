@@ -3,11 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Diagnóstico — ¿Dónde estás atrapado? Ejecutor, Gestor o Dueño</title>
+<title>Diagnóstico — ¿Dónde se va tu plata?</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="supabase-client.js"></script>
+<script src="/src/js/supabase-client.js"></script>
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   :root {
@@ -113,14 +113,18 @@
   .block-score-bar { height: 3px; background: var(--gray-200); border-radius: 2px; overflow: hidden; margin-top: 0.5rem; }
   .block-score-fill { height: 100%; border-radius: 2px; transition: width 0.8s ease; }
 
-  .roles-chart { margin-bottom: 2rem; background: var(--white); border: 1px solid var(--gray-200); border-radius: 12px; padding: 1.5rem; }
-  .roles-title { font-size: 0.75rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--gray-400); margin-bottom: 1.25rem; }
-  .roles-bars { display: flex; flex-direction: column; gap: 1.25rem; }
-  .role-row { display: flex; align-items: center; gap: 1rem; }
-  .role-label { font-size: 0.85rem; font-weight: 500; color: var(--olive-dark); min-width: 90px; }
-  .role-bar-wrap { flex: 1; height: 28px; background: var(--cream-dark); border-radius: 8px; overflow: hidden; position: relative; }
-  .role-bar-fill { height: 100%; border-radius: 8px; transition: width 0.8s ease; display: flex; align-items: center; justify-content: flex-end; padding-right: 0.75rem; }
-  .role-pct { font-size: 0.8rem; font-weight: 600; color: var(--white); }
+  .clarity-chart { margin-bottom: 2rem; background: var(--white); border: 1px solid var(--gray-200); border-radius: 12px; padding: 1.5rem; }
+  .clarity-title { font-size: 0.75rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--gray-400); margin-bottom: 1.25rem; }
+  .clarity-track-wrap { position: relative; padding-top: 22px; margin-bottom: 0.75rem; }
+  .clarity-track { height: 14px; border-radius: 8px; overflow: hidden; display: flex; background: var(--gray-200); }
+  .clarity-zone { height: 100%; }
+  .clarity-marker { position: absolute; top: 0; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; transition: left 0.8s cubic-bezier(0.4,0,0.2,1); }
+  .clarity-marker-value { font-family: 'DM Serif Display', serif; font-size: 0.85rem; color: var(--olive-dark); background: var(--white); border: 1.5px solid var(--olive-dark); border-radius: 6px; padding: 1px 8px; margin-bottom: 3px; white-space: nowrap; }
+  .clarity-marker-arrow { width: 0; height: 0; border-left: 5px solid transparent; border-right: 5px solid transparent; border-top: 6px solid var(--olive-dark); }
+  .clarity-legend { display: flex; justify-content: space-between; margin-top: 0.6rem; }
+  .clarity-legend-item { font-size: 0.68rem; color: var(--gray-400); text-align: center; flex: 1; }
+  .clarity-legend-item:first-child { text-align: left; }
+  .clarity-legend-item:last-child { text-align: right; }
 
   .section-head { font-size: 0.7rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--gray-400); margin-bottom: 1rem; margin-top: 1.75rem; }
 
@@ -137,7 +141,6 @@
     .container { padding: 1.5rem 1rem 3rem; }
     .level-grid { grid-template-columns: 1fr; }
     .block-scores { grid-template-columns: 1fr; }
-    .roles-bars { gap: 1rem; }
   }
 </style>
 </head>
@@ -146,32 +149,32 @@
 <div class="header">
   <div>
     <div class="header-logo">Assistify<span>.</span></div>
-    <div class="header-tag">Diagnóstico Paso 1</div>
+    <div class="header-tag">Diagnóstico Paso 2</div>
   </div>
 </div>
 
 <div class="container">
   <!-- INTRO -->
   <div class="screen active" id="screen-intro">
-    <p class="intro-eyebrow">Inventario de Tiempo + Dinero</p>
-    <h1 class="intro-title">¿Dónde estás <em>atrapado?</em></h1>
-    <p class="intro-desc">En 8 preguntas descubrís en qué rol estás invirtiendo más tiempo y energía: Ejecutor, Gestor o Dueño.</p>
-    
+    <p class="intro-eyebrow">Inventario de Dinero</p>
+    <h1 class="intro-title">¿Dónde se va <em>tu plata?</em></h1>
+    <p class="intro-desc">En 8 preguntas descubrís qué tan clara es tu visibilidad financiera hoy: si decidís con data real o si estás manejando el negocio a ciegas.</p>
+
     <div class="level-grid">
       <div class="level-card">
         <div class="level-dot" style="background: #c0392b;"></div>
-        <div class="level-name">Ejecutor</div>
-        <div class="level-desc">Hacés el trabajo que vendes</div>
+        <div class="level-name">A ciegas</div>
+        <div class="level-desc">Facturás, pero no sabés cuánto te queda</div>
       </div>
       <div class="level-card">
         <div class="level-dot" style="background: #b45309;"></div>
-        <div class="level-name">Gestor</div>
-        <div class="level-desc">Coordinás gente y procesos</div>
+        <div class="level-name">Claridad parcial</div>
+        <div class="level-desc">Tenés piezas sueltas, no el cuadro completo</div>
       </div>
       <div class="level-card">
         <div class="level-dot" style="background: #0f6e56;"></div>
-        <div class="level-name">Dueño</div>
-        <div class="level-desc">Pensás estrategia y números</div>
+        <div class="level-name">Claridad total</div>
+        <div class="level-desc">Sabés qué entra, qué sale y qué te queda</div>
       </div>
     </div>
 
@@ -190,8 +193,8 @@
   <div class="screen" id="screen-form">
     <p class="form-eyebrow">Antes de empezar</p>
     <h2 class="form-title">Contanos un poco sobre vos</h2>
-    <p class="form-desc">Con estos datos personalizamos tu resultado y te mandamos el acceso al Sheet de Inventario.</p>
-    
+    <p class="form-desc">Con estos datos personalizamos tu resultado y te mandamos el acceso al Sheet de Ingresos y Gastos.</p>
+
     <div style="display: flex; flex-direction: column; gap: 12px;">
       <div style="display: flex; flex-direction: column; gap: 6px;">
         <label style="font-size: 0.75rem; font-weight: 600; color: var(--olive-dark);">Nombre <span style="color: var(--gold);">*</span></label>
@@ -217,6 +220,8 @@
       Empezar el diagnóstico →
     </button>
   </div>
+
+  <!-- QUESTIONS -->
   <div class="screen" id="screen-questions">
     <div class="progress-wrap">
       <div class="progress-top">
@@ -244,116 +249,109 @@
 </div>
 
 <script>
-const BLOCK_NAMES = ["Distribución de Tiempo", "Dependencia", "Visibilidad Financiera", "Documentación"];
+const BLOCK_NAMES = ["Visibilidad de Ingresos", "Rastreo de Gastos", "Conocimiento de Costos", "Toma de Decisiones"];
 
 const ALL_Q = [
-  // BLOQUE 0: Distribución de Tiempo
+  // BLOQUE 0: Visibilidad de Ingresos
   {
     bi: 0,
-    block: "Distribución de Tiempo",
-    text: "Cuando termina tu semana, ¿qué es lo que más te consume energía?",
-    hint: "Pensá en energía mental, no solo horas.",
-    opts: [
-      "Hacer el trabajo día a día (consulta, producción, servicio)",
-      "Coordinar gente, reuniones, herramientas",
-      "Pensar en números y estrategia del negocio",
-      "No sabría decir, todo me consume igual"
-    ],
-    pts: [2, 1, 0, 1]
-  },
-  {
-    bi: 0,
-    block: "Distribución de Tiempo",
-    text: "Un cliente urgente te llama ahora. ¿Qué probabilidad hay de que vos directamente resuelvas el problema?",
+    block: "Visibilidad de Ingresos",
+    text: "¿Cuándo revisás cuánto entró de plata realmente (no lo facturado, lo cobrado)?",
     hint: null,
     opts: [
-      "Seguro, siempre lo resuelvo yo",
-      "Generalmente lo hago, pero a veces delego",
-      "A veces delego, pero muchas me llaman de nuevo",
-      "Casi siempre lo resuelve el equipo"
+      "Nunca, no lo reviso",
+      "A fin de mes, cuando cierro números",
+      "Semanalmente",
+      "Tengo esto en tiempo real, en un sheet o sistema"
     ],
-    pts: [2, 1, 1, 0]
+    pts: [0, 1, 1, 2]
   },
-  // BLOQUE 1: Dependencia
+  {
+    bi: 0,
+    block: "Visibilidad de Ingresos",
+    text: "¿Sabés hoy, sin buscar nada, cuánto cobraste el mes pasado?",
+    hint: null,
+    opts: [
+      "No tengo idea",
+      "Tengo una idea aproximada",
+      "Sé el número exacto"
+    ],
+    pts: [0, 1, 2]
+  },
+  // BLOQUE 1: Rastreo de Gastos
   {
     bi: 1,
-    block: "Dependencia",
-    text: "¿Qué pasaría si te tomaras una semana de vacaciones sin estar disponible?",
+    block: "Rastreo de Gastos",
+    text: "¿Tenés tus costos separados entre fijos (sueldos, herramientas, alquiler) y variables (lo que depende de cada proyecto o cliente)?",
     hint: null,
     opts: [
-      "Se para todo, los clientes se quejarían",
-      "Funciona mal, aparecen problemas operativos",
-      "Funciona pero con algunos problemas",
-      "Funciona normal, el equipo se maneja bien"
+      "No, todo es \"gastos\" en una sola bolsa",
+      "Los tengo separados en mi cabeza, pero no por escrito",
+      "Los tengo separados y registrados en algún lado"
     ],
-    pts: [2, 1, 1, 0]
+    pts: [0, 1, 2]
   },
   {
     bi: 1,
-    block: "Dependencia",
-    text: "¿Cuáles son los procesos que solo vos sabés cómo se hacen?",
-    hint: "Procesos clave para que el negocio funcione.",
+    block: "Rastreo de Gastos",
+    text: "¿Con qué frecuencia registrás o revisás tus gastos?",
+    hint: null,
     opts: [
-      "La mayoría de los procesos",
-      "Algunos procesos clave",
-      "Muy pocos, la mayoría está documentado",
-      "No hay procesos que dependan solo de mí"
+      "Casi nunca, reacciono cuando falta plata",
+      "Los reviso cuando me acuerdo",
+      "Tengo una rutina fija (semanal/mensual) para esto"
     ],
-    pts: [2, 1, 0, 0]
+    pts: [0, 1, 2]
   },
-  // BLOQUE 2: Visibilidad Financiera
+  // BLOQUE 2: Conocimiento de Costos
   {
     bi: 2,
-    block: "Visibilidad Financiera",
-    text: "Si te pregunto 'cuál es tu rentabilidad real', ¿qué tan rápido podés contestar?",
-    hint: "Rentabilidad = ingresos - gastos reales.",
+    block: "Conocimiento de Costos",
+    text: "¿Podés decir hoy cuánto margen te deja tu cliente o proyecto más grande?",
+    hint: null,
     opts: [
-      "No tengo ni idea, nunca lo calculé",
-      "Tengo números pero no confío del todo",
-      "Tengo idea aproximada pero no es exacto",
-      "Tengo claridad, lo reviso regularmente"
+      "No, ni idea",
+      "Tengo una sensación, pero no el número",
+      "Sí, lo sé con precisión"
     ],
-    pts: [2, 1, 1, 0]
+    pts: [0, 1, 2]
   },
   {
     bi: 2,
-    block: "Visibilidad Financiera",
-    text: "¿Conocés el margen de cada proyecto o cliente que vendés?",
+    block: "Conocimiento de Costos",
+    text: "¿Alguna vez calculaste si un cliente \"grande\" en realidad te deja poco margen?",
     hint: null,
     opts: [
-      "No, facturación nada más",
-      "Algunos, pero no es sistemático",
-      "Más o menos, tengo una idea",
-      "Sí, lo tengo mapeado"
+      "Nunca lo pensé",
+      "Lo sospecho pero no lo calculé",
+      "Sí, ya lo calculé al menos una vez"
     ],
-    pts: [2, 1, 1, 0]
+    pts: [0, 1, 2]
   },
-  // BLOQUE 3: Documentación
+  // BLOQUE 3: Toma de Decisiones
   {
     bi: 3,
-    block: "Documentación",
-    text: "Si alguien nuevo entra al equipo, ¿qué tan fácil es que entienda cómo se hacen las cosas?",
+    block: "Toma de Decisiones",
+    text: "Cuando definís un precio o aceptás un proyecto nuevo, ¿en qué te basás?",
     hint: null,
     opts: [
-      "Muy difícil, todo está en mi cabeza",
-      "Les tengo que explicar casi todo personalmente",
-      "Hay algunos procesos escritos, pero no todos",
-      "Está todo documentado, pueden empezar solos"
+      "Intuición",
+      "Un poco de cálculo, un poco de intuición",
+      "Cálculo basado en costos y margen objetivo"
     ],
-    pts: [2, 1, 1, 0]
+    pts: [0, 1, 2]
   },
   {
     bi: 3,
-    block: "Documentación",
-    text: "¿Dónde guardás el conocimiento operativo? (cómo se hace cada cosa)",
-    hint: "Notion, Asana, ERP, CRM, Sheets, Drive, etc.",
+    block: "Toma de Decisiones",
+    text: "Si tuvieras que bajar gastos mañana, ¿sabrías exactamente dónde cortar?",
+    hint: null,
     opts: [
-      "En mi cabeza, en mensajes, en mi experiencia",
-      "Un poco en Sheets, un poco en mi cabeza",
-      "Tengo un sistema (Notion, Asana, ERP) pero incompleto",
-      "Sistema completo y actualizado"
+      "No, no sabría por dónde empezar",
+      "Tengo una idea general",
+      "Sí, sé exactamente qué recortar sin afectar lo esencial"
     ],
-    pts: [2, 1, 1, 0]
+    pts: [0, 1, 2]
   }
 ];
 
@@ -362,31 +360,31 @@ let answers = new Array(8).fill(null);
 let blockScores = [0, 0, 0, 0];
 let userData = {};
 
-function startDiag() { 
-  showScreen('screen-form'); 
+function startDiag() {
+  showScreen('screen-form');
 }
 
 function submitForm() {
   const nombre = document.getElementById('f-nombre').value.trim();
   const email = document.getElementById('f-email').value.trim();
-  
+
   if (!nombre || !email || !email.includes('@')) {
     alert('Por favor completá nombre y email válido.');
     return;
   }
-  
+
   userData = {
     nombre: nombre,
     email: email,
     antiguedad: document.getElementById('f-antiguedad').value || 'No especificado'
   };
-  
+
   showScreen('screen-questions');
   renderQuestion();
 }
 
-function showScreen(id) { 
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); 
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
@@ -446,70 +444,50 @@ function downloadPDF() {
   const element = document.getElementById('screen-result');
   const opt = {
     margin: 10,
-    filename: 'diagnostico-assistify.pdf',
+    filename: 'diagnostico-assistify-paso2.pdf',
     image: { type: 'jpeg', quality: 0.98 },
     html2canvas: { scale: 2 },
     jsPDF: { orientation: 'portrait', unit: 'mm', format: 'a4' }
   };
-  
-  // Fallback: descargar como PNG si html2pdf no está disponible
+
   if (typeof html2pdf === 'undefined') {
     alert('Descargá tu resultado capturando la pantalla o guardando como PDF desde tu navegador (Ctrl+P / Cmd+P).');
     return;
   }
-  
+
   html2pdf().set(opt).from(element).save();
 }
 
 async function renderResult() {
-  const total = answers.reduce((s, a, i) => s + (a !== null ? ALL_Q[i].pts[a] : 0), 0);
+  const total = blockScores.reduce((s, b) => s + b, 0);
+  const maxScore = 8;
+  const pctPos = Math.min(100, Math.max(0, (total / maxScore) * 100));
 
-  // Calcular distribución de roles
-  const maxScore = 16; // 8 preguntas * 2 puntos max
-  const ejecutorScore = blockScores[0] + blockScores[1]; // Distribución + Dependencia
-  const gestorScore = blockScores[1] + blockScores[3]; // Dependencia + Documentación
-  const duenioScore = blockScores[2]; // Visibilidad Financiera
-
-  const totalRoles = ejecutorScore + gestorScore + duenioScore;
-  const ejecutorPct = Math.round((ejecutorScore / totalRoles) * 100) || 0;
-  const gestorPct = Math.round((gestorScore / totalRoles) * 100) || 0;
-  const duenioPct = Math.round((duenioScore / totalRoles) * 100) || 0;
-
-  // Colores para roles
-  const ejecutorColor = '#c0392b';
-  const gestorColor = '#b45309';
-  const duenioColor = '#0f6e56';
-
-  let insight = '';
-  if (ejecutorScore > gestorScore && ejecutorScore > duenioScore) {
-    insight = 'Estás atrapado en el rol de Ejecutor. Tu tiempo se va en hacer el trabajo día a día, pero no tenés espacio para estrategia ni control.';
-  } else if (gestorScore > ejecutorScore && gestorScore > duenioScore) {
-    insight = 'Estás atrapado en el rol de Gestor. Coordinás mucho pero el conocimiento sigue en tu cabeza, lo que hace que todo dependa de vos.';
-  } else if (duenioScore > ejecutorScore && duenioScore > gestorScore) {
-    insight = 'Te falta visibilidad financiera. No conocés bien tus márgenes ni rentabilidad por proyecto, lo que frena decisiones estratégicas.';
+  let level, insight;
+  if (total <= 3) {
+    level = "A ciegas";
+    insight = 'Facturás, pero no sabés realmente cuánto te queda ni por qué. Tus decisiones de precio y de gasto se apoyan en intuición, no en datos. Este es el punto de partida más común — y el que más rápido cambia con un registro simple.';
+  } else if (total <= 6) {
+    level = "Claridad parcial";
+    insight = 'Tenés algunas piezas del rompecabezas — sabés algo de lo que entra o de lo que sale — pero todavía no el cuadro completo. Te falta conectar ingresos, costos y margen por cliente en un solo lugar.';
   } else {
-    insight = 'Estás balanceado entre los 3 roles, pero hay oportunidades de mejora en cada uno.';
+    level = "Claridad total";
+    insight = 'Sabés qué entra, qué sale, y qué te deja cada cliente. Tu próximo paso ya no es ganar visibilidad, es usar esa claridad para decidir mejor dónde poner tu tiempo y tu foco.';
   }
 
   // 🔥 Guardar en Supabase
   const resultData = {
     total: total,
-    nivel: ejecutorScore > Math.max(gestorScore, duenioScore) ? 'Ejecutor' :
-           gestorScore > Math.max(ejecutorScore, duenioScore) ? 'Gestor' :
-           duenioScore > Math.max(ejecutorScore, gestorScore) ? 'Dueño' : 'Balanceado',
+    nivel: level,
     insight: insight,
     blockNames: BLOCK_NAMES,
     extra: {
-      ejecutorScore,
-      gestorScore,
-      duenioScore,
-      ejecutorPct,
-      gestorPct,
-      duenioPct
+      pctPos: pctPos,
+      maxScore: maxScore
     }
   };
 
-  const saveResult = await guardarDiagnostico('paso1', userData, answers, ALL_Q, blockScores, resultData);
+  const saveResult = await guardarDiagnostico('paso2', userData, answers, ALL_Q, blockScores, resultData);
   if (saveResult.success) {
     console.log('✅ Datos guardados en Supabase. ID:', saveResult.id);
   } else {
@@ -518,48 +496,39 @@ async function renderResult() {
 
   document.getElementById('screen-result').innerHTML = `
     <div class="result-header">
-      <p class="result-eyebrow">Tu distribución actual</p>
-      <h2 class="result-level">¿Dónde estás atrapado?</h2>
+      <p class="result-eyebrow">Tu nivel de claridad financiera</p>
+      <h2 class="result-level">${level}</h2>
+      <p class="result-range">${total}/8 puntos</p>
       <p class="result-diag">${insight}</p>
     </div>
 
-    <div class="roles-chart">
-      <p class="roles-title">Distribución de Roles (%)</p>
-      <div class="roles-bars">
-        <div class="role-row">
-          <div class="role-label">Ejecutor</div>
-          <div class="role-bar-wrap">
-            <div class="role-bar-fill" id="bar-ejecutor" style="width:0%;background:${ejecutorColor}">
-              <span class="role-pct" id="pct-ejecutor"></span>
-            </div>
-          </div>
+    <div class="clarity-chart">
+      <p class="clarity-title">Dónde estás parado hoy</p>
+      <div class="clarity-track-wrap">
+        <div class="clarity-marker" id="clarity-marker" style="left:0%">
+          <div class="clarity-marker-value" id="clarity-marker-value">${total}/8</div>
+          <div class="clarity-marker-arrow"></div>
         </div>
-        <div class="role-row">
-          <div class="role-label">Gestor</div>
-          <div class="role-bar-wrap">
-            <div class="role-bar-fill" id="bar-gestor" style="width:0%;background:${gestorColor}">
-              <span class="role-pct" id="pct-gestor"></span>
-            </div>
-          </div>
+        <div class="clarity-track">
+          <div class="clarity-zone" style="width:37.5%;background:#c0392b"></div>
+          <div class="clarity-zone" style="width:37.5%;background:#b45309"></div>
+          <div class="clarity-zone" style="width:25%;background:#0f6e56"></div>
         </div>
-        <div class="role-row">
-          <div class="role-label">Dueño</div>
-          <div class="role-bar-wrap">
-            <div class="role-bar-fill" id="bar-duenio" style="width:0%;background:${duenioColor}">
-              <span class="role-pct" id="pct-duenio"></span>
-            </div>
-          </div>
-        </div>
+      </div>
+      <div class="clarity-legend">
+        <div class="clarity-legend-item">A ciegas</div>
+        <div class="clarity-legend-item">Claridad parcial</div>
+        <div class="clarity-legend-item">Claridad total</div>
       </div>
     </div>
 
     <div class="block-scores">
       ${blockScores.map((s, i) => {
         const colors = ['#c0392b', '#b45309', '#0f6e56', '#6b7a3a'];
-        const pct = Math.round((s / 8) * 100);
+        const pct = Math.round((s / 4) * 100);
         return `<div class="block-score-card">
           <div class="block-score-name">${BLOCK_NAMES[i]}</div>
-          <div class="block-score-num">${s}<span style="font-size:0.9rem;color:#9c9a94">/8</span></div>
+          <div class="block-score-num">${s}<span style="font-size:0.9rem;color:#9c9a94">/4</span></div>
           <div class="block-score-bar"><div class="block-score-fill" style="width:0%;background:${colors[i]}" data-w="${pct}"></div></div>
         </div>`;
       }).join('')}
@@ -567,8 +536,8 @@ async function renderResult() {
 
     <!-- COMENTADO: Próximo paso y Comparate en 6 semanas
     <div class="cta-box">
-      <p class="cta-title">Próximo paso: El Sheet de Inventario</p>
-      <p class="cta-desc">Este diagnóstico te da una foto rápida. Ahora viene lo profundo: descargá el Sheet de Inventario y registrá una semana real de tu trabajo. Ahí verás exactamente dónde se te va el tiempo y la plata.</p>
+      <p class="cta-title">Próximo paso: El Sheet de Ingresos y Gastos</p>
+      <p class="cta-desc">Este diagnóstico te da una foto rápida. Ahora viene lo profundo: descargá el Sheet y cargá tus ingresos reales, tus costos fijos y variables, y el margen de tus clientes principales. Ahí vas a ver exactamente dónde se te va la plata.</p>
       <div class="cta-btns">
         <button class="btn-cta-primary" onclick="downloadPDF()">⬇ Descargar mi resultado</button>
         <button class="btn-cta-secondary" onclick="startDiag()">Hacer el diagnóstico de nuevo</button>
@@ -577,17 +546,12 @@ async function renderResult() {
 
     <div style="background: rgba(159, 153, 89, 0.05); border-radius: 8px; padding: 1.5rem; margin-top: 1.75rem; border-left: 3px solid var(--gold);">
       <p style="font-size: 0.75rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--gray-400); margin-bottom: 0.5rem;">Comparate en 6 semanas</p>
-      <p style="font-size: 0.85rem; line-height: 1.6; color: var(--gray-600);">Guardá este resultado. Al terminar el Sistema C.E.O, volvé acá y repetí el diagnóstico. Vas a ver cómo cambió la distribución de tus roles — esa es la prueba de que el sistema funciona.</p>
+      <p style="font-size: 0.85rem; line-height: 1.6; color: var(--gray-600);">Guardá este resultado. Al terminar el Sistema C.E.O, volvé acá y repetí el diagnóstico. Vas a ver cómo cambió tu claridad financiera — esa es la prueba de que el sistema funciona.</p>
     </div>
     -->`;
 
   setTimeout(() => {
-    document.getElementById('bar-ejecutor').style.width = ejecutorPct + '%';
-    document.getElementById('pct-ejecutor').textContent = ejecutorPct + '%';
-    document.getElementById('bar-gestor').style.width = gestorPct + '%';
-    document.getElementById('pct-gestor').textContent = gestorPct + '%';
-    document.getElementById('bar-duenio').style.width = duenioPct + '%';
-    document.getElementById('pct-duenio').textContent = duenioPct + '%';
+    document.getElementById('clarity-marker').style.left = pctPos + '%';
     document.querySelectorAll('[data-w]').forEach(el => {
       el.style.width = el.getAttribute('data-w') + '%';
     });

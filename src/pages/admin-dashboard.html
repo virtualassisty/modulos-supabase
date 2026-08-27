@@ -6,7 +6,7 @@
 <title>Admin Dashboard - Diagnósticos</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="supabase-client.js"></script>
+<script src="/src/js/supabase-client.js?v=2"></script>
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   :root {
@@ -185,7 +185,7 @@
     font-weight: 600;
   }
 
-  .badge-modulo1 {
+  .badge-paso1 {
     background: rgba(192, 57, 43, 0.1);
     color: #c0392b;
   }
@@ -193,6 +193,11 @@
   .badge-paso2 {
     background: rgba(15, 110, 86, 0.1);
     color: #0f6e56;
+  }
+
+  .badge-operaciones_saludables {
+    background: rgba(107, 122, 58, 0.1);
+    color: #6b7a3a;
   }
 
   .loading {
@@ -305,12 +310,16 @@
       <div class="stat-value" id="stat-total">-</div>
     </div>
     <div class="stat-card">
-      <div class="stat-label">Módulo 1</div>
-      <div class="stat-value" id="stat-modulo1">-</div>
+      <div class="stat-label">Paso 1</div>
+      <div class="stat-value" id="stat-paso1">-</div>
     </div>
     <div class="stat-card">
       <div class="stat-label">Paso 2</div>
       <div class="stat-value" id="stat-paso2">-</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Op. Saludables</div>
+      <div class="stat-value" id="stat-ops">-</div>
     </div>
     <div class="stat-card">
       <div class="stat-label">Hoy</div>
@@ -323,8 +332,9 @@
       <label class="filter-label">Tipo</label>
       <select id="filter-tipo" onchange="applyFilters()">
         <option value="">Todos</option>
-        <option value="modulo1">Módulo 1</option>
+        <option value="paso1">Paso 1</option>
         <option value="paso2">Paso 2</option>
+        <option value="operaciones_saludables">Operaciones Saludables</option>
       </select>
     </div>
     <div class="filter-group">
@@ -428,6 +438,15 @@ async function loadDiagnosticos() {
 
     allDiagnosticos = data || [];
 
+    // Debug: Mostrar tipos únicos en la consola
+    const tipos = [...new Set(allDiagnosticos.map(d => d.tipo))];
+    console.log('📊 Tipos de diagnósticos encontrados:', tipos);
+    console.log('📊 Primeros 3 diagnósticos:', allDiagnosticos.slice(0, 3).map(d => ({
+      id: d.id.slice(0, 8),
+      tipo: d.tipo,
+      nombre: d.nombre
+    })));
+
     // Poblar selector de meses
     populateMonthFilter(allDiagnosticos);
 
@@ -520,23 +539,33 @@ function applyFilters() {
     return;
   }
 
-  tbody.innerHTML = filtered.map(d => `
+  tbody.innerHTML = filtered.map(d => {
+    // Determinar etiqueta del tipo
+    let tipoLabel = 'Desconocido';
+    if (d.tipo === 'paso1') tipoLabel = 'Paso 1';
+    else if (d.tipo === 'paso2') tipoLabel = 'Paso 2';
+    else if (d.tipo === 'operaciones_saludables') tipoLabel = 'Op. Saludables';
+    else tipoLabel = `Desconocido (${d.tipo})`;
+
+    return `
     <tr>
       <td>${new Date(d.created_at).toLocaleDateString('es-AR')}</td>
-      <td><span class="badge badge-${d.tipo}">${d.tipo === 'modulo1' ? 'Módulo 1' : 'Paso 2'}</span></td>
+      <td><span class="badge badge-${d.tipo}">${tipoLabel}</span></td>
       <td>${escapeHTML(d.nombre)}</td>
       <td>${escapeHTML(d.email)}</td>
       <td>${escapeHTML(d.nivel) || '-'}</td>
       <td>${parseInt(d.puntaje_total) || '-'}</td>
       <td><button class="detail-btn" onclick="showDetail('${escapeHTML(d.id)}')">Ver detalle</button></td>
     </tr>
-  `).join('');
+    `;
+  }).join('');
 }
 
 function updateStats(data) {
   const total = data.length;
-  const modulo1 = data.filter(d => d.tipo === 'modulo1').length;
+  const paso1 = data.filter(d => d.tipo === 'paso1').length;
   const paso2 = data.filter(d => d.tipo === 'paso2').length;
+  const ops = data.filter(d => d.tipo === 'operaciones_saludables').length;
   const hoy = data.filter(d => {
     const created = new Date(d.created_at);
     const today = new Date();
@@ -559,8 +588,9 @@ function updateStats(data) {
   }
 
   document.getElementById('stat-total').textContent = total;
-  document.getElementById('stat-modulo1').textContent = modulo1;
+  document.getElementById('stat-paso1').textContent = paso1;
   document.getElementById('stat-paso2').textContent = paso2;
+  document.getElementById('stat-ops').textContent = ops;
   document.getElementById('stat-hoy').textContent = hoy;
 }
 
@@ -602,7 +632,7 @@ async function showDetail(id) {
     </div>
     <div class="detail-row">
       <span class="detail-label">Tipo:</span>
-      <span class="detail-value">${diagnostico.tipo === 'modulo1' ? 'Módulo 1' : 'Paso 2'}</span>
+      <span class="detail-value">${diagnostico.tipo === 'paso1' ? 'Paso 1' : (diagnostico.tipo === 'paso2' ? 'Paso 2' : (diagnostico.tipo === 'operaciones_saludables' ? 'Operaciones Saludables' : diagnostico.tipo))}</span>
     </div>
     <div class="detail-row">
       <span class="detail-label">Nombre:</span>

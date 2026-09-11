@@ -253,7 +253,7 @@ function handleCredentialResponse(response) {
       // Redirect to admin panel
       console.log('✅ Access granted. Redirecting...');
       showLoading(false);
-      window.location.href = '/admin-panel.html';
+      window.location.href = '/admin';
 
     } else {
       showLoading(false);
@@ -297,7 +297,7 @@ function checkExistingSession() {
       const maxAge = 24 * 60 * 60 * 1000; // 24 hours
       if (Date.now() - data.timestamp < maxAge) {
         console.log('✅ Valid session found. Redirecting...');
-        window.location.href = '/admin-panel.html';
+        window.location.href = '/admin';
         return true;
       } else {
         // Session expired

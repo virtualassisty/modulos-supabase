@@ -421,7 +421,7 @@ function checkAuthentication() {
 
   if (!session) {
     console.warn('⚠️ No session found. Redirecting to login...');
-    window.location.href = '/admin-panel-auth.html';
+    window.location.href = '/admin-panel-auth.html'; // Rewrite maneja la ruta
     return false;
   }
 
@@ -470,7 +470,7 @@ function checkAuthentication() {
 
 function logout() {
   localStorage.removeItem('admin_session');
-  window.location.href = '/admin-panel-auth.html';
+  window.location.href = '/admin-panel-auth.html'; // Rewrite maneja la ruta
 }
 
 // Check authentication before loading data

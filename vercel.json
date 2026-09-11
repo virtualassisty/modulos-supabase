@@ -65,7 +65,15 @@
     },
     {
       "source": "/admin",
-      "destination": "/src/pages/admin-dashboard.html"
+      "destination": "/src/admin/index.html"
+    },
+    {
+      "source": "/admin-panel.html",
+      "destination": "/src/admin/index.html"
+    },
+    {
+      "source": "/admin-panel-auth.html",
+      "destination": "/src/admin/login.html"
     },
     {
       "source": "/login",
@@ -73,15 +81,19 @@
     },
     {
       "source": "/paso1",
-      "destination": "/src/pages/diagnostico_assistify_paso1.html"
+      "destination": "/src/forms/assistify/paso1.html"
     },
     {
       "source": "/paso2",
-      "destination": "/src/pages/diagnostico_assistify_paso2.html"
+      "destination": "/src/forms/assistify/paso2.html"
     },
     {
       "source": "/operaciones-saludables",
-      "destination": "/src/pages/diagnostico_operacionesSaludables.html"
+      "destination": "/src/forms/assistify/operaciones-saludables.html"
+    },
+    {
+      "source": "/Entregables/:path*",
+      "destination": "/src/forms/entregables/:path*"
     }
   ],
   "headers": [

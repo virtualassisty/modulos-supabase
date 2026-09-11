@@ -42,6 +42,13 @@ header {
   padding: 1.5rem 2rem;
   border-radius: 12px;
   margin-bottom: 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+header > div:first-child {
+  flex: 1;
 }
 
 h1 {
@@ -316,9 +323,11 @@ pre {
 
 <div class="container">
   <header>
-    <h1>🗄️ Panel de Administración Unificado</h1>
-    <p class="subtitle">Todos los formularios — Sistema JSONB</p>
-    <!-- TODO: Add Google OAuth for virtualassist@assistify365.com -->
+    <div>
+      <h1>🗄️ Panel de Administración Unificado</h1>
+      <p class="subtitle">Todos los formularios — Sistema JSONB</p>
+    </div>
+    <!-- User info will be injected here by JavaScript -->
   </header>
 
   <div class="filters">
@@ -403,18 +412,73 @@ pre {
 <script src="/api/config.js"></script>
 
 <script>
-// TODO: Implement Google OAuth authentication
-// Only allow access to: virtualassist@assistify365.com
-//
-// Implementation steps:
-// 1. Add Google OAuth client library
-// 2. Configure OAuth consent screen in Google Cloud Console
-// 3. Add sign-in button and authentication flow
-// 4. Check user email === 'virtualassist@assistify365.com'
-// 5. Store session in localStorage/cookie
-// 6. Redirect to login page if not authenticated
-//
-// For now, panel is publicly accessible (configure OAuth before production use)
+// ═══════════════════════════════════════════════════════════════════════════
+//                        AUTHENTICATION CHECK
+// ═══════════════════════════════════════════════════════════════════════════
+
+function checkAuthentication() {
+  const session = localStorage.getItem('admin_session');
+
+  if (!session) {
+    console.warn('⚠️ No session found. Redirecting to login...');
+    window.location.href = '/admin-panel-auth.html';
+    return false;
+  }
+
+  try {
+    const data = JSON.parse(session);
+
+    // Check if session is not too old (24 hours)
+    const maxAge = 24 * 60 * 60 * 1000; // 24 hours
+    if (Date.now() - data.timestamp > maxAge) {
+      console.warn('⚠️ Session expired. Redirecting to login...');
+      localStorage.removeItem('admin_session');
+      window.location.href = '/admin-panel-auth.html';
+      return false;
+    }
+
+    // Verify email
+    if (data.email !== 'virtualassist@assistify365.com') {
+      console.error('❌ Unauthorized email. Redirecting to login...');
+      localStorage.removeItem('admin_session');
+      window.location.href = '/admin-panel-auth.html';
+      return false;
+    }
+
+    console.log('✅ Authenticated as:', data.email);
+
+    // Add user info to header
+    const header = document.querySelector('header');
+    const userInfo = document.createElement('div');
+    userInfo.style.cssText = 'display: flex; align-items: center; gap: 0.75rem;';
+    userInfo.innerHTML = `
+      <span style="font-size: 0.85rem; color: rgba(255,255,255,0.7);">${data.name}</span>
+      <img src="${data.picture}" alt="${data.name}" style="width: 32px; height: 32px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.2);">
+      <button onclick="logout()" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; padding: 0.5rem 1rem; border-radius: 6px; cursor: pointer; font-size: 0.85rem; font-family: inherit;">Cerrar sesión</button>
+    `;
+    header.appendChild(userInfo);
+
+    return true;
+
+  } catch (error) {
+    console.error('❌ Error checking session:', error);
+    localStorage.removeItem('admin_session');
+    window.location.href = '/admin-panel-auth.html';
+    return false;
+  }
+}
+
+function logout() {
+  localStorage.removeItem('admin_session');
+  window.location.href = '/admin-panel-auth.html';
+}
+
+// Check authentication before loading data
+if (!checkAuthentication()) {
+  throw new Error('Authentication required');
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
 
 // Inicializar Supabase
 const supabaseAdmin = supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY);

@@ -8,11 +8,6 @@
       "permanent": false
     },
     {
-      "source": "/src/pages/:path*",
-      "destination": "/",
-      "permanent": false
-    },
-    {
       "source": "/.env.local",
       "destination": "/",
       "permanent": false
@@ -61,7 +56,7 @@
   "rewrites": [
     {
       "source": "/",
-      "destination": "/src/pages/index.html"
+      "destination": "/index.html"
     },
     {
       "source": "/admin",
@@ -74,10 +69,6 @@
     {
       "source": "/admin-panel-auth.html",
       "destination": "/src/admin/login.html"
-    },
-    {
-      "source": "/login",
-      "destination": "/src/pages/login.html"
     },
     {
       "source": "/paso1",

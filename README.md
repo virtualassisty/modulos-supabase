@@ -6,6 +6,7 @@ Sistema unificado de formularios para Operaciones Saludables y Assistify, con ba
 
 ```
 modulos/
+├── index.html                    # Landing page (/)
 ├── src/
 │   ├── admin/                    # Panel de administración
 │   │   ├── index.html           # Panel admin principal (/admin)
@@ -20,11 +21,9 @@ modulos/
 │   │       ├── Modulo 2/        # Inventario Semanal
 │   │       ├── Modulo 4/        # Diagnóstico Delegación
 │   │       └── Modulo 5/        # Generador Búsqueda (no guarda)
-│   ├── js/                       # Scripts JavaScript
-│   │   ├── formularios-client.js    # Cliente universal JSONB
-│   │   ├── formularios-wrapper.js   # Wrapper automático
-│   │   └── supabase-client.js       # Cliente legacy
-│   └── pages/                    # Páginas legacy (deprecadas)
+│   └── js/                       # Scripts JavaScript
+│       ├── formularios-client.js    # Cliente universal JSONB
+│       └── formularios-wrapper.js   # Wrapper automático
 ├── api/                          # Vercel Serverless Functions
 │   ├── config.js                # Configuración Supabase
 │   ├── oauth-config.js          # Configuración OAuth

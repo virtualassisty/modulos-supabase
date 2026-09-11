@@ -13,7 +13,12 @@
       "permanent": false
     },
     {
-      "source": "/.env*",
+      "source": "/.env.local",
+      "destination": "/",
+      "permanent": false
+    },
+    {
+      "source": "/.env.example",
       "destination": "/",
       "permanent": false
     },

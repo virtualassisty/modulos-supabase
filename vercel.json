@@ -83,6 +83,26 @@
       "destination": "/src/forms/assistify/operaciones-saludables.html"
     },
     {
+      "source": "/diagnostico-financiero",
+      "destination": "/src/forms/entregables/Modulo 1/app_diagnostico_financiero.html"
+    },
+    {
+      "source": "/diagnostico-roles",
+      "destination": "/src/forms/entregables/Modulo 1/app_diagnostico_roles.html"
+    },
+    {
+      "source": "/inventario-semanal",
+      "destination": "/src/forms/entregables/Modulo 2/1. inventario_semanal_m2.html"
+    },
+    {
+      "source": "/diagnostico-delegacion",
+      "destination": "/src/forms/entregables/Modulo 4/2. diagnostico_delegacion_m2.html"
+    },
+    {
+      "source": "/generador-busqueda",
+      "destination": "/src/forms/entregables/Modulo 5/app_contratacion_m4.html"
+    },
+    {
       "source": "/Entregables/:path*",
       "destination": "/src/forms/entregables/:path*"
     }

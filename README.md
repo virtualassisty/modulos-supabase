@@ -42,6 +42,8 @@ modulos/
 
 ## 🌐 URLs del Sistema
 
+Ver **[URLS.md](URLS.md)** para la lista completa de todas las URLs del proyecto.
+
 ### Panel de Administración
 - **Login**: https://modulos-theta.vercel.app/admin-panel-auth.html
 - **Panel Admin**: https://modulos-theta.vercel.app/admin (requiere login)
@@ -51,12 +53,12 @@ modulos/
 - **Paso 2**: https://modulos-theta.vercel.app/paso2
 - **Operaciones Saludables**: https://modulos-theta.vercel.app/operaciones-saludables
 
-### Formularios Entregables
-- **Diagnóstico Financiero**: `/Entregables/Modulo 1/app_diagnostico_financiero.html`
-- **Diagnóstico de Roles**: `/Entregables/Modulo 1/app_diagnostico_roles.html`
-- **Inventario Semanal**: `/Entregables/Modulo 2/1. inventario_semanal_m2.html`
-- **Diagnóstico de Delegación**: `/Entregables/Modulo 4/2. diagnostico_delegacion_m2.html`
-- **Generador de Búsqueda**: `/Entregables/Modulo 5/app_contratacion_m4.html` (no guarda en BD)
+### Formularios Entregables (URLs amigables)
+- **Diagnóstico Financiero**: https://modulos-theta.vercel.app/diagnostico-financiero
+- **Diagnóstico de Roles**: https://modulos-theta.vercel.app/diagnostico-roles
+- **Inventario Semanal**: https://modulos-theta.vercel.app/inventario-semanal
+- **Diagnóstico de Delegación**: https://modulos-theta.vercel.app/diagnostico-delegacion
+- **Generador de Búsqueda**: https://modulos-theta.vercel.app/generador-busqueda (no guarda en BD)
 
 ## 🗄️ Base de Datos
 

@@ -8,7 +8,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <script src="/api/config.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="/src/js/supabase-client.js?v=3"></script>
+<script src="/src/js/formularios-client.js"></script>
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   :root {
@@ -488,9 +488,34 @@ async function renderResult() {
     }
   };
 
-  const saveResult = await guardarDiagnostico('paso2', userData, answers, ALL_Q, blockScores, resultData);
+  // Guardar en el nuevo sistema JSONB
+  const respuestasJSONB = {
+    datos_usuario: {
+      antiguedad: userData.antiguedad,
+      profesion: userData.profesion || '',
+      tipo: userData.tipo || '',
+      equipo: userData.equipo || ''
+    },
+    respuestas_preguntas: answers.map((answerIndex, i) => ({
+      pregunta_num: i + 1,
+      bloque: ALL_Q[i].block,
+      respuesta_index: answerIndex,
+      respuesta_texto: ALL_Q[i].opts[answerIndex],
+      puntos: ALL_Q[i].pts[answerIndex]
+    })),
+    puntajes: {
+      total: blockScores.reduce((a, b) => a + b, 0),
+      bloques: blockScores,
+      nivel: level,
+      pct_positivas: pctPos,
+      max_score: maxScore
+    },
+    insight: insight
+  };
+
+  const saveResult = await guardarFormulario('diagnostico_paso2', userData.email, userData.nombre, respuestasJSONB);
   if (saveResult.success) {
-    console.log('✅ Datos guardados en Supabase. ID:', saveResult.id);
+    console.log('✅ Datos guardados en Supabase (JSONB). ID:', saveResult.data.id);
   } else {
     console.error('❌ Error al guardar:', saveResult.error);
   }

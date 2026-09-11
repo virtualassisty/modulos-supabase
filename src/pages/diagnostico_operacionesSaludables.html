@@ -7,7 +7,7 @@
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="/api/config.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="/src/js/supabase-client.js?v=3"></script>
+<script src="/src/js/formularios-client.js"></script>
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   :root {
@@ -511,25 +511,38 @@ async function renderResult() {
   const scorePct = Math.round(((total - 15) / 30) * 100);
   const blockNames = ["Delegación", "Control y métricas", "Mentalidad"];
 
-  // Guardar en Supabase
+  // Guardar en Supabase usando el nuevo sistema JSONB
   try {
-    const result = await guardarDiagnostico(
-      'operaciones_saludables',
-      userData,
-      answers,
-      ALL_Q.map(q => ({ block: q.blockTag, opts: q.opts, pts: q.pts })),
-      blockScores,
-      {
+    const respuestasJSONB = {
+      datos_usuario: {
+        profesion: userData.profesion,
+        tipo_practica: userData.tipo,
+        tiene_equipo: userData.equipo,
+        antiguedad: userData.antiguedad || ''
+      },
+      respuestas_preguntas: answers.map((answerIndex, i) => ({
+        pregunta_num: i + 1,
+        bloque: ALL_Q[i].blockTag,
+        respuesta_index: answerIndex,
+        respuesta_texto: ALL_Q[i].opts[answerIndex],
+        puntos: ALL_Q[i].pts[answerIndex]
+      })),
+      puntajes: {
         total: total,
+        bloque_delegacion: blockScores[0],
+        bloque_control: blockScores[1],
+        bloque_mentalidad: blockScores[2],
         nivel: r.level,
-        insight: r.diag,
-        blockNames: blockNames,
-        extra: { eyebrow: r.eyebrow }
-      }
-    );
+        porcentaje: scorePct
+      },
+      insight: r.diag,
+      eyebrow: r.eyebrow
+    };
+
+    const result = await guardarFormulario('operaciones_saludables', userData.email, userData.nombre, respuestasJSONB);
 
     if (result.success) {
-      console.log('✅ Diagnóstico guardado en Supabase:', result.id);
+      console.log('✅ Diagnóstico guardado en Supabase (JSONB):', result.data.id);
     } else {
       console.error('⚠️ No se pudo guardar el diagnóstico:', result.error);
     }

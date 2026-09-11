@@ -316,8 +316,9 @@ pre {
 
 <div class="container">
   <header>
-    <h1>🗄️ Panel de Administración</h1>
-    <p class="subtitle">Respuestas de formularios — Operaciones Saludables</p>
+    <h1>🗄️ Panel de Administración Unificado</h1>
+    <p class="subtitle">Todos los formularios — Sistema JSONB</p>
+    <!-- TODO: Add Google OAuth for virtualassist@assistify365.com -->
   </header>
 
   <div class="filters">
@@ -333,10 +334,17 @@ pre {
       <label class="filter-label">Tipo de formulario</label>
       <select id="filter-tipo" class="filter-select">
         <option value="">Todos los formularios</option>
-        <option value="diagnostico_financiero">Diagnóstico Financiero</option>
-        <option value="diagnostico_roles">Diagnóstico de Roles</option>
-        <option value="inventario_semanal">Inventario Semanal</option>
-        <option value="diagnostico_delegacion">Diagnóstico de Delegación</option>
+        <optgroup label="Assistify (Sistema Antiguo)">
+          <option value="diagnostico_paso1">Diagnóstico Paso 1</option>
+          <option value="diagnostico_paso2">Diagnóstico Paso 2</option>
+          <option value="operaciones_saludables">Operaciones Saludables</option>
+        </optgroup>
+        <optgroup label="Entregables (Sistema Nuevo)">
+          <option value="diagnostico_financiero">Diagnóstico Financiero</option>
+          <option value="diagnostico_roles">Diagnóstico de Roles</option>
+          <option value="inventario_semanal">Inventario Semanal</option>
+          <option value="diagnostico_delegacion">Diagnóstico de Delegación</option>
+        </optgroup>
       </select>
     </div>
     <div class="filter-group" style="display: flex; align-items: flex-end;">
@@ -395,6 +403,19 @@ pre {
 <script src="/api/config.js"></script>
 
 <script>
+// TODO: Implement Google OAuth authentication
+// Only allow access to: virtualassist@assistify365.com
+//
+// Implementation steps:
+// 1. Add Google OAuth client library
+// 2. Configure OAuth consent screen in Google Cloud Console
+// 3. Add sign-in button and authentication flow
+// 4. Check user email === 'virtualassist@assistify365.com'
+// 5. Store session in localStorage/cookie
+// 6. Redirect to login page if not authenticated
+//
+// For now, panel is publicly accessible (configure OAuth before production use)
+
 // Inicializar Supabase
 const supabaseAdmin = supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY);
 
@@ -456,6 +477,11 @@ function renderizarTabla(respuestas) {
 
     const badgeClass = `badge-${r.formulario_id.split('_')[1] || r.formulario_id}`;
     const nombreFormulario = {
+      // Formularios antiguos (Assistify)
+      'diagnostico_paso1': 'Diagnóstico Paso 1',
+      'diagnostico_paso2': 'Diagnóstico Paso 2',
+      'operaciones_saludables': 'Operaciones Saludables',
+      // Formularios nuevos (Entregables)
       'diagnostico_financiero': 'Diagnóstico Financiero',
       'diagnostico_roles': 'Diagnóstico de Roles',
       'inventario_semanal': 'Inventario Semanal',

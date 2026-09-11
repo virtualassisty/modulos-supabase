@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Diagnóstico Financiero — Operaciones Saludables</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --navy:#1e2d5a;
+  --navy-d:#151f3e;
+  --navy-l:#2a3d7a;
+  --teal:#00c9a0;
+  --teal-d:#00a882;
+  --teal-l:#e6faf6;
+  --olive:#6b7a3a;
+  --olive-m:#3f4323;
+  --olive-l:#f2f4e8;
+  --cream:#f7f4ef;
+  --white:#fff;
+  --g100:#f5f5f3;
+  --g200:#e8e6e0;
+  --g400:#9c9a94;
+  --g600:#5c5a56;
+  --red:#e24b4a;
+  --red-l:#fff0f0;
+  --amber:#ba7517;
+  --amber-l:#fff8ec;
+  --green:#0f6e56;
+  --green-l:#eefaf6;
+}
+
+html{scroll-behavior:smooth}
+
+body{
+  font-family:'DM Sans',sans-serif;
+  background:#f7f4ef;
+  color:var(--navy-d);
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+}
+
+/* HEADER */
+.hdr{
+  width:100%;
+  background:var(--olive-m);
+  padding:1rem 2rem;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+}
+.hdr-brand{
+  font-family:'DM Serif Display',serif;
+  font-size:1.15rem;
+  color:var(--white);
+  letter-spacing:-.01em;
+}
+.hdr-brand span{color:var(--olive-m)}
+.hdr-logos{display:flex;align-items:center;gap:1rem}
+.logo-badge{
+  font-size:.62rem;
+  font-weight:600;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  color:rgba(255,255,255,.5);
+  border:1px solid rgba(255,255,255,.15);
+  padding:4px 10px;
+  border-radius:20px;
+}
+.logo-badge.teal{color:#c7cca8;border-color:rgba(199,204,168,.3)}
+
+/* WRAP */
+.wrap{width:100%;max-width:640px;padding:2.5rem 1.5rem 5rem}
+
+/* INTRO */
+.intro-card{
+  background:var(--navy);
+  border-radius:16px;
+  padding:1.75rem 2rem;
+  margin-bottom:2rem;
+  position:relative;
+  overflow:hidden;
+}
+.intro-card::before{
+  content:'';
+  position:absolute;
+  top:0;left:0;right:0;
+  height:3px;
+  background:#3f4323;
+}
+.intro-eyebrow{
+  font-size:.68rem;
+  font-weight:600;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+  color:#c7cca8;
+  margin-bottom:.6rem;
+}
+.intro-title{
+  font-family:'DM Serif Display',serif;
+  font-size:1.65rem;
+  line-height:1.2;
+  color:var(--white);
+  margin-bottom:.9rem;
+}
+.intro-title em{font-style:italic;color:#c7cca8}
+.intro-body{
+  font-size:.88rem;
+  line-height:1.7;
+  color:rgba(255,255,255,.7);
+}
+.intro-body strong{color:var(--white)}
+
+/* SECTION */
+.section{margin-bottom:1.5rem}
+.section-hdr{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin-bottom:1rem;
+}
+.section-num{
+  width:28px;height:28px;
+  border-radius:8px;
+  background:var(--olive-m);
+  color:var(--white);
+  font-size:.75rem;
+  font-weight:700;
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+}
+.section-title{
+  font-family:'DM Serif Display',serif;
+  font-size:1.1rem;
+  color:var(--navy);
+}
+
+/* FIELD */
+.field{
+  background:#fafaf7;
+  border:1.5px solid var(--g200);
+  border-radius:12px;
+  padding:1rem 1.15rem;
+  margin-bottom:.6rem;
+  transition:border-color .18s;
+}
+.field:focus-within{border-color:#3f4323}
+.field-label{
+  font-size:.72rem;
+  font-weight:600;
+  color:var(--navy);
+  letter-spacing:.02em;
+  margin-bottom:3px;
+  display:block;
+}
+.field-hint{
+  font-size:.68rem;
+  color:var(--g400);
+  font-style:italic;
+  margin-bottom:6px;
+  line-height:1.5;
+  display:block;
+}
+.field-input{
+  width:100%;
+  border:none;
+  outline:none;
+  font-family:'DM Sans',sans-serif;
+  font-size:1rem;
+  font-weight:500;
+  color:var(--navy-d);
+  background:transparent;
+  text-align:right;
+}
+.field-input::placeholder{color:var(--g400);font-weight:400;font-size:.88rem}
+
+/* TOTAL ROW */
+.total-row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  background:var(--olive-m);
+  border-radius:10px;
+  padding:.85rem 1.15rem;
+  margin-top:.25rem;
+}
+.total-label{font-size:.78rem;font-weight:600;color:rgba(255,255,255,.7);letter-spacing:.04em;text-transform:uppercase}
+.total-value{font-size:1.1rem;font-weight:700;color:var(--white)}
+.total-row.egreso{background:var(--navy)}
+
+/* CTA */
+.cta-btn{
+  width:100%;
+  background:var(--olive-m);
+  color:var(--white);
+  border:none;
+  border-radius:12px;
+  padding:1.1rem;
+  font-family:'DM Sans',sans-serif;
+  font-size:1rem;
+  font-weight:600;
+  cursor:pointer;
+  transition:background .18s,transform .15s;
+  margin-top:1.5rem;
+  letter-spacing:.01em;
+}
+.cta-btn:hover{background:var(--navy-d);transform:translateY(-1px)}
+
+/* RESULT */
+.result{
+  display:none;
+  border-radius:16px;
+  overflow:hidden;
+  margin-top:1.5rem;
+  animation:fadeUp .4s ease;
+}
+.result.visible{display:block}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+
+.result-top{padding:1.75rem 1.75rem 1.25rem}
+.result-emoji{font-size:2rem;margin-bottom:.6rem}
+.result-estado{
+  font-size:.68rem;
+  font-weight:700;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+  margin-bottom:.5rem;
+}
+.result-title{
+  font-family:'DM Serif Display',serif;
+  font-size:1.45rem;
+  line-height:1.25;
+  margin-bottom:.75rem;
+}
+.result-body{font-size:.88rem;line-height:1.7}
+
+.result-nums{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:1px;
+  background:rgba(0,0,0,.08);
+  margin-top:1px;
+}
+.result-num{
+  padding:1.1rem 1.4rem;
+  background:var(--white);
+}
+.result-num-label{font-size:.68rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--g400);margin-bottom:4px}
+.result-num-value{font-size:1.35rem;font-weight:700;color:var(--navy)}
+.result-num-sub{font-size:.72rem;color:var(--g400);margin-top:2px}
+
+.result-cta{
+  padding:1.25rem 1.75rem;
+  font-size:.83rem;
+  line-height:1.65;
+}
+.result-cta strong{display:block;margin-bottom:.3rem;font-size:.88rem}
+
+/* COLORS BY STATE */
+.state-red .result-top{background:var(--red-l)}
+.state-red .result-estado{color:var(--red)}
+.state-red .result-title{color:#7a1f1f}
+.state-red .result-body{color:#5c3030}
+.state-red .result-cta{background:var(--red);color:var(--white)}
+
+.state-amber .result-top{background:var(--amber-l)}
+.state-amber .result-estado{color:var(--amber)}
+.state-amber .result-title{color:#5c3a00}
+.state-amber .result-body{color:#5c4020}
+.state-amber .result-cta{background:var(--amber);color:var(--white)}
+
+.state-green .result-top{background:var(--green-l)}
+.state-green .result-estado{color:var(--green)}
+.state-green .result-title{color:#0a3d2e}
+.state-green .result-body{color:#1a4a38}
+.state-green .result-cta{background:var(--olive-m);color:#f7f4ef}
+
+/* DIVIDER */
+.divider{
+  height:1px;
+  background:var(--g200);
+  margin:1.5rem 0;
+}
+
+/* FOOTER */
+.footer{
+  width:100%;
+  padding:1.5rem 2rem;
+  border-top:1px solid var(--g200);
+  background:var(--olive-m);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:1.5rem;
+  margin-top:auto;
+}
+.footer-logo{font-size:.72rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:rgba(199,204,168,.6)}
+.footer-logo span{color:#f7f4ef}
+.footer-sep{width:4px;height:4px;border-radius:50%;background:rgba(199,204,168,.3)}
+
+@media(max-width:480px){
+  .wrap{padding:1.5rem 1rem 4rem}
+  .intro-title{font-size:1.35rem}
+  .result-nums{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<header class="hdr">
+  <div style="display:flex;align-items:center;gap:.75rem">
+    <div style="width:32px;height:32px;border-radius:8px;background:rgba(247,244,239,.12);border:1px solid rgba(247,244,239,.2);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+      <span style="font-family:'Fraunces',serif;font-size:.8rem;font-weight:600;color:#f7f4ef">OS</span>
+    </div>
+    <span style="font-family:'Fraunces',serif;font-size:1.1rem;font-weight:300;color:#f7f4ef;letter-spacing:-.01em">Operaciones <span style="color:#c7cca8">Saludables</span></span>
+  </div>
+  <span style="font-size:.6rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:rgba(247,244,239,.4)">Módulo 1 · Diagnóstico</span>
+</header>
+
+<main class="wrap">
+
+  <div class="intro-card">
+    <p class="intro-eyebrow">Módulo 1 · Diagnóstico financiero</p>
+    <h1 class="intro-title">¿Tu centro genera<br><em>margen real?</em></h1>
+    <p class="intro-body">
+      Esto no es contabilidad. Es una <strong>foto rápida</strong> de cómo está tu negocio hoy — en menos de 5 minutos.<br><br>
+      Completá los campos con los números aproximados del <strong>último mes</strong>, en <strong>pesos argentinos</strong>. No tienen que ser perfectos: lo que buscamos es una primera lectura, no un balance.
+    </p>
+  </div>
+
+  <!-- DATOS DEL USUARIO -->
+  <div class="section">
+    <div class="section-hdr">
+      <div class="section-num">0</div>
+      <h2 class="section-title">Tus datos</h2>
+    </div>
+    <div class="field">
+      <label class="field-label">Nombre completo</label>
+      <input class="field-input" type="text" id="user-nombre" placeholder="Ej: María González" required>
+    </div>
+    <div class="field">
+      <label class="field-label">Email</label>
+      <input class="field-input" type="email" id="user-email" placeholder="tu@email.com" required>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- INGRESOS -->
+  <div class="section">
+    <div class="section-hdr">
+      <div class="section-num">1</div>
+      <h2 class="section-title">¿Cuánto ingresó al centro el último mes? <span style="font-family:'DM Sans',sans-serif;font-size:.75rem;font-weight:400;color:var(--g400)">(en pesos argentinos)</span></h2>
+    </div>
+
+    <div class="field">
+      <label class="field-label">Consultas y sesiones clínicas</label>
+      <span class="field-hint">Ej: turnos de kinesiología, consultas médicas, sesiones de osteopatía, controles de seguimiento</span>
+      <input class="field-input" type="number" id="ing1" placeholder="0" oninput="calcular()">
+    </div>
+    <div class="field">
+      <label class="field-label">Procedimientos y tratamientos</label>
+      <span class="field-hint">Ej: botox, rellenos, limpiezas dentales, estudios, cirugías estéticas, tratamientos funcionales</span>
+      <input class="field-input" type="number" id="ing2" placeholder="0" oninput="calcular()">
+    </div>
+    <div class="field">
+      <label class="field-label">Venta de productos o suplementos</label>
+      <span class="field-hint">Ej: cremas, vitaminas, ortesis, suplementos nutricionales, kits de cuidado</span>
+      <input class="field-input" type="number" id="ing3" placeholder="0" oninput="calcular()">
+    </div>
+    <div class="field">
+      <label class="field-label">Alquiler de consultorios a otros profesionales</label>
+      <span class="field-hint">Ej: le alquilás el espacio a otro médico, kinesiólogo o especialista por horas o días</span>
+      <input class="field-input" type="number" id="ing4" placeholder="0" oninput="calcular()">
+    </div>
+    <div class="field">
+      <label class="field-label">Otros ingresos</label>
+      <span class="field-hint">Ej: talleres, capacitaciones, charlas, cursos que hayas dado ese mes</span>
+      <input class="field-input" type="number" id="ing5" placeholder="0" oninput="calcular()">
+    </div>
+
+    <div class="total-row">
+      <span class="total-label">Total ingresos</span>
+      <span class="total-value" id="total-ing">$ 0</span>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- GASTOS -->
+  <div class="section">
+    <div class="section-hdr">
+      <div class="section-num">2</div>
+      <h2 class="section-title">¿Cuánto se gastó ese mes en total? <span style="font-family:'DM Sans',sans-serif;font-size:.75rem;font-weight:400;color:var(--g400)">(en pesos argentinos)</span></h2>
+    </div>
+
+    <div class="field">
+      <label class="field-label">Sueldos y honorarios del equipo</label>
+      <span class="field-hint">Ej: recepcionista, enfermera, asistente, otros profesionales que trabajan con vos — fijos o por porcentaje</span>
+      <input class="field-input" type="number" id="eg1" placeholder="0" oninput="calcular()">
+    </div>
+    <div class="field">
+      <label class="field-label">Alquiler del espacio</label>
+      <span class="field-hint">Ej: lo que pagás por el consultorio, la clínica o el centro</span>
+      <input class="field-input" type="number" id="eg2" placeholder="0" oninput="calcular()">
+    </div>
+    <div class="field">
+      <label class="field-label">Insumos y materiales</label>
+      <span class="field-hint">Ej: guantes, jeringas, materiales dentales, productos estéticos, insumos de kinesiología</span>
+      <input class="field-input" type="number" id="eg3" placeholder="0" oninput="calcular()">
+    </div>
+    <div class="field">
+      <label class="field-label">Impuestos y cargas fiscales</label>
+      <span class="field-hint">Ej: monotributo, obra social, AFIP, cargas sociales del personal</span>
+      <input class="field-input" type="number" id="eg4" placeholder="0" oninput="calcular()">
+    </div>
+    <div class="field">
+      <label class="field-label">Otros gastos</label>
+      <span class="field-hint">Ej: marketing, redes sociales, software, internet, teléfono, limpieza, seguros</span>
+      <input class="field-input" type="number" id="eg5" placeholder="0" oninput="calcular()">
+    </div>
+
+    <div class="total-row egreso">
+      <span class="total-label">Total gastos</span>
+      <span class="total-value" id="total-eg">$ 0</span>
+    </div>
+  </div>
+
+  <button class="cta-btn" onclick="mostrarResultado()">Ver el diagnóstico →</button>
+
+  <!-- RESULTADO -->
+  <div class="result" id="result">
+    <div class="result-top">
+      <div class="result-emoji" id="r-emoji"></div>
+      <p class="result-estado" id="r-estado"></p>
+      <h2 class="result-title" id="r-title"></h2>
+      <p class="result-body" id="r-body"></p>
+    </div>
+    <div class="result-nums">
+      <div class="result-num">
+        <p class="result-num-label">Ingresos del mes</p>
+        <p class="result-num-value" id="r-ing"></p>
+      </p>
+      </div>
+      <div class="result-num">
+        <p class="result-num-label">Gastos del mes</p>
+        <p class="result-num-value" id="r-eg"></p>
+      </div>
+      <div class="result-num">
+        <p class="result-num-label">Margen bruto</p>
+        <p class="result-num-value" id="r-margen"></p>
+        <p class="result-num-sub" id="r-margen-sub"></p>
+      </div>
+      <div class="result-num">
+        <p class="result-num-label">% de margen</p>
+        <p class="result-num-value" id="r-pct"></p>
+        <p class="result-num-sub" id="r-pct-sub"></p>
+      </div>
+    </div>
+    <div class="result-cta" id="r-cta"></div>
+  </div>
+
+</main>
+
+<footer class="footer">
+  <span class="footer-logo">Operaciones Saludables — una iniciativa de <span>Negocios Saludables</span> y <span>Assistify</span></span>
+</footer>
+
+<!-- Cargar Supabase y cliente de formularios -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/api/config.js"></script>
+<script src="/src/js/formularios-client.js"></script>
+
+<script>
+function fmt(n){
+  return '$ ' + Math.round(n).toLocaleString('es-AR');
+}
+
+function val(id){
+  return parseFloat(document.getElementById(id).value) || 0;
+}
+
+function calcular(){
+  var ing = val('ing1')+val('ing2')+val('ing3')+val('ing4')+val('ing5');
+  var eg  = val('eg1')+val('eg2')+val('eg3')+val('eg4')+val('eg5');
+  document.getElementById('total-ing').textContent = fmt(ing);
+  document.getElementById('total-eg').textContent  = fmt(eg);
+}
+
+async function mostrarResultado(){
+  // Validar datos del usuario
+  const nombre = document.getElementById('user-nombre').value;
+  const email = document.getElementById('user-email').value;
+
+  if (!nombre || !email) {
+    alert('Por favor completá tu nombre y email antes de continuar.');
+    document.getElementById('user-nombre').focus();
+    return;
+  }
+
+  var ing = val('ing1')+val('ing2')+val('ing3')+val('ing4')+val('ing5');
+  var eg  = val('eg1')+val('eg2')+val('eg3')+val('eg4')+val('eg5');
+
+  if(ing === 0){
+    alert('Completá al menos los ingresos del mes para ver el diagnóstico.');
+    return;
+  }
+
+  var margen = ing - eg;
+  var pct = ing > 0 ? (margen / ing) * 100 : 0;
+
+  document.getElementById('r-ing').textContent    = fmt(ing);
+  document.getElementById('r-eg').textContent     = fmt(eg);
+  document.getElementById('r-margen').textContent = fmt(margen);
+  document.getElementById('r-pct').textContent    = Math.round(pct) + '%';
+
+  var el = document.getElementById('result');
+  el.className = 'result visible';
+
+  if(pct < 20){
+    el.classList.add('state-red');
+    document.getElementById('r-emoji').textContent = '🔴';
+    document.getElementById('r-estado').textContent = 'Margen crítico';
+    document.getElementById('r-title').textContent  = 'Tu centro está trabajando mucho y quedando poco.';
+    document.getElementById('r-body').textContent   = 'Menos del 20% de lo que entra queda después de los gastos. Eso significa que cualquier mes difícil — un paciente que no paga, un gasto imprevisto — lo sentís directo. Este es exactamente el punto de partida de lo que vamos a trabajar juntos.';
+    document.getElementById('r-margen-sub').textContent = 'Quedan menos de $2 de cada $10 que entraron';
+    document.getElementById('r-pct-sub').textContent    = 'Por debajo del mínimo recomendado (20%)';
+    document.getElementById('r-cta').innerHTML = '<strong>¿Qué sigue?</strong>En el Módulo 3 vas a entender exactamente a dónde va cada peso de tu centro — y cómo empezar a recuperar margen real, sin necesitar facturar más.';
+  } else if(pct < 35){
+    el.classList.add('state-amber');
+    document.getElementById('r-emoji').textContent = '🟡';
+    document.getElementById('r-estado').textContent = 'Margen ajustado';
+    document.getElementById('r-title').textContent  = 'Hay margen, pero es frágil.';
+    document.getElementById('r-body').textContent   = 'Entre el 20% y el 35% es un rango que funciona — hasta que algo sale mal. Un mes bajo, un gasto extra o un turno que no se cobró pueden comerse lo que quedaba. El siguiente paso es entender qué parte de ese margen está en riesgo y cómo protegerlo.';
+    document.getElementById('r-margen-sub').textContent = 'Zona de atención — puede mejorar con orden';
+    document.getElementById('r-pct-sub').textContent    = 'En el rango ajustado (20%–35%)';
+    document.getElementById('r-cta').innerHTML = '<strong>¿Qué sigue?</strong>En el Módulo 3 vas a ver exactamente dónde está ese margen en riesgo y qué movimientos concretos podés hacer para que sea más sólido y predecible.';
+  } else {
+    el.classList.add('state-green');
+    document.getElementById('r-emoji').textContent = '🟢';
+    document.getElementById('r-estado').textContent = 'Margen saludable';
+    document.getElementById('r-title').textContent  = 'Bien. Tu centro genera margen real.';
+    document.getElementById('r-body').textContent   = 'Más del 35% de lo que entra queda después de los gastos. Eso es una base sólida. El trabajo ahora no es generar más margen — es protegerlo, entender de dónde viene y asegurarte de que el mes que viene no sea una sorpresa.';
+    document.getElementById('r-margen-sub').textContent = 'Base sólida para crecer con criterio';
+    document.getElementById('r-pct-sub').textContent    = 'Por encima del mínimo saludable (35%)';
+    document.getElementById('r-cta').innerHTML = '<strong>¿Qué sigue?</strong>En el Módulo 3 vas a mapear en detalle de dónde viene ese margen y cómo asegurarte de que sea consistente — no una foto buena de un mes bueno.';
+  }
+
+  // Guardar en Supabase
+  const respuestas = {
+    ingresos: {
+      consultas_sesiones: val('ing1'),
+      procedimientos: val('ing2'),
+      venta_productos: val('ing3'),
+      alquiler_consultorios: val('ing4'),
+      otros_ingresos: val('ing5'),
+      total: ing
+    },
+    gastos: {
+      sueldos_honorarios: val('eg1'),
+      alquiler_espacio: val('eg2'),
+      insumos: val('eg3'),
+      impuestos: val('eg4'),
+      otros_gastos: val('eg5'),
+      total: eg
+    },
+    resultados: {
+      margen_bruto: margen,
+      porcentaje_margen: Math.round(pct),
+      estado: pct < 20 ? 'critico' : (pct < 35 ? 'ajustado' : 'saludable')
+    }
+  };
+
+  const resultado = await guardarFormulario('diagnostico_financiero', email, nombre, respuestas);
+
+  if (!resultado.success) {
+    console.warn('No se pudo guardar:', resultado.error);
+    // Continuar mostrando resultados aunque falle el guardado
+  } else {
+    console.log('✅ Diagnóstico guardado con ID:', resultado.data.id);
+  }
+
+  document.getElementById('result').scrollIntoView({behavior:'smooth', block:'start'});
+}
+</script>
+</body>
+</html>

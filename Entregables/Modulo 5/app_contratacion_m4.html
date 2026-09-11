@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Generador de Búsqueda — Módulo 4</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --navy:#1e2d5a;--navy-d:#151f3e;--navy-l:#2a3d7a;
+  --teal:#00c9a0;--teal-d:#00a882;--teal-l:#e6faf6;
+  --olive:#6b7a3a;--olive-m:#3f4323;--olive-l:#f2f4e8;
+  --cream:#f7f4ef;--white:#fff;
+  --g100:#f5f5f3;--g200:#e8e6e0;--g400:#9c9a94;--g600:#5c5a56;
+  --red:#e24b4a;--red-l:#fff0f0;
+  --amber:#ba7517;--amber-l:#fff8ec;
+  --green:#0f6e56;--green-l:#eefaf6;
+}
+html{scroll-behavior:smooth}
+body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--navy-d);min-height:100vh;display:flex;flex-direction:column;align-items:center}
+
+.hdr{width:100%;background:var(--navy);padding:1rem 2rem;display:flex;align-items:center;justify-content:space-between}
+.hdr-logo{font-family:'DM Serif Display',serif;font-size:1.1rem;color:#fff}
+.hdr-logo span{color:var(--teal)}
+.hdr-tag{font-size:.7rem;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.45)}
+
+.wrap{width:100%;max-width:700px;padding:2.5rem 2rem 4rem}
+.screen{display:none}
+.screen.active{display:block;animation:fadeIn .3s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+.eyebrow{font-size:.7rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--teal-d);margin-bottom:1rem}
+.page-title{font-family:'DM Serif Display',serif;font-size:clamp(1.8rem,4vw,2.4rem);line-height:1.15;color:var(--navy);margin-bottom:1rem}
+.page-title em{font-style:italic;color:var(--teal-d)}
+.page-desc{font-size:.95rem;line-height:1.7;color:var(--g600);margin-bottom:2rem;max-width:520px}
+
+/* Steps indicator */
+.steps-bar{display:flex;gap:0;margin-bottom:2.5rem;background:var(--g200);border-radius:10px;overflow:hidden}
+.step-tab{flex:1;padding:.7rem 1rem;text-align:center;font-size:.78rem;font-weight:500;color:var(--g400);cursor:pointer;transition:all .2s;background:transparent}
+.step-tab.active{background:var(--navy);color:#fff;font-weight:600}
+.step-tab.done{background:var(--teal-l);color:var(--teal-d)}
+
+/* Form */
+.form-card{background:var(--white);border:1px solid var(--g200);border-radius:16px;padding:1.75rem;margin-bottom:1.25rem}
+.fc-title{font-family:'DM Serif Display',serif;font-size:1.15rem;color:var(--navy);margin-bottom:1.25rem;display:flex;align-items:center;gap:10px}
+.fc-title .badge{font-family:'DM Sans',sans-serif;font-size:.68rem;font-weight:600;background:var(--teal-l);color:var(--teal-d);padding:3px 10px;border-radius:20px}
+.field{margin-bottom:1.1rem}
+.field-label{font-size:.75rem;font-weight:600;color:var(--navy);letter-spacing:.03em;margin-bottom:6px;display:block}
+.field-label span{color:var(--teal-d)}
+.field-hint{font-size:.72rem;color:var(--g400);font-style:italic;margin-bottom:6px;display:block}
+.f-input{padding:.7rem 1rem;border:1.5px solid var(--g200);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:.9rem;color:var(--navy-d);background:var(--white);outline:none;transition:border-color .18s;width:100%}
+.f-input:focus{border-color:var(--teal-d)}
+.f-input::placeholder{color:var(--g400)}
+.f-textarea{resize:vertical;min-height:80px;line-height:1.5}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.select-wrap{position:relative}
+.select-wrap::after{content:'';position:absolute;right:12px;top:50%;transform:translateY(-50%);width:0;height:0;border-left:4px solid transparent;border-right:4px solid transparent;border-top:5px solid var(--g400);pointer-events:none}
+.f-select{width:100%;padding:.7rem 2rem .7rem 1rem;border:1.5px solid var(--g200);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:.9rem;color:var(--navy-d);background:var(--white);outline:none;transition:border-color .18s;appearance:none;cursor:pointer}
+.f-select:focus{border-color:var(--teal-d)}
+
+/* Skill chips */
+.skills-wrap{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
+.skill-chip{padding:.45rem .9rem;border:1.5px solid var(--g200);border-radius:20px;font-size:.78rem;font-weight:500;cursor:pointer;background:var(--white);color:var(--g600);transition:all .18s;user-select:none}
+.skill-chip:hover{border-color:var(--navy);color:var(--navy)}
+.skill-chip.on{border-color:var(--teal-d);background:var(--teal-l);color:var(--navy-d)}
+
+/* Buttons */
+.btn-p{display:inline-flex;align-items:center;gap:10px;background:var(--navy);color:#fff;border:none;border-radius:10px;padding:.9rem 1.75rem;font-family:'DM Sans',sans-serif;font-size:.95rem;font-weight:500;cursor:pointer;transition:background .2s,transform .15s}
+.btn-p:hover{background:var(--navy-l);transform:translateY(-1px)}
+.btn-g{padding:.7rem 1.4rem;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:.88rem;font-weight:500;cursor:pointer;transition:all .18s;border:1.5px solid var(--g200);background:var(--white);color:var(--g600)}
+.btn-g:hover{border-color:var(--navy);color:var(--navy)}
+.btn-copy{display:inline-flex;align-items:center;gap:8px;padding:.65rem 1.25rem;background:var(--teal);border:none;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:.82rem;font-weight:600;color:var(--navy-d);cursor:pointer;transition:all .18s}
+.btn-copy:hover{background:var(--teal-d);color:#fff}
+.btn-copy.copied{background:var(--green-l);color:var(--green)}
+.nav-row{display:flex;gap:10px;margin-top:1.5rem;justify-content:space-between;align-items:center}
+
+/* Result: aviso */
+.aviso-box{background:var(--navy-d);border-radius:14px;padding:1.5rem;margin-bottom:1.25rem;position:relative}
+.aviso-label{font-size:.68rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--teal);margin-bottom:1rem}
+.aviso-text{font-family:'DM Sans',sans-serif;font-size:.9rem;line-height:1.75;color:rgba(255,255,255,.85);white-space:pre-line}
+.aviso-actions{display:flex;gap:10px;margin-top:1.1rem;flex-wrap:wrap}
+.aviso-tip{font-size:.75rem;color:rgba(255,255,255,.45);margin-top:.75rem;font-style:italic}
+
+/* Form questions result */
+.q-section{margin-bottom:1.5rem}
+.q-section-title{font-size:.7rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--g400);margin-bottom:.75rem;padding-bottom:.5rem;border-bottom:1px solid var(--g200)}
+.q-item{background:var(--white);border:1px solid var(--g200);border-radius:10px;padding:1rem 1.1rem;margin-bottom:8px}
+.q-num{font-size:.65rem;font-weight:600;color:var(--teal-d);background:var(--teal-l);padding:2px 8px;border-radius:10px;display:inline-block;margin-bottom:.4rem}
+.q-text{font-size:.88rem;font-weight:600;color:var(--navy);margin-bottom:.5rem}
+.q-opts{display:flex;flex-direction:column;gap:4px}
+.q-opt{font-size:.78rem;color:var(--g600);padding:4px 0;display:flex;align-items:center;gap:8px}
+.q-opt::before{content:'○';color:var(--g400);flex-shrink:0;font-size:.7rem}
+
+/* Instructions box */
+.instructions{background:var(--olive-l);border:1px solid var(--olive);border-radius:12px;padding:1.25rem;margin-bottom:1.25rem}
+.inst-title{font-size:.8rem;font-weight:600;color:var(--olive-m);margin-bottom:.75rem}
+.inst-steps{display:flex;flex-direction:column;gap:.5rem}
+.inst-step{font-size:.8rem;color:var(--g600);line-height:1.5;display:flex;gap:10px;align-items:flex-start}
+.inst-step-num{width:20px;height:20px;border-radius:6px;background:var(--olive-m);color:#fff;font-size:.65rem;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+
+.footer{width:100%;padding:1.5rem 2rem;text-align:center;font-size:.72rem;color:var(--g400);border-top:1px solid var(--g200);margin-top:auto}
+
+@media(max-width:520px){
+  .field-row{grid-template-columns:1fr}
+  .wrap{padding:1.5rem 1.25rem 3rem}
+}
+</style>
+</head>
+<body>
+<header class="hdr">
+  <span class="hdr-logo">Negocios <span>Saludables</span></span>
+  <span class="hdr-tag">Módulo 4 — Contratación Inteligente</span>
+</header>
+<main class="wrap">
+
+  <!-- INTRO -->
+  <div class="screen active" id="s-intro">
+    <p class="eyebrow">Kit de herramientas operativas · Módulo 4</p>
+    <h1 class="page-title">Generador de<br><em>búsqueda laboral</em></h1>
+    <p class="page-desc">Completás los datos del rol que necesitás y la herramienta te genera el aviso listo para publicar y las preguntas para filtrar candidatos — sin tener que pensar en cómo redactarlo.</p>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:2rem">
+      <div style="background:var(--white);border:1px solid var(--g200);border-radius:12px;padding:1rem;text-align:center">
+        <div style="font-size:1.5rem;margin-bottom:.4rem">📢</div>
+        <div style="font-size:.82rem;font-weight:600;color:var(--navy);margin-bottom:.25rem">Aviso de búsqueda</div>
+        <div style="font-size:.72rem;color:var(--g400);line-height:1.4">Texto listo para Instagram Stories, WhatsApp o LinkedIn</div>
+      </div>
+      <div style="background:var(--white);border:1px solid var(--g200);border-radius:12px;padding:1rem;text-align:center">
+        <div style="font-size:1.5rem;margin-bottom:.4rem">📋</div>
+        <div style="font-size:.82rem;font-weight:600;color:var(--navy);margin-bottom:.25rem">Formulario de postulación</div>
+        <div style="font-size:.72rem;color:var(--g400);line-height:1.4">Preguntas con opciones para armar tu Google Form</div>
+      </div>
+    </div>
+
+    <button class="btn-p" onclick="go('s-step1')">
+      Empezar
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
+    </button>
+  </div>
+
+  <!-- STEP 1: DATOS DEL ROL -->
+  <div class="screen" id="s-step1">
+    <div class="steps-bar">
+      <div class="step-tab active" id="tab1">1. El rol</div>
+      <div class="step-tab" id="tab2">2. El aviso</div>
+      <div class="step-tab" id="tab3">3. El formulario</div>
+    </div>
+
+    <div class="form-card">
+      <p class="fc-title">Contanos sobre el rol que buscás <span class="badge">Paso 1 de 2</span></p>
+
+      <div class="field">
+        <label class="field-label">¿Qué rol necesitás? <span>*</span></label>
+        <div class="select-wrap">
+          <select class="f-select" id="rol-tipo" onchange="onRolChange()">
+            <option value="">Seleccioná el rol</option>
+            <option value="secretaria">Secretaria / Asistente administrativa</option>
+            <option value="administrativo">Administrativo/a part-time</option>
+            <option value="setter">Setter / Comunicación y calificación</option>
+            <option value="contenido">Asistente de contenido</option>
+            <option value="personalizado">Otro rol (personalizado)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="field" id="field-rol-custom" style="display:none">
+        <label class="field-label">Nombre del rol <span>*</span></label>
+        <input class="f-input" id="rol-custom" type="text" placeholder="Ej: Coordinadora de pacientes"/>
+      </div>
+
+      <div class="field">
+        <label class="field-label">¿Cuáles son las tareas principales? <span>*</span></label>
+        <span class="field-hint">Listá 3-5 tareas concretas — no "ayudar con todo"</span>
+        <textarea class="f-input f-textarea" id="tareas" placeholder="Ej: confirmación de turnos, seguimiento de cobros, responder WhatsApp del consultorio"></textarea>
+      </div>
+
+      <div class="field-row">
+        <div class="field">
+          <label class="field-label">Horas por semana <span>*</span></label>
+          <input class="f-input" id="horas" type="text" placeholder="Ej: 15hs"/>
+        </div>
+        <div class="field">
+          <label class="field-label">Modalidad <span>*</span></label>
+          <div class="select-wrap">
+            <select class="f-select" id="modalidad">
+              <option value="">Seleccioná</option>
+              <option>Presencial</option>
+              <option>Remoto</option>
+              <option>Mixto</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="field-label">Rango de pago</label>
+        <span class="field-hint">Publicarlo atrae mejores candidatos y evita conversaciones incómodas después</span>
+        <input class="f-input" id="pago" type="text" placeholder="Ej: $200-250 USD/mes · $60.000-80.000 ARS/mes"/>
+      </div>
+
+      <div class="field">
+        <label class="field-label">Skills que necesitás <span>*</span></label>
+        <span class="field-hint">Seleccioná los que aplican — se pre-seleccionan según el rol</span>
+        <div class="skills-wrap" id="skills-wrap"></div>
+      </div>
+    </div>
+
+    <div class="nav-row">
+      <button class="btn-g" onclick="go('s-intro')">← Atrás</button>
+      <button class="btn-p" onclick="goToAviso()">
+        Generar aviso →
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- STEP 2: AVISO GENERADO -->
+  <div class="screen" id="s-step2">
+    <div class="steps-bar">
+      <div class="step-tab done" id="tab1b">✓ El rol</div>
+      <div class="step-tab active" id="tab2b">2. El aviso</div>
+      <div class="step-tab" id="tab3b">3. El formulario</div>
+    </div>
+
+    <p class="eyebrow">Tu aviso de búsqueda</p>
+    <h2 style="font-family:'DM Serif Display',serif;font-size:1.6rem;color:var(--navy);margin-bottom:.5rem">Copiá y publicá donde tengas presencia</h2>
+    <p style="font-size:.85rem;color:var(--g600);margin-bottom:1.5rem;line-height:1.6">Instagram Stories, WhatsApp de colegas, LinkedIn — el canal no importa. El aviso bien redactado es lo que atrae al perfil correcto.</p>
+
+    <div class="aviso-box">
+      <p class="aviso-label">Aviso listo para publicar</p>
+      <div class="aviso-text" id="aviso-text"></div>
+      <div class="aviso-actions">
+        <button class="btn-copy" id="btn-copy-aviso" onclick="copyAviso()">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="4" width="8" height="9" rx="1"/><path d="M4 4V3a1 1 0 011-1h6a1 1 0 011 1v8a1 1 0 01-1 1h-1"/></svg>
+          Copiar texto
+        </button>
+      </div>
+      <p class="aviso-tip">💡 Agregá el link de tu formulario al final del aviso antes de publicarlo</p>
+    </div>
+
+    <div class="nav-row">
+      <button class="btn-g" onclick="go('s-step1')">← Editar datos</button>
+      <button class="btn-p" onclick="goToForm()">
+        Ver el formulario →
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- STEP 3: FORMULARIO DE POSTULACIÓN -->
+  <div class="screen" id="s-step3">
+    <div class="steps-bar">
+      <div class="step-tab done">✓ El rol</div>
+      <div class="step-tab done">✓ El aviso</div>
+      <div class="step-tab active">3. El formulario</div>
+    </div>
+
+    <p class="eyebrow">Tu formulario de postulación</p>
+    <h2 style="font-family:'DM Serif Display',serif;font-size:1.6rem;color:var(--navy);margin-bottom:.5rem">Preguntas para armar tu Google Form</h2>
+    <p style="font-size:.85rem;color:var(--g600);margin-bottom:1.5rem;line-height:1.6">Copiá estas preguntas en tu formulario. Las respuestas con opciones te permiten filtrar candidatos en minutos.</p>
+
+    <div class="instructions">
+      <p class="inst-title">📝 Cómo crear tu formulario en Google Forms</p>
+      <div class="inst-steps">
+        <div class="inst-step"><div class="inst-step-num">1</div><span>Entrá a <strong>forms.google.com</strong> y creá un nuevo formulario</span></div>
+        <div class="inst-step"><div class="inst-step-num">2</div><span>Copiá cada pregunta y sus opciones de respuesta</span></div>
+        <div class="inst-step"><div class="inst-step-num">3</div><span>Hacé clic en "Enviar" y copiá el link para compartirlo</span></div>
+        <div class="inst-step"><div class="inst-step-num">4</div><span>Pegá el link al final del aviso que generaste</span></div>
+      </div>
+    </div>
+
+    <div id="form-questions"></div>
+
+    <div style="margin-bottom:1.5rem">
+      <button class="btn-copy" id="btn-copy-form" onclick="copyForm()" style="width:100%;justify-content:center;padding:.85rem">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="4" width="8" height="9" rx="1"/><path d="M4 4V3a1 1 0 011-1h6a1 1 0 011 1v8a1 1 0 01-1 1h-1"/></svg>
+        Copiar todas las preguntas
+      </button>
+    </div>
+
+    <div style="background:var(--navy);border-radius:14px;padding:1.4rem;text-align:center;margin-bottom:1.5rem">
+      <p style="font-family:'DM Serif Display',serif;font-size:1.1rem;color:#fff;margin-bottom:.4rem">¿Tenés las preguntas listas?</p>
+      <p style="font-size:.82rem;color:rgba(255,255,255,.6);line-height:1.6">El siguiente paso es preparar las preguntas para la entrevista. Las encontrás en la pestaña <strong style="color:var(--teal)">'Guía de Entrevista'</strong> del Google Sheet de este módulo.</p>
+    </div>
+
+    <div class="nav-row">
+      <button class="btn-g" onclick="go('s-step2')">← Ver aviso</button>
+      <button class="btn-p" onclick="restart()">Nueva búsqueda ↺</button>
+    </div>
+  </div>
+
+</main>
+<footer class="footer">Programa Negocios Saludables · Kit de Herramientas Operativas</footer>
+
+<script>
+// ── DATA ─────────────────────────────────────────────────────────────────────
+
+var SKILLS = [
+  {id:"whatsapp",    label:"WhatsApp / comunicación escrita"},
+  {id:"calendar",    label:"Agenda digital (Google Calendar)"},
+  {id:"sheets",      label:"Planillas (Google Sheets / Excel)"},
+  {id:"presencial",  label:"Atención presencial a pacientes"},
+  {id:"discrecion",  label:"Discreción con información confidencial"},
+  {id:"cobros",      label:"Seguimiento de cobros y pagos"},
+  {id:"stock",       label:"Gestión de stock de insumos"},
+  {id:"contratos",   label:"Contratos y alquileres de consultorios"},
+  {id:"facturacion", label:"Facturación y registros básicos"},
+  {id:"redes",       label:"Redes sociales para negocios"},
+  {id:"edicion",     label:"Edición de contenido (Canva / reels)"},
+  {id:"redaccion",   label:"Redacción para redes o comunicación"},
+  {id:"setter",      label:"Llamadas de calificación de consultas"},
+  {id:"leads",       label:"Seguimiento de personas interesadas"},
+  {id:"conversion",  label:"Conversión de consultas en turnos/ventas"},
+];
+
+var ROL_SKILLS = {
+  secretaria:    ["whatsapp","calendar","sheets","presencial","discrecion","cobros"],
+  administrativo:["calendar","cobros","stock","contratos","sheets","facturacion"],
+  setter:        ["setter","leads","whatsapp","conversion","redes"],
+  contenido:     ["redes","edicion","redaccion","whatsapp"],
+  personalizado: [],
+};
+
+var SKILL_QUESTIONS = {
+  whatsapp:    {q:"¿Usás WhatsApp para trabajo? ¿Con qué frecuencia?", opts:["Sí, todos los días en trabajo anterior","Sí, ocasionalmente","No, pero puedo aprender","No"]},
+  calendar:    {q:"¿Manejás agendas digitales?", opts:["Sí, Google Calendar u otra herramienta habitualmente","Lo usé alguna vez","No, pero puedo aprender rápido","No"]},
+  sheets:      {q:"¿Usás Google Sheets o Excel para trabajar?", opts:["Sí, habitualmente","Nivel básico","No, pero puedo aprender","No"]},
+  presencial:  {q:"¿Tuviste experiencia de atención directa a clientes o pacientes?", opts:["Sí, más de 2 años","Sí, menos de 2 años","No, pero me interesa trabajar en el rubro salud","No"]},
+  discrecion:  {q:"¿Trabajaste con información confidencial de clientes o pacientes?", opts:["Sí, habitualmente y con protocolos claros","Alguna vez","No, pero entiendo la importancia","No"]},
+  cobros:      {q:"¿Tuviste experiencia haciendo seguimiento de cobros o pagos?", opts:["Sí, habitualmente","Alguna vez","No"]},
+  stock:       {q:"¿Gestionaste stock o inventario de insumos?", opts:["Sí, con registros y puntos de pedido","Alguna vez de forma básica","No"]},
+  contratos:   {q:"¿Tuviste experiencia gestionando contratos o pagos de alquiler?", opts:["Sí","No"]},
+  facturacion: {q:"¿Manejaste facturación o registros contables básicos?", opts:["Sí, habitualmente","Nivel básico","No"]},
+  redes:       {q:"¿Manejás redes sociales para un negocio (no personal)?", opts:["Sí, activamente","Alguna vez","No"]},
+  edicion:     {q:"¿Usás Canva o editás videos/reels?", opts:["Sí, habitualmente","Nivel básico","No"]},
+  redaccion:   {q:"¿Tenés experiencia redactando textos para comunicación o redes?", opts:["Sí, habitualmente","Alguna vez","No"]},
+  setter:      {q:"¿Tuviste experiencia en llamadas para entender si alguien es el perfil adecuado para un servicio?", opts:["Sí, habitualmente","Alguna vez","No, pero me interesa ese tipo de trabajo","No"]},
+  leads:       {q:"¿Hiciste seguimiento de personas interesadas en un servicio?", opts:["Sí, habitualmente con algún sistema o registro","Alguna vez","No"]},
+  conversion:  {q:"¿Tuviste experiencia convirtiendo consultas en ventas o turnos confirmados?", opts:["Sí, con buenos resultados","Alguna vez","No"]},
+};
+
+var BASE_QUESTIONS = [
+  {q:"¿Cuál es tu disponibilidad horaria?", opts:["Mañanas (9 a 13hs)","Tardes (14 a 18hs)","Mañanas y tardes","Flexible / A definir"]},
+  {q:"¿Cuál es tu expectativa de remuneración mensual?", opts:["Completar con texto libre"]},
+  {q:"¿Tenés experiencia previa en un trabajo similar? Describila brevemente.", opts:["Completar con texto libre"]},
+];
+
+var selectedSkills = new Set();
+var formData = {};
+
+// ── INIT ─────────────────────────────────────────────────────────────────────
+
+function initSkills() {
+  var wrap = document.getElementById('skills-wrap');
+  wrap.innerHTML = '';
+  SKILLS.forEach(function(s) {
+    var btn = document.createElement('button');
+    btn.className = 'skill-chip' + (selectedSkills.has(s.id) ? ' on' : '');
+    btn.textContent = s.label;
+    btn.onclick = function() { toggleSkill(s.id, btn); };
+    wrap.appendChild(btn);
+  });
+}
+
+function toggleSkill(id, btn) {
+  if (selectedSkills.has(id)) { selectedSkills.delete(id); btn.classList.remove('on'); }
+  else { selectedSkills.add(id); btn.classList.add('on'); }
+}
+
+function onRolChange() {
+  var rol = document.getElementById('rol-tipo').value;
+  var customField = document.getElementById('field-rol-custom');
+  customField.style.display = rol === 'personalizado' ? 'block' : 'none';
+  selectedSkills.clear();
+  if (ROL_SKILLS[rol]) ROL_SKILLS[rol].forEach(function(s) { selectedSkills.add(s); });
+  initSkills();
+}
+
+// ── NAVIGATION ────────────────────────────────────────────────────────────────
+
+function go(id) {
+  document.querySelectorAll('.screen').forEach(function(s) { s.classList.remove('active'); });
+  document.getElementById(id).classList.add('active');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+// ── STEP 1 → 2 ───────────────────────────────────────────────────────────────
+
+function goToAviso() {
+  var rolTipo = document.getElementById('rol-tipo').value;
+  var tareas  = document.getElementById('tareas').value.trim();
+  var horas   = document.getElementById('horas').value.trim();
+  var modal   = document.getElementById('modalidad').value;
+
+  if (!rolTipo || !tareas || !horas || !modal || selectedSkills.size === 0) {
+    alert('Completá el rol, las tareas, las horas, la modalidad y al menos un skill antes de continuar.'); return;
+  }
+
+  var rolLabel;
+  if (rolTipo === 'personalizado') {
+    rolLabel = document.getElementById('rol-custom').value.trim() || 'Rol personalizado';
+  } else {
+    rolLabel = document.getElementById('rol-tipo').options[document.getElementById('rol-tipo').selectedIndex].text;
+  }
+
+  var pago   = document.getElementById('pago').value.trim();
+  var skills = SKILLS.filter(function(s) { return selectedSkills.has(s.id); }).map(function(s) { return s.label; });
+
+  formData = { rolTipo, rolLabel, tareas, horas, modal, pago, skills };
+
+  var tareasLines = tareas.split(/[\n,·•]+/).map(function(t) { return t.trim(); }).filter(Boolean);
+
+  var skillLine = skills.slice(0,4).join(' · ');
+  if (skills.length > 4) skillLine += ' · y más';
+
+  var aviso = '🔍 Buscamos ' + rolLabel + '\n';
+  aviso += horas + '/semana · ' + modal + '\n\n';
+  aviso += '¿Qué vas a hacer?\n';
+  tareasLines.forEach(function(t) { aviso += '→ ' + (t.charAt(0).toUpperCase() + t.slice(1)) + '\n'; });
+  aviso += '\n¿Qué necesitamos?\n';
+  aviso += skillLine + '\n';
+  if (pago) aviso += '\n💰 Remuneración: ' + pago + '\n';
+  aviso += '\n¿Te interesa? Completá el formulario 👇\n[link del formulario]';
+
+  document.getElementById('aviso-text').textContent = aviso;
+  formData.avisoText = aviso;
+
+  go('s-step2');
+}
+
+function copyAviso() {
+  navigator.clipboard.writeText(formData.avisoText || '').then(function() {
+    var btn = document.getElementById('btn-copy-aviso');
+    btn.textContent = '✓ Copiado';
+    btn.classList.add('copied');
+    setTimeout(function() { btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="4" width="8" height="9" rx="1"/><path d="M4 4V3a1 1 0 011-1h6a1 1 0 011 1v8a1 1 0 01-1 1h-1"/></svg> Copiar texto'; btn.classList.remove('copied'); }, 2500);
+  });
+}
+
+// ── STEP 2 → 3 ────────────────────────────────────────────────────────────────
+
+function goToForm() {
+  var container = document.getElementById('form-questions');
+  container.innerHTML = '';
+  var qNum = 1;
+  var allFormText = '';
+
+  // Base questions
+  var baseSection = document.createElement('div');
+  baseSection.className = 'q-section';
+  var baseTitle = document.createElement('p');
+  baseTitle.className = 'q-section-title';
+  baseTitle.textContent = 'PREGUNTAS BASE — siempre incluir';
+  baseSection.appendChild(baseTitle);
+
+  BASE_QUESTIONS.forEach(function(bq) {
+    var card = makeQCard(qNum, bq.q, bq.opts);
+    baseSection.appendChild(card);
+    allFormText += qNum + '. ' + bq.q + '\n';
+    bq.opts.forEach(function(o) { allFormText += '   ○ ' + o + '\n'; });
+    allFormText += '\n';
+    qNum++;
+  });
+  container.appendChild(baseSection);
+
+  // Skill-specific questions
+  var skillSection = document.createElement('div');
+  skillSection.className = 'q-section';
+  var skillTitle = document.createElement('p');
+  skillTitle.className = 'q-section-title';
+  skillTitle.textContent = 'PREGUNTAS SEGÚN EL ROL';
+  skillSection.appendChild(skillTitle);
+
+  SKILLS.filter(function(s) { return selectedSkills.has(s.id); }).forEach(function(s) {
+    var sq = SKILL_QUESTIONS[s.id];
+    if (!sq) return;
+    var card = makeQCard(qNum, sq.q, sq.opts);
+    skillSection.appendChild(card);
+    allFormText += qNum + '. ' + sq.q + '\n';
+    sq.opts.forEach(function(o) { allFormText += '   ○ ' + o + '\n'; });
+    allFormText += '\n';
+    qNum++;
+  });
+
+  // Add CV question
+  var cvQ = {q:"Adjuntá tu CV (PDF preferentemente)", opts:["Adjuntar archivo"]};
+  var cvCard = makeQCard(qNum, cvQ.q, cvQ.opts);
+  skillSection.appendChild(cvCard);
+  allFormText += qNum + '. ' + cvQ.q + '\n   ○ Adjuntar archivo\n\n';
+  qNum++;
+
+  container.appendChild(skillSection);
+  formData.allFormText = allFormText;
+
+  go('s-step3');
+}
+
+function makeQCard(num, question, opts) {
+  var card = document.createElement('div');
+  card.className = 'q-item';
+  var numEl = document.createElement('div');
+  numEl.className = 'q-num';
+  numEl.textContent = 'Pregunta ' + num;
+  var qEl = document.createElement('div');
+  qEl.className = 'q-text';
+  qEl.textContent = question;
+  var optsEl = document.createElement('div');
+  optsEl.className = 'q-opts';
+  opts.forEach(function(o) {
+    var opt = document.createElement('div');
+    opt.className = 'q-opt';
+    opt.appendChild(document.createTextNode(o));
+    optsEl.appendChild(opt);
+  });
+  card.appendChild(numEl);
+  card.appendChild(qEl);
+  card.appendChild(optsEl);
+  return card;
+}
+
+function copyForm() {
+  navigator.clipboard.writeText(formData.allFormText || '').then(function() {
+    var btn = document.getElementById('btn-copy-form');
+    btn.textContent = '✓ Preguntas copiadas';
+    btn.classList.add('copied');
+    setTimeout(function() { btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="4" width="8" height="9" rx="1"/><path d="M4 4V3a1 1 0 011-1h6a1 1 0 011 1v8a1 1 0 01-1 1h-1"/></svg> Copiar todas las preguntas'; btn.classList.remove('copied'); }, 2500);
+  });
+}
+
+function restart() {
+  selectedSkills.clear();
+  formData = {};
+  document.getElementById('rol-tipo').value = '';
+  document.getElementById('tareas').value = '';
+  document.getElementById('horas').value = '';
+  document.getElementById('modalidad').value = '';
+  document.getElementById('pago').value = '';
+  document.getElementById('field-rol-custom').style.display = 'none';
+  initSkills();
+  go('s-intro');
+}
+
+// Init
+initSkills();
+</script>
+</body>
+</html>

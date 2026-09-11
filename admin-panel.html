@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Panel Admin — Respuestas Formularios</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --navy: #1e2d5a;
+  --teal: #00c9a0;
+  --olive: #6b7a3a;
+  --cream: #f7f4ef;
+  --white: #fff;
+  --gray-100: #f5f5f5;
+  --gray-200: #e8e6e0;
+  --gray-400: #9c9a94;
+  --gray-600: #5c5a56;
+}
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--cream);
+  color: var(--navy);
+  padding: 2rem;
+}
+
+.container {
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+header {
+  background: var(--navy);
+  color: white;
+  padding: 1.5rem 2rem;
+  border-radius: 12px;
+  margin-bottom: 2rem;
+}
+
+h1 {
+  font-size: 1.75rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.subtitle {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.95rem;
+}
+
+.filters {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 10px;
+  margin-bottom: 1.5rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.filter-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--navy);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.filter-input,
+.filter-select {
+  padding: 0.7rem 1rem;
+  border: 1.5px solid var(--gray-200);
+  border-radius: 8px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.95rem;
+  transition: border-color 0.2s;
+}
+
+.filter-input:focus,
+.filter-select:focus {
+  outline: none;
+  border-color: var(--teal);
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.stat-card {
+  background: white;
+  padding: 1.25rem;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.stat-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--gray-400);
+  margin-bottom: 0.5rem;
+}
+
+.stat-value {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--navy);
+}
+
+.table-wrapper {
+  background: white;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+thead {
+  background: var(--navy);
+  color: white;
+}
+
+th {
+  padding: 1rem;
+  text-align: left;
+  font-weight: 600;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+td {
+  padding: 1rem;
+  border-bottom: 1px solid var(--gray-200);
+  font-size: 0.9rem;
+}
+
+tr:hover {
+  background: var(--gray-100);
+}
+
+.badge {
+  display: inline-block;
+  padding: 0.3rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.badge-financiero {
+  background: #e6faf6;
+  color: #00a882;
+}
+
+.badge-roles {
+  background: #fff8ec;
+  color: #ba7517;
+}
+
+.badge-inventario {
+  background: #f0f2f8;
+  color: #6b7a9a;
+}
+
+.badge-delegacion {
+  background: #fff0f0;
+  color: #e24b4a;
+}
+
+.json-preview {
+  max-width: 300px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: 'Courier New', monospace;
+  font-size: 0.85rem;
+  color: var(--gray-600);
+  cursor: pointer;
+}
+
+.json-preview:hover {
+  color: var(--teal);
+}
+
+.loading {
+  text-align: center;
+  padding: 3rem;
+  color: var(--gray-400);
+}
+
+.empty-state {
+  text-align: center;
+  padding: 4rem 2rem;
+}
+
+.empty-state svg {
+  width: 64px;
+  height: 64px;
+  margin-bottom: 1rem;
+  opacity: 0.3;
+}
+
+.btn {
+  padding: 0.75rem 1.5rem;
+  background: var(--teal);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.btn:hover {
+  background: #00a882;
+}
+
+.modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal.active {
+  display: flex;
+}
+
+.modal-content {
+  background: white;
+  border-radius: 12px;
+  padding: 2rem;
+  max-width: 800px;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid var(--gray-200);
+}
+
+.modal-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--navy);
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: var(--gray-400);
+  padding: 0;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: background 0.2s;
+}
+
+.close-btn:hover {
+  background: var(--gray-100);
+  color: var(--navy);
+}
+
+pre {
+  background: var(--gray-100);
+  padding: 1rem;
+  border-radius: 8px;
+  overflow-x: auto;
+  font-size: 0.85rem;
+  line-height: 1.5;
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+  <header>
+    <h1>🗄️ Panel de Administración</h1>
+    <p class="subtitle">Respuestas de formularios — Operaciones Saludables</p>
+  </header>
+
+  <div class="filters">
+    <div class="filter-group">
+      <label class="filter-label">Nombre</label>
+      <input type="text" id="filter-nombre" class="filter-input" placeholder="Buscar por nombre...">
+    </div>
+    <div class="filter-group">
+      <label class="filter-label">Email</label>
+      <input type="email" id="filter-email" class="filter-input" placeholder="Buscar por email...">
+    </div>
+    <div class="filter-group">
+      <label class="filter-label">Tipo de formulario</label>
+      <select id="filter-tipo" class="filter-select">
+        <option value="">Todos los formularios</option>
+        <option value="diagnostico_financiero">Diagnóstico Financiero</option>
+        <option value="diagnostico_roles">Diagnóstico de Roles</option>
+        <option value="inventario_semanal">Inventario Semanal</option>
+        <option value="diagnostico_delegacion">Diagnóstico de Delegación</option>
+      </select>
+    </div>
+    <div class="filter-group" style="display: flex; align-items: flex-end;">
+      <button class="btn" onclick="aplicarFiltros()">Filtrar</button>
+    </div>
+  </div>
+
+  <div class="stats">
+    <div class="stat-card">
+      <div class="stat-label">Total respuestas</div>
+      <div class="stat-value" id="stat-total">-</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Últimas 24h</div>
+      <div class="stat-value" id="stat-recent">-</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Usuarios únicos</div>
+      <div class="stat-value" id="stat-users">-</div>
+    </div>
+  </div>
+
+  <div class="table-wrapper">
+    <table id="respuestas-table">
+      <thead>
+        <tr>
+          <th>Fecha</th>
+          <th>Formulario</th>
+          <th>Nombre</th>
+          <th>Email</th>
+          <th>Respuestas</th>
+        </tr>
+      </thead>
+      <tbody id="table-body">
+        <tr>
+          <td colspan="5" class="loading">Cargando respuestas...</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Modal para ver respuestas completas -->
+<div class="modal" id="json-modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2 class="modal-title">Respuestas completas</h2>
+      <button class="close-btn" onclick="cerrarModal()">×</button>
+    </div>
+    <pre id="json-content"></pre>
+  </div>
+</div>
+
+<!-- Cargar Supabase y lógica -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/api/config.js"></script>
+
+<script>
+// Inicializar Supabase
+const supabaseAdmin = supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY);
+
+let allRespuestas = [];
+
+// Cargar respuestas al iniciar
+async function cargarRespuestas() {
+  try {
+    const { data, error } = await supabaseAdmin
+      .from('respuestas_formularios')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+
+    allRespuestas = data;
+    renderizarTabla(data);
+    actualizarEstadisticas(data);
+
+  } catch (error) {
+    console.error('Error al cargar respuestas:', error);
+    document.getElementById('table-body').innerHTML = `
+      <tr>
+        <td colspan="5" class="empty-state">
+          ❌ Error al cargar datos: ${error.message}
+        </td>
+      </tr>
+    `;
+  }
+}
+
+// Renderizar tabla
+function renderizarTabla(respuestas) {
+  const tbody = document.getElementById('table-body');
+
+  if (!respuestas || respuestas.length === 0) {
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="5" class="empty-state">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+          </svg>
+          <p style="font-size: 1.1rem; font-weight: 600; margin-bottom: 0.5rem;">No hay respuestas aún</p>
+          <p style="color: var(--gray-400);">Las respuestas aparecerán aquí cuando los usuarios completen los formularios</p>
+        </td>
+      </tr>
+    `;
+    return;
+  }
+
+  tbody.innerHTML = respuestas.map(r => {
+    const fecha = new Date(r.created_at).toLocaleString('es-AR', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+
+    const badgeClass = `badge-${r.formulario_id.split('_')[1] || r.formulario_id}`;
+    const nombreFormulario = {
+      'diagnostico_financiero': 'Diagnóstico Financiero',
+      'diagnostico_roles': 'Diagnóstico de Roles',
+      'inventario_semanal': 'Inventario Semanal',
+      'diagnostico_delegacion': 'Diagnóstico de Delegación'
+    }[r.formulario_id] || r.formulario_id;
+
+    const jsonPreview = JSON.stringify(r.respuestas).substring(0, 50) + '...';
+
+    return `
+      <tr>
+        <td>${fecha}</td>
+        <td><span class="badge ${badgeClass}">${nombreFormulario}</span></td>
+        <td>${r.nombre}</td>
+        <td>${r.email}</td>
+        <td>
+          <span class="json-preview" onclick='verJSON(${JSON.stringify(r.respuestas).replace(/'/g, "\\'")})'>${jsonPreview}</span>
+        </td>
+      </tr>
+    `;
+  }).join('');
+}
+
+// Actualizar estadísticas
+function actualizarEstadisticas(respuestas) {
+  document.getElementById('stat-total').textContent = respuestas.length;
+
+  const hace24h = new Date(Date.now() - 24 * 60 * 60 * 1000);
+  const recientes = respuestas.filter(r => new Date(r.created_at) > hace24h);
+  document.getElementById('stat-recent').textContent = recientes.length;
+
+  const emailsUnicos = new Set(respuestas.map(r => r.email));
+  document.getElementById('stat-users').textContent = emailsUnicos.size;
+}
+
+// Aplicar filtros
+function aplicarFiltros() {
+  const nombreFiltro = document.getElementById('filter-nombre').value.toLowerCase();
+  const emailFiltro = document.getElementById('filter-email').value.toLowerCase();
+  const tipoFiltro = document.getElementById('filter-tipo').value;
+
+  const filtradas = allRespuestas.filter(r => {
+    const matchNombre = !nombreFiltro || r.nombre.toLowerCase().includes(nombreFiltro);
+    const matchEmail = !emailFiltro || r.email.toLowerCase().includes(emailFiltro);
+    const matchTipo = !tipoFiltro || r.formulario_id === tipoFiltro;
+
+    return matchNombre && matchEmail && matchTipo;
+  });
+
+  renderizarTabla(filtradas);
+  actualizarEstadisticas(filtradas);
+}
+
+// Ver JSON completo en modal
+function verJSON(respuestas) {
+  const modal = document.getElementById('json-modal');
+  const content = document.getElementById('json-content');
+  content.textContent = JSON.stringify(respuestas, null, 2);
+  modal.classList.add('active');
+}
+
+function cerrarModal() {
+  document.getElementById('json-modal').classList.remove('active');
+}
+
+// Event listeners
+document.getElementById('filter-nombre').addEventListener('input', aplicarFiltros);
+document.getElementById('filter-email').addEventListener('input', aplicarFiltros);
+document.getElementById('filter-tipo').addEventListener('change', aplicarFiltros);
+
+// Cerrar modal con ESC o click fuera
+document.getElementById('json-modal').addEventListener('click', (e) => {
+  if (e.target.id === 'json-modal') cerrarModal();
+});
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') cerrarModal();
+});
+
+// Iniciar carga
+cargarRespuestas();
+
+// Recargar cada 30 segundos
+setInterval(cargarRespuestas, 30000);
+</script>
+
+</body>
+</html>

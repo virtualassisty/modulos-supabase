@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Inventario Semanal del Dueño — Módulo 2</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --navy:#1e2d5a;--navy-dark:#151f3e;--navy-light:#2a3d7a;
+  --olive:#3f4323;--olive-dark:#3f4323;--olive-lite:#e6faf6;
+  --olive:#6b7a3a;--olive-lite:#f2f4e8;
+  --cream:#f7f4ef;--white:#fff;
+  --g100:#f8f7f5;--g200:#e8e6e0;--g400:#9c9a94;--g600:#5c5a56;
+  --red:#e24b4a;--red-lite:#fff0f0;
+  --amber:#ba7517;--amber-lite:#fff8ec;
+  --green:#0f6e56;--green-lite:#f2f4e8;
+  --clinical:#6b7a9a;--clinical-lite:#f0f2f8;
+}
+html{scroll-behavior:smooth}
+body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--navy-dark);min-height:100vh;display:flex;flex-direction:column;align-items:center}
+
+/* HEADER */
+.hdr{width:100%;background:var(--navy);padding:1rem 2rem;display:flex;align-items:center;justify-content:space-between}
+.hdr-logo{font-family:'DM Serif Display',serif;font-size:1.1rem;color:#fff}
+.hdr-logo span{color:#3f4323}
+.hdr-tag{font-size:.7rem;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.45)}
+
+/* LAYOUT */
+.wrap{width:100%;max-width:720px;padding:2.5rem 2rem 4rem}
+.screen{display:none}
+.screen.active{display:block;animation:fadeIn .3s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* TYPOGRAPHY */
+.eyebrow{font-size:.7rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:#3f4323;margin-bottom:1rem}
+.page-title{font-family:'DM Serif Display',serif;font-size:clamp(1.8rem,4.5vw,2.6rem);line-height:1.15;color:var(--navy);margin-bottom:1rem}
+.page-desc{font-size:.95rem;line-height:1.7;color:var(--g600);margin-bottom:1.75rem;max-width:540px}
+.sec-head{font-size:.7rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--g400);margin-bottom:.9rem;margin-top:1.5rem;display:flex;align-items:center;gap:8px}
+.sec-head::after{content:'';flex:1;height:1px;background:var(--g200)}
+
+/* HOW GRID */
+.how-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:2rem}
+.how-card{background:var(--white);border:1px solid var(--g200);border-radius:12px;padding:1rem;text-align:center}
+.how-num{width:28px;height:28px;border-radius:8px;background:var(--navy);color:#fff;font-size:.75rem;font-weight:600;display:flex;align-items:center;justify-content:center;margin:0 auto .6rem}
+.how-title{font-size:.8rem;font-weight:600;color:var(--navy);margin-bottom:.3rem}
+.how-desc{font-size:.72rem;color:var(--g400);line-height:1.45}
+
+/* BUTTONS */
+.btn-p{display:inline-flex;align-items:center;gap:10px;background:var(--navy);color:#fff;border:none;border-radius:10px;padding:.9rem 1.75rem;font-family:'DM Sans',sans-serif;font-size:.95rem;font-weight:500;cursor:pointer;transition:background .2s,transform .15s}
+.btn-p:hover{background:var(--navy-light);transform:translateY(-1px)}
+.btn-p:disabled{opacity:.35;cursor:not-allowed;transform:none}
+.btn-g{padding:.7rem 1.4rem;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:.88rem;font-weight:500;cursor:pointer;transition:all .18s;border:1.5px solid var(--g200);background:var(--white);color:var(--g600)}
+.btn-g:hover{border-color:var(--navy);color:var(--navy)}
+.nav-row{display:flex;gap:10px;margin-top:1.5rem}
+
+/* FORM */
+.form-wrap{background:var(--white);border:1px solid var(--g200);border-radius:16px;padding:1.75rem;margin-bottom:1.5rem}
+.form-title{font-family:'DM Serif Display',serif;font-size:1.2rem;color:var(--navy);margin-bottom:1.25rem}
+.field{margin-bottom:1.1rem}
+.field-label{font-size:.75rem;font-weight:600;color:var(--navy);letter-spacing:.03em;margin-bottom:6px;display:block}
+.field-label span{color:#3f4323}
+.f-input{padding:.7rem 1rem;border:1.5px solid var(--g200);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:.9rem;color:var(--navy-dark);background:var(--white);outline:none;transition:border-color .18s;width:100%}
+.f-input:focus{border-color:#3f4323}
+.f-input::placeholder{color:var(--g400)}
+
+/* TOGGLE BUTTONS */
+.tgrp{display:flex;flex-direction:column;gap:7px}
+.tbtn{padding:.65rem 1rem;border:1.5px solid var(--g200);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:.83rem;cursor:pointer;background:var(--white);color:var(--g600);transition:all .18s;text-align:left;line-height:1.4}
+.tbtn:hover{border-color:var(--navy);color:var(--navy)}
+.tbtn.on{border-color:#3f4323;background:var(--olive-lite);color:var(--navy-dark);font-weight:500}
+.tbtn.on-amber{border-color:var(--amber);background:var(--amber-lite);color:var(--amber);font-weight:500}
+.tbtn.on-clinical{border-color:var(--clinical);background:var(--clinical-lite);color:var(--clinical);font-weight:500}
+.hint{font-size:.73rem;color:var(--g400);margin-top:6px;font-style:italic;line-height:1.5}
+.f-err{display:none;font-size:.78rem;color:var(--red);margin-top:.5rem}
+
+/* Conditional fields */
+.cond-fields{display:none;margin-top:1rem;padding-top:1rem;border-top:1px solid var(--g200)}
+.cond-fields.visible{display:block}
+
+/* TASK LIST */
+.tl-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:.75rem}
+.tl-label{font-size:.75rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--g400)}
+.empty{text-align:center;padding:2rem;color:var(--g400);font-size:.88rem;border:1.5px dashed var(--g200);border-radius:12px}
+.task-item{background:var(--white);border:1px solid var(--g200);border-radius:10px;padding:.9rem 1rem;margin-bottom:8px;display:flex;align-items:center;gap:12px}
+.t-badge{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.t-info{flex:1;min-width:0}
+.t-name{font-size:.88rem;font-weight:500;color:var(--navy-dark);margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.t-meta{font-size:.73rem;color:var(--g400);display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.t-cat{font-size:.68rem;font-weight:600;padding:2px 8px;border-radius:10px}
+.t-del{background:none;border:none;cursor:pointer;color:var(--g400);font-size:.9rem;padding:4px;border-radius:4px;flex-shrink:0;transition:color .18s}
+.t-del:hover{color:var(--red)}
+
+/* ANALYSIS */
+.a-hdr{background:var(--navy);border-radius:16px;padding:1.75rem;margin-bottom:1.5rem;position:relative;overflow:hidden}
+.a-hdr::before{content:'';position:absolute;top:-30px;right:-30px;width:140px;height:140px;border-radius:50%;background:rgba(0,201,160,.08)}
+.a-ey{font-size:.68rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:#3f4323;margin-bottom:.5rem}
+.a-ttl{font-family:'DM Serif Display',serif;font-size:1.6rem;color:#fff;margin-bottom:.4rem}
+.a-sub{font-size:.85rem;color:rgba(255,255,255,.6)}
+
+/* Clinical info banner */
+.clinical-banner{background:var(--clinical-lite);border:1px solid #c5cce0;border-radius:12px;padding:1rem 1.25rem;margin-bottom:1.25rem;display:flex;align-items:flex-start;gap:12px}
+.clinical-icon{font-size:1.1rem;flex-shrink:0;margin-top:1px}
+.clinical-text{font-size:.83rem;color:var(--clinical);line-height:1.55}
+.clinical-text strong{font-weight:600;color:var(--navy)}
+
+/* Stat grid */
+.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:1.25rem}
+.stat-card{background:var(--white);border:1px solid var(--g200);border-radius:10px;padding:.9rem;text-align:center}
+.stat-num{font-family:'DM Serif Display',serif;font-size:1.6rem;line-height:1;margin-bottom:.2rem}
+.stat-lbl{font-size:.68rem;color:var(--g400);font-weight:500;line-height:1.35}
+
+/* Cards */
+.card{background:var(--white);border:1px solid var(--g200);border-radius:14px;padding:1.5rem;margin-bottom:1.25rem}
+.card-title{font-size:.7rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--g400);margin-bottom:1rem;display:flex;align-items:center;gap:8px}
+.card-title::after{content:'';flex:1;height:1px;background:var(--g200)}
+
+/* Pie */
+.pie-wrap{display:flex;align-items:center;gap:2rem;flex-wrap:wrap}
+.pie-legend{display:flex;flex-direction:column;gap:10px;flex:1;min-width:160px}
+.pie-li{display:flex;align-items:center;gap:10px}
+.pie-dot{width:12px;height:12px;border-radius:50%;flex-shrink:0}
+.pie-lbl{font-size:.82rem;color:var(--g600);line-height:1.3;flex:1}
+.pie-val{font-size:.88rem;font-weight:600}
+.pill-warn{margin-top:.75rem;padding:.7rem 1rem;border-radius:8px;font-size:.78rem;line-height:1.55}
+
+/* Distribution bars */
+.dist-row{margin-bottom:1rem}
+.dist-row:last-child{margin-bottom:0}
+.dist-lrow{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:5px}
+.dist-lbl{font-size:.82rem;font-weight:500;color:var(--navy)}
+.dist-pct{font-size:.82rem;font-weight:600}
+.dist-ideal{font-size:.72rem;color:var(--g400);margin-left:4px}
+.dist-track{height:10px;background:var(--g200);border-radius:5px;overflow:hidden;position:relative}
+.dist-fill{height:100%;border-radius:5px;transition:width .8s cubic-bezier(.4,0,.2,1)}
+.dist-iline{position:absolute;top:0;height:100%;width:2px;background:rgba(0,0,0,.18)}
+.dist-gap{font-size:.72rem;margin-top:4px}
+
+/* Insight */
+.insight{border-radius:12px;padding:1.1rem 1.25rem;margin-bottom:1.25rem}
+.insight-ttl{font-size:.85rem;font-weight:600;margin-bottom:.35rem}
+.insight-txt{font-size:.82rem;line-height:1.6}
+
+/* Delegate list */
+.del-list{display:flex;flex-direction:column;gap:8px}
+.del-card{background:var(--white);border:1px solid var(--g200);border-radius:10px;padding:1rem 1.1rem;display:flex;align-items:flex-start;gap:12px}
+.del-icon{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:.85rem;font-weight:700}
+.del-name{font-size:.88rem;font-weight:600;color:var(--navy);margin-bottom:2px}
+.del-meta{font-size:.75rem;color:var(--g400)}
+
+/* Steps */
+.step-card{background:var(--white);border:1px solid var(--g200);border-radius:10px;padding:1rem 1.1rem;display:flex;gap:12px;align-items:flex-start;margin-bottom:8px}
+.step-num{width:26px;height:26px;border-radius:7px;background:var(--olive-lite);color:#3f4323;font-size:.75rem;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.step-ttl{font-size:.87rem;font-weight:600;color:var(--navy);margin-bottom:3px}
+.step-dsc{font-size:.8rem;color:var(--g600);line-height:1.5}
+
+/* CTA */
+.cta-box{background:var(--navy);border-radius:14px;padding:1.5rem;margin-top:1.5rem}
+.cta-ttl{font-family:'DM Serif Display',serif;font-size:1.2rem;color:#fff;margin-bottom:.5rem}
+.cta-dsc{font-size:.83rem;color:rgba(255,255,255,.65);line-height:1.6;margin-bottom:1rem}
+.cta-btns{display:flex;gap:10px;flex-wrap:wrap}
+.btn-cp{padding:.65rem 1.3rem;background:#3f4323;color:var(--navy-dark);border:none;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:.83rem;font-weight:600;cursor:pointer;transition:all .18s}
+.btn-cp:hover{background:#3f4323;color:#fff}
+.btn-cs{padding:.65rem 1.3rem;background:transparent;color:rgba(255,255,255,.65);border:1px solid rgba(255,255,255,.2);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:.83rem;cursor:pointer;transition:all .18s}
+.btn-cs:hover{border-color:rgba(255,255,255,.5);color:#fff}
+
+.footer{width:100%;padding:1.5rem 2rem;text-align:center;font-size:.72rem;color:var(--g400);border-top:1px solid var(--g200);margin-top:auto}
+
+@media(max-width:520px){
+  .how-grid{grid-template-columns:1fr}
+  .stat-grid{grid-template-columns:repeat(2,1fr)}
+  .wrap{padding:1.5rem 1.25rem 3rem}
+  .cta-btns,.pie-wrap{flex-direction:column}
+}
+</style>
+</head>
+<body>
+
+<header style="width:100%;background:#3f4323;padding:.85rem 2rem;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100">
+  <div style="display:flex;align-items:center;gap:.75rem">
+    <div style="width:32px;height:32px;border-radius:8px;background:rgba(247,244,239,.12);border:1px solid rgba(247,244,239,.2);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+      <span style="font-family:'DM Serif Display',serif;font-size:.8rem;font-weight:600;color:#f7f4ef">OS</span>
+    </div>
+    <span style="font-family:'DM Serif Display',serif;font-size:1.1rem;font-weight:300;color:#f7f4ef;letter-spacing:-.01em">Operaciones <span style="color:#c7cca8">Saludables</span></span>
+  </div>
+  <span style="font-size:.6rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:rgba(199,204,168,.5)">Módulo 2 · Inventario de Tareas</span>
+</header>
+
+<main class="wrap">
+
+  <!-- INTRO -->
+  <div class="screen active" id="s-intro">
+    
+    <h1 class="page-title">¿En qué estás<br>gastando tu tiempo?</h1>
+    <p class="page-desc">Cargá las tareas de tu semana y descubrí cómo estás distribuyendo tu tiempo fuera de la consulta — y qué podrías empezar a soltar.</p>
+    <div class="how-grid">
+      <div class="how-card">
+        <div class="how-num">1</div>
+        <div class="how-title">Cargás tus tareas</div>
+        <div class="how-desc">Todo lo que hiciste esta semana, incluyendo consultas</div>
+      </div>
+      <div class="how-card">
+        <div class="how-num">2</div>
+        <div class="how-title">Clasificás cada una</div>
+        <div class="how-desc">¿Es práctica clínica? ¿Requiere tu criterio? ¿Se puede delegar?</div>
+      </div>
+      <div class="how-card">
+        <div class="how-num">3</div>
+        <div class="how-title">Ves el análisis</div>
+        <div class="how-desc">Cómo usás el tiempo fuera de la consulta + qué soltar primero</div>
+      </div>
+    </div>
+    <div style="background:var(--clinical-lite);border:1px solid #c5cce0;border-radius:10px;padding:.9rem 1.1rem;margin-bottom:1.75rem;font-size:.82rem;color:var(--clinical);line-height:1.6">
+      📌 <strong style="color:var(--navy)">Nota:</strong> Las horas de consulta con pacientes no se analizan en la distribución — son el núcleo de tu trabajo y no están en discusión. El análisis se enfoca en todo lo que hacés <em>además</em> de atender.
+    </div>
+    <button class="btn-p" onclick="go('s-tasks')">
+      Empezar inventario
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
+    </button>
+  </div>
+
+  <!-- TASKS -->
+  <div class="screen" id="s-tasks">
+    <p class="eyebrow">Cargá tus tareas de la semana</p>
+    <h2 style="font-family:'DM Serif Display',serif;font-size:1.6rem;color:var(--navy);margin-bottom:.5rem">¿Qué hiciste esta semana?</h2>
+    <p style="font-size:.88rem;color:var(--g600);margin-bottom:1.5rem;line-height:1.6">Incluí tanto las consultas clínicas como todo lo demás. Cuanto más completo, más útil el análisis.</p>
+
+    <div class="form-wrap">
+      <p class="form-title">Agregar tarea</p>
+
+      <div class="field">
+        <label class="field-label">¿Qué tarea hiciste? <span>*</span></label>
+        <input class="f-input" id="f-tarea" type="text" placeholder="Ej: Atender consultas, confirmar turnos, responder WhatsApp..."/>
+      </div>
+
+      <div class="field">
+        <label class="field-label">Horas por semana <span>*</span></label>
+        <input class="f-input" id="f-horas" type="number" min="0.25" max="60" step="0.25" placeholder="Ej: 4" style="max-width:160px"/>
+      </div>
+
+      <div class="field">
+        <label class="field-label">¿Es parte de tu práctica clínica? <span>*</span></label>
+        <div class="tgrp" id="tg-clinica">
+          <button class="tbtn" data-v="si" onclick="pickClinical(this,'si')">Sí — es atención a pacientes, consultas o tratamientos directos</button>
+          <button class="tbtn" data-v="no" onclick="pickClinical(this,'no')">No — es una tarea de gestión o administración del negocio</button>
+        </div>
+      </div>
+
+      <!-- Campos condicionales (solo si NO es clínica) -->
+      <div class="cond-fields" id="cond-fields">
+        <div class="field">
+          <label class="field-label">¿Qué parte de esta tarea requiere tu criterio exclusivo? <span>*</span></label>
+          <div class="tgrp" id="tg-c">
+            <button class="tbtn" data-v="toda" onclick="pick('tg-c',this)">Toda la tarea — solo yo puedo hacerla de principio a fin</button>
+            <button class="tbtn" data-v="decision" onclick="pick('tg-c',this)">Solo la decisión final — el resto lo podría hacer alguien con instrucciones</button>
+            <button class="tbtn" data-v="ninguna" onclick="pick('tg-c',this)">Ninguna parte — con un proceso claro, otra persona podría hacerla entera</button>
+          </div>
+          <p class="hint">Ej: en el seguimiento de pacientes, la decisión clínica es tuya — pero el recordatorio y el registro los puede hacer una secretaria.</p>
+        </div>
+
+        <div class="field">
+          <label class="field-label">¿Es urgente o importante para el negocio? <span>*</span></label>
+          <div class="tgrp" id="tg-u">
+            <button class="tbtn" data-v="urgente" onclick="pick('tg-u',this,'on-amber')">Urgente — hay consecuencias inmediatas si no lo hago</button>
+            <button class="tbtn" data-v="importante" onclick="pick('tg-u',this,'on-amber')">Importante — impacta el crecimiento o la calidad del negocio</button>
+            <button class="tbtn" data-v="rutina" onclick="pick('tg-u',this,'on-amber')">Ninguna — es operativo de rutina</button>
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="field-label">¿Se puede delegar o automatizar? <span>*</span></label>
+          <div class="tgrp" id="tg-d">
+            <button class="tbtn" data-v="delegar" onclick="pick('tg-d',this)">Sí, lo podría hacer otra persona</button>
+            <button class="tbtn" data-v="automatizar" onclick="pick('tg-d',this)">Sí, se puede automatizar (recordatorio, plantilla, herramienta)</button>
+            <button class="tbtn" data-v="no" onclick="pick('tg-d',this)">No, por ahora tengo que hacerlo yo</button>
+          </div>
+        </div>
+      </div>
+
+      <button class="btn-p" style="margin-top:.75rem" onclick="addTask()">+ Agregar tarea</button>
+      <p class="f-err" id="f-err">Completá todos los campos antes de agregar.</p>
+    </div>
+
+    <div class="tl-hdr">
+      <span class="tl-label" id="tc-label">0 tareas cargadas</span>
+      <span style="font-size:.75rem;color:#3f4323;font-weight:500" id="h-label"></span>
+    </div>
+    <div id="task-list">
+      <div class="empty">Todavía no cargaste ninguna tarea.<br>Agregá al menos 3 para ver el análisis.</div>
+    </div>
+
+    <div class="nav-row">
+      <button class="btn-g" onclick="go('s-intro')">← Atrás</button>
+      <button class="btn-p" id="btn-ver" onclick="buildAnalysis()" disabled>Ver mi análisis →</button>
+    </div>
+  </div>
+
+  <!-- ANALYSIS -->
+  <div class="screen" id="s-analysis"></div>
+
+</main>
+<footer style="width:100%;background:#3f4323;padding:1.25rem 2rem;display:flex;align-items:center;justify-content:center;gap:.75rem;margin-top:auto">
+  <span style="font-size:.65rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:rgba(199,204,168,.6)">Operaciones Saludables — una iniciativa de <span style="color:#c7cca8">Negocios Saludables</span> y <span style="color:#c7cca8">Assistify</span></span>
+</footer>
+
+<script>
+var tasks = [];
+var isClinical = null; // tracks current form state
+
+function go(id) {
+  document.querySelectorAll('.screen').forEach(function(s){ s.classList.remove('active'); });
+  document.getElementById(id).classList.add('active');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function pickClinical(btn, val) {
+  isClinical = (val === 'si');
+  document.getElementById('tg-clinica').querySelectorAll('.tbtn').forEach(function(b){
+    b.classList.remove('on','on-amber','on-clinical');
+  });
+  btn.classList.add(isClinical ? 'on-clinical' : 'on');
+  // Show/hide conditional fields
+  var cond = document.getElementById('cond-fields');
+  if (isClinical) {
+    cond.classList.remove('visible');
+    // Clear conditional selections
+    ['tg-c','tg-u','tg-d'].forEach(function(g){
+      var el = document.getElementById(g);
+      if (el) el.querySelectorAll('.tbtn').forEach(function(b){ b.classList.remove('on','on-amber'); });
+    });
+  } else {
+    cond.classList.add('visible');
+  }
+}
+
+function pick(gid, btn, cls) {
+  var ac = cls || 'on';
+  document.getElementById(gid).querySelectorAll('.tbtn').forEach(function(b){ b.classList.remove('on','on-amber'); });
+  btn.classList.add(ac);
+}
+
+function getV(gid) {
+  var el = document.getElementById(gid);
+  if (!el) return null;
+  var a = el.querySelector('.on,.on-amber,.on-clinical');
+  return a ? a.getAttribute('data-v') : null;
+}
+
+function classify(c, u, d) {
+  if (c === 'toda'     && u === 'importante') return 'estrategica';
+  if (c === 'toda'     && u === 'rutina')     return 'estrategica';
+  if (c === 'decision' && u === 'importante') return 'tactica';
+  if (c === 'toda'     && u === 'urgente')    return 'tactica';
+  if (c === 'ninguna')                        return 'ejecutora';
+  if (c === 'decision' && u === 'urgente')    return 'ejecutora';
+  if (d === 'delegar' || d === 'automatizar') return 'ejecutora';
+  return 'tactica';
+}
+
+function catColor(cat) {
+  return {clinica:'#6b7a9a', estrategica:'#0f6e56', tactica:'#ba7517', ejecutora:'#e24b4a'}[cat] || '#9c9a94';
+}
+function catLite(cat) {
+  return {clinica:'#f0f2f8', estrategica:'#f2f4e8', tactica:'#fff8ec', ejecutora:'#fff0f0'}[cat] || '#f5f5f3';
+}
+function catLabel(cat) {
+  return {clinica:'Práctica clínica', estrategica:'Estratégica', tactica:'Táctica', ejecutora:'Ejecutora'}[cat] || cat;
+}
+
+function addTask() {
+  var tarea = document.getElementById('f-tarea').value.trim();
+  var horas = parseFloat(document.getElementById('f-horas').value);
+  var clinicaVal = getV('tg-clinica');
+  var err = document.getElementById('f-err');
+
+  if (!tarea || isNaN(horas) || horas <= 0 || !clinicaVal) {
+    err.style.display = 'block'; return;
+  }
+
+  var cat, c = null, u = null, d = null;
+  if (clinicaVal === 'si') {
+    cat = 'clinica';
+  } else {
+    c = getV('tg-c'); u = getV('tg-u'); d = getV('tg-d');
+    if (!c || !u || !d) { err.style.display = 'block'; return; }
+    cat = classify(c, u, d);
+  }
+  err.style.display = 'none';
+
+  tasks.push({id: Date.now(), tarea: tarea, horas: horas, cat: cat, c: c, u: u, d: d});
+
+  // Reset form
+  document.getElementById('f-tarea').value = '';
+  document.getElementById('f-horas').value = '';
+  isClinical = null;
+  document.getElementById('cond-fields').classList.remove('visible');
+  ['tg-clinica','tg-c','tg-u','tg-d'].forEach(function(g){
+    var el = document.getElementById(g);
+    if (el) el.querySelectorAll('.tbtn').forEach(function(b){ b.classList.remove('on','on-amber','on-clinical'); });
+  });
+  renderList();
+}
+
+function delTask(id) { tasks = tasks.filter(function(t){ return t.id !== id; }); renderList(); }
+
+function renderList() {
+  var list  = document.getElementById('task-list');
+  var total = tasks.reduce(function(s,t){ return s+t.horas; }, 0);
+  document.getElementById('tc-label').textContent = tasks.length + ' tarea' + (tasks.length !== 1 ? 's' : '') + ' cargada' + (tasks.length !== 1 ? 's' : '');
+  document.getElementById('h-label').textContent  = total > 0 ? total.toFixed(1) + ' hs en total' : '';
+  document.getElementById('btn-ver').disabled      = tasks.length < 3;
+
+  if (tasks.length === 0) {
+    list.innerHTML = '<div class="empty">Todavía no cargaste ninguna tarea.<br>Agregá al menos 3 para ver el análisis.</div>';
+    return;
+  }
+
+  var html = '';
+  tasks.forEach(function(t) {
+    var delegaTag = '';
+    if (t.d === 'delegar')     delegaTag = '<span style="color:#3f4323;font-size:.7rem;font-weight:600">↗ Delegar</span>';
+    if (t.d === 'automatizar') delegaTag = '<span style="color:#6b7a3a;font-size:.7rem;font-weight:600">⚙ Automatizar</span>';
+    html += '<div class="task-item">';
+    html += '<div class="t-badge" style="background:' + catColor(t.cat) + '"></div>';
+    html += '<div class="t-info"><div class="t-name">' + t.tarea + '</div>';
+    html += '<div class="t-meta"><span>' + t.horas + 'h/sem</span>';
+    html += '<span class="t-cat" style="background:' + catLite(t.cat) + ';color:' + catColor(t.cat) + '">' + catLabel(t.cat) + '</span>';
+    html += delegaTag + '</div></div>';
+    html += '<button class="t-del" onclick="delTask(' + t.id + ')">✕</button>';
+    html += '</div>';
+  });
+  list.innerHTML = html;
+}
+
+// ── PIE CHART ─────────────────────────────────────────────────────────────────
+function drawPie(canvasId, slices) {
+  var cv = document.getElementById(canvasId);
+  if (!cv) return;
+  var ctx = cv.getContext('2d');
+  var W = cv.width, H = cv.height, cx = W/2, cy = H/2, r = Math.min(W,H)/2 - 6;
+  ctx.clearRect(0, 0, W, H);
+  var total = slices.reduce(function(s,sl){ return s + sl.v; }, 0);
+  if (!total) return;
+  var start = -Math.PI/2;
+  slices.forEach(function(sl) {
+    if (!sl.v) return;
+    var sw = (sl.v / total) * Math.PI * 2;
+    ctx.beginPath(); ctx.moveTo(cx, cy); ctx.arc(cx, cy, r, start, start + sw); ctx.closePath();
+    ctx.fillStyle = sl.color; ctx.fill();
+    start += sw;
+  });
+  // Donut hole
+  ctx.beginPath(); ctx.arc(cx, cy, r * 0.54, 0, Math.PI * 2);
+  ctx.fillStyle = '#ffffff'; ctx.fill();
+  // Center text — show % delegable of NON-clinical
+  var nonClinical = slices.filter(function(s){ return s.cat !== 'clinica'; }).reduce(function(a,s){ return a+s.v; }, 0);
+  var delVal = slices.filter(function(s){ return s.delegable; }).reduce(function(a,s){ return a+s.v; }, 0);
+  var pct = nonClinical > 0 ? Math.round((delVal / nonClinical) * 100) : 0;
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillStyle = '#e24b4a'; ctx.font = 'bold 19px DM Sans,sans-serif';
+  ctx.fillText(pct + '%', cx, cy - 8);
+  ctx.fillStyle = '#9c9a94'; ctx.font = '7.5px DM Sans,sans-serif';
+  ctx.fillText('del tiempo no', cx, cy + 5);
+  ctx.fillText('clínico es', cx, cy + 14);
+  ctx.fillText('delegable', cx, cy + 23);
+}
+
+// ── BUILD ANALYSIS ─────────────────────────────────────────────────────────────
+function buildAnalysis() {
+  if (tasks.length < 3) return;
+
+  var totalHs = tasks.reduce(function(s,t){ return s+t.horas; }, 0);
+  var clinicaHs = tasks.filter(function(t){ return t.cat === 'clinica'; }).reduce(function(s,t){ return s+t.horas; }, 0);
+  var nonClinHs = totalHs - clinicaHs;
+
+  var by = {estrategica:0, tactica:0, ejecutora:0};
+  tasks.filter(function(t){ return t.cat !== 'clinica'; }).forEach(function(t){ by[t.cat] += t.horas; });
+
+  function pct(cat) { return nonClinHs > 0 ? Math.round((by[cat]/nonClinHs)*100) : 0; }
+  var pe = pct('estrategica'), pt = pct('tactica'), px = pct('ejecutora');
+
+  // Ideals for non-clinical time — adjusted for NS avatar (already sells well)
+  var ideal = {estrategica:60, tactica:25, ejecutora:15};
+
+  var toD = []; var seen = {};
+  tasks.filter(function(t){ return t.cat === 'ejecutora' || t.d === 'delegar' || t.d === 'automatizar'; })
+       .forEach(function(t){ if(!seen[t.id]){ seen[t.id]=true; toD.push(t); } });
+  var delHs = toD.reduce(function(s,t){ return s+t.horas; }, 0);
+  var delPctTotal = nonClinHs > 0 ? Math.round((by['ejecutora']/nonClinHs)*100) : 0;
+
+  var iT, iX, iBg, iFg;
+  if (px >= 40) {
+    iT = 'Estás en modo Ejecutor'; iBg = '#fff0f0'; iFg = '#e24b4a';
+    iX = 'Más del 40% de tu tiempo fuera de consulta está en tareas operativas que podría hacer otra persona. Hay margen real para empezar a soltar esta semana.';
+  } else if (pe >= 50) {
+    iT = 'Estás en modo Dueño'; iBg = '#f2f4e8'; iFg = '#0f6e56';
+    iX = 'La mayor parte de tu tiempo fuera de consulta está en estrategia. El siguiente paso es asegurarte de que lo operativo tenga sistema para no volver a caer sobre vos.';
+  } else {
+    iT = 'Estás en transición'; iBg = '#fff8ec'; iFg = '#ba7517';
+    iX = 'Tu tiempo está distribuido, pero todavía hay espacio para liberar horas del operativo y dedicarlas a lo que realmente hace crecer el negocio.';
+  }
+
+  var html = '';
+
+  // Header
+  html += '<div class="a-hdr">';
+  html += '<p class="a-ey">Inventario Semanal · Resultado</p>';
+  html += '<h2 class="a-ttl">Así distribuís tu tiempo</h2>';
+  html += '<p class="a-sub">' + tasks.length + ' tareas · ' + totalHs.toFixed(1) + ' horas en total</p>';
+  html += '</div>';
+
+  // Clinical banner (if any)
+  if (clinicaHs > 0) {
+    var clinicaPct = Math.round((clinicaHs/totalHs)*100);
+    html += '<div class="clinical-banner">';
+    html += '<div class="clinical-icon">🩺</div>';
+    html += '<div class="clinical-text"><strong>' + clinicaHs.toFixed(1) + ' horas (' + clinicaPct + '% de tu semana)</strong> son práctica clínica — atención directa a pacientes. Estas horas no se analizan en la distribución porque son el núcleo de tu trabajo. El análisis de abajo se basa en las <strong>' + nonClinHs.toFixed(1) + ' horas restantes.</strong></div>';
+    html += '</div>';
+  }
+
+  // Stat cards
+  html += '<div class="stat-grid">';
+  html += '<div class="stat-card"><div class="stat-num" style="color:#6b7a9a">' + clinicaHs.toFixed(1) + 'h</div><div class="stat-lbl">Práctica<br>clínica</div></div>';
+  html += '<div class="stat-card"><div class="stat-num" style="color:#0f6e56">' + pe + '%</div><div class="stat-lbl">Estratégico<br><span style="font-size:.6rem;color:#9c9a94">ideal: 60%</span></div></div>';
+  html += '<div class="stat-card"><div class="stat-num" style="color:#ba7517">' + pt + '%</div><div class="stat-lbl">Táctico<br><span style="font-size:.6rem;color:#9c9a94">ideal: 25%</span></div></div>';
+  html += '<div class="stat-card"><div class="stat-num" style="color:#e24b4a">' + px + '%</div><div class="stat-lbl">Ejecutor<br><span style="font-size:.6rem;color:#9c9a94">ideal: ≤15%</span></div></div>';
+  html += '</div>';
+
+  // Pie chart
+  html += '<div class="card"><p class="card-title">¿Cuánto de tu tiempo no clínico podría hacer otra persona?</p>';
+  html += '<div class="pie-wrap">';
+  html += '<canvas id="pie" width="180" height="180"></canvas>';
+  html += '<div class="pie-legend">';
+  html += '<div class="pie-li"><div class="pie-dot" style="background:#6b7a9a"></div><div class="pie-lbl">Clínico<br><span style="font-size:.7rem;color:#9c9a94">Excluido del análisis</span></div><div class="pie-val" style="color:#6b7a9a">' + (totalHs > 0 ? Math.round((clinicaHs/totalHs)*100) : 0) + '%</div></div>';
+  html += '<div class="pie-li"><div class="pie-dot" style="background:#0f6e56"></div><div class="pie-lbl">Estratégico<br><span style="font-size:.7rem;color:#9c9a94">Solo vos podés hacerlo</span></div><div class="pie-val" style="color:#0f6e56">' + pe + '%</div></div>';
+  html += '<div class="pie-li"><div class="pie-dot" style="background:#ba7517"></div><div class="pie-lbl">Táctico<br><span style="font-size:.7rem;color:#9c9a94">Coordinación y supervisión</span></div><div class="pie-val" style="color:#ba7517">' + pt + '%</div></div>';
+  html += '<div class="pie-li"><div class="pie-dot" style="background:#e24b4a"></div><div class="pie-lbl">Ejecutor<br><span style="font-size:.7rem;color:#9c9a94">Otra persona podría hacerlo</span></div><div class="pie-val" style="color:#e24b4a">' + px + '%</div></div>';
+  if (nonClinHs > 0) {
+    html += '<div class="pill-warn" style="background:#fff0f0;color:#e24b4a"><strong>' + delPctTotal + '% de tu tiempo fuera de consulta</strong> está en tareas que podrías empezar a soltar.</div>';
+  }
+  html += '</div></div></div>';
+
+  // Distribution bars (non-clinical only)
+  if (nonClinHs > 0) {
+    html += '<div class="card"><p class="card-title">Distribución del tiempo no clínico vs ideal</p>';
+    var cats = ['estrategica','tactica','ejecutora'];
+    cats.forEach(function(cat) {
+      var p = pct(cat), id = ideal[cat], g = p - id, col = catColor(cat);
+      var gTxt = g > 0
+        ? '<span style="color:'+col+';font-size:.72rem">+'+g+'% por encima del ideal</span>'
+        : g < 0
+        ? '<span style="color:#0f6e56;font-size:.72rem">'+Math.abs(g)+'% por debajo del ideal ✓</span>'
+        : '<span style="color:#9c9a94;font-size:.72rem">Exactamente en el ideal</span>';
+      html += '<div class="dist-row">';
+      html += '<div class="dist-lrow"><span class="dist-lbl">'+catLabel(cat)+'</span><span class="dist-pct" style="color:'+col+'">'+p+'%<span class="dist-ideal"> / ideal '+id+'%</span></span></div>';
+      html += '<div class="dist-track"><div class="dist-fill" id="bar-'+cat+'" style="width:0;background:'+col+'"></div><div class="dist-iline" style="left:'+id+'%"></div></div>';
+      html += '<div class="dist-gap">'+gTxt+'</div></div>';
+    });
+    html += '<p style="font-size:.72rem;color:#9c9a94;margin-top:1rem;font-style:italic">Ideales ajustados para profesionales de salud que ya venden bien y quieren escalar sin más horas. El ejecutor debería tender a 0% con el tiempo.</p>';
+    html += '</div>';
+  }
+
+  // Insight
+  html += '<div class="insight" style="background:'+iBg+';border-left:3px solid '+iFg+'">';
+  html += '<p class="insight-ttl" style="color:'+iFg+'">'+iT+'</p>';
+  html += '<p class="insight-txt" style="color:#5c5a56">'+iX+'</p></div>';
+
+  // Delegate list
+  if (toD.length > 0) {
+    var libH = toD.slice(0,6).reduce(function(s,t){ return s+t.horas; }, 0);
+    html += '<p class="sec-head">Tareas para soltar primero</p><div class="del-list">';
+    toD.slice(0,6).forEach(function(t) {
+      var icon = t.d === 'automatizar' ? '⚙' : '↗';
+      var act  = t.d === 'automatizar' ? 'Automatizar' : 'Delegar';
+      var bg   = t.d === 'automatizar' ? '#f2f4e8' : '#e6faf6';
+      var fg   = t.d === 'automatizar' ? '#6b7a3a' : '#3f4323';
+      html += '<div class="del-card"><div class="del-icon" style="background:'+bg+';color:'+fg+'">'+icon+'</div>';
+      html += '<div><div class="del-name">'+t.tarea+'</div>';
+      html += '<div class="del-meta">'+t.horas+'h/semana · '+act+' · <span style="color:'+catColor(t.cat)+'">'+catLabel(t.cat)+'</span></div></div></div>';
+    });
+    html += '</div>';
+    html += '<p style="font-size:.75rem;color:#9c9a94;margin-top:.6rem;font-style:italic">Si delegás estas tareas, liberás aprox. <strong style="color:#1e2d5a">'+libH.toFixed(1)+' horas</strong> por semana.</p>';
+  }
+
+  // Next steps
+  html += '<p class="sec-head">Tus próximos 3 pasos</p>';
+  var steps = [
+    {t:'Elegí UNA tarea ejecutora y documentá cómo se hace', d:'Escribí el proceso paso a paso: qué, cómo, cuándo, resultado esperado. Es lo único que necesitás para poder delegarla correctamente.'},
+    {t:'Definí a quién le vas a pasar esa tarea esta semana', d:'No tiene que ser perfecto. La idea es empezar a soltar aunque sea una cosa. La próxima semana, una más.'},
+    {t:'Bloqueá tiempo estratégico en tu agenda', d:'Las horas que liberaste van a estrategia. Agendalo como si fuera una consulta — o lo va a desplazar lo urgente.'}
+  ];
+  steps.forEach(function(s, i) {
+    html += '<div class="step-card"><div class="step-num">'+(i+1)+'</div>';
+    html += '<div><div class="step-ttl">'+s.t+'</div><div class="step-dsc">'+s.d+'</div></div></div>';
+  });
+
+  // CTA
+  html += '<div class="cta-box"><p class="cta-ttl">¿Tenés dudas sobre tu resultado?</p>';
+  html += '<p class="cta-dsc">Este inventario es una herramienta del Módulo 2. En tu próxima sesión con tu consultor podés profundizar cualquier punto y empezar a trabajar en los cambios concretos.</p>';
+  html += '<div class="cta-btns"><button class="btn-cs" onclick="restart()">Hacer de nuevo</button></div></div>';
+
+  document.getElementById('s-analysis').innerHTML = html;
+  go('s-analysis');
+
+  setTimeout(function() {
+    ['estrategica','tactica','ejecutora'].forEach(function(cat) {
+      var b = document.getElementById('bar-'+cat);
+      if (b) { b.style.width = pct(cat) + '%'; }
+    });
+    var clinPct = totalHs > 0 ? (clinicaHs/totalHs)*100 : 0;
+    var nonClinPct = 100 - clinPct;
+    drawPie('pie', [
+      {v: clinicaHs,          color: '#6b7a9a', cat:'clinica',     delegable: false},
+      {v: by['estrategica'],  color: '#0f6e56', cat:'estrategica', delegable: false},
+      {v: by['tactica'],      color: '#ba7517', cat:'tactica',     delegable: false},
+      {v: by['ejecutora'],    color: '#e24b4a', cat:'ejecutora',   delegable: true},
+    ]);
+  }, 200);
+}
+
+function restart() { tasks = []; isClinical = null; renderList(); go('s-intro'); }
+renderList();
+
+// Guardar en Supabase al ver resultados
+async function guardarInventario() {
+  const nombre = prompt('¿Cuál es tu nombre completo?');
+  const email = prompt('¿Cuál es tu email?');
+
+  if (!nombre || !email) return;
+
+  const totalHs = tasks.reduce((sum, t) => sum + (parseFloat(t.horas) || 0), 0);
+  const clinicaHs = tasks.filter(t => t.cat === 'clinica').reduce((s, t) => s + parseFloat(t.horas), 0);
+
+  const respuestas = {
+    tareas: tasks,
+    metricas: {
+      total_horas: totalHs,
+      total_tareas: tasks.length,
+      horas_clinicas: clinicaHs,
+      horas_gestion: totalHs - clinicaHs
+    }
+  };
+
+  const resultado = await guardarFormulario('inventario_semanal', email, nombre, respuestas);
+  if (resultado.success) {
+    console.log('✅ Inventario guardado');
+  }
+}
+
+// Llamar automáticamente al cargar resultados
+const originalShowResults = window.showResults || (() => {});
+window.showResults = function() {
+  originalShowResults();
+  setTimeout(() => guardarInventario(), 1000);
+};
+</script>
+
+<!-- Cargar Supabase y cliente de formularios -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/api/config.js"></script>
+<script src="/src/js/formularios-client.js"></script>
+
+</body>
+</html>

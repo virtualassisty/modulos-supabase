@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Diagnóstico — ¿Sabés delegar? · Módulo 2</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --navy:#1e2d5a;--navy-dark:#151f3e;--navy-light:#2a3d7a;
+  --olive:#3f4323;--olive-dark:#3f4323;--olive-lite:#e6faf6;
+  --olive:#6b7a3a;--olive-med:#3f4323;--olive-lite:#f2f4e8;
+  --cream:#f7f4ef;--white:#fff;
+  --g100:#f5f5f3;--g200:#e8e6e0;--g400:#9c9a94;--g600:#5c5a56;
+  --red:#e24b4a;--red-lite:#fff0f0;
+  --amber:#ba7517;--amber-lite:#fff8ec;
+  --green:#0f6e56;--green-lite:#f2f4e8;
+}
+html{scroll-behavior:smooth}
+body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--navy-dark);min-height:100vh;display:flex;flex-direction:column;align-items:center}
+.hdr{width:100%;background:var(--navy);padding:1rem 2rem;display:flex;align-items:center;justify-content:space-between}
+.hdr-logo{font-family:'DM Serif Display',serif;font-size:1.1rem;color:#fff}
+.hdr-logo span{color:#3f4323}
+.hdr-tag{font-size:.7rem;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.45)}
+.wrap{width:100%;max-width:680px;padding:2.5rem 2rem 4rem}
+.screen{display:none}
+.screen.active{display:block;animation:fadeIn .3s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* INTRO */
+.eyebrow{font-size:.7rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:#3f4323;margin-bottom:1rem}
+.page-title{font-family:'DM Serif Display',serif;font-size:clamp(1.8rem,4.5vw,2.6rem);line-height:1.15;color:var(--navy);margin-bottom:1rem}
+.page-title em{font-style:italic;color:#3f4323}
+.page-desc{font-size:.95rem;line-height:1.7;color:var(--g600);margin-bottom:1.75rem;max-width:540px}
+.level-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:2rem}
+.level-card{background:var(--white);border:1px solid var(--g200);border-radius:12px;padding:1rem;text-align:center}
+.level-dot{width:10px;height:10px;border-radius:50%;margin:0 auto .6rem}
+.level-name{font-size:.8rem;font-weight:600;color:var(--navy);margin-bottom:.3rem}
+.level-desc{font-size:.72rem;color:var(--g400);line-height:1.45}
+.intro-meta{font-size:.78rem;color:var(--g400);margin-bottom:1.75rem;display:flex;gap:1.25rem}
+.intro-meta span::before{content:'·';margin-right:.5rem;opacity:.4}
+.intro-meta span:first-child::before{content:none}
+.btn-p{display:inline-flex;align-items:center;gap:10px;background:var(--navy);color:#fff;border:none;border-radius:10px;padding:.9rem 1.75rem;font-family:'DM Sans',sans-serif;font-size:.95rem;font-weight:500;cursor:pointer;transition:background .2s,transform .15s}
+.btn-p:hover{background:var(--navy-light);transform:translateY(-1px)}
+.btn-p:disabled{opacity:.35;cursor:not-allowed;transform:none}
+
+/* FORM */
+.form-wrap{background:var(--white);border:1px solid var(--g200);border-radius:16px;padding:1.75rem;margin-bottom:1.5rem}
+.form-title{font-family:'DM Serif Display',serif;font-size:1.2rem;color:var(--navy);margin-bottom:1.25rem}
+.field{margin-bottom:1.1rem}
+.field-label{font-size:.75rem;font-weight:600;color:var(--navy);letter-spacing:.03em;margin-bottom:6px;display:block}
+.field-label span{color:#3f4323}
+.f-input{padding:.7rem 1rem;border:1.5px solid var(--g200);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:.9rem;color:var(--navy-dark);background:var(--white);outline:none;transition:border-color .18s;width:100%}
+.f-input:focus{border-color:#3f4323}
+.f-input::placeholder{color:var(--g400)}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.select-wrap{position:relative}
+.select-wrap::after{content:'';position:absolute;right:12px;top:50%;transform:translateY(-50%);width:0;height:0;border-left:4px solid transparent;border-right:4px solid transparent;border-top:5px solid var(--g400);pointer-events:none}
+.f-select{width:100%;padding:.7rem 2rem .7rem 1rem;border:1.5px solid var(--g200);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:.9rem;color:var(--navy-dark);background:var(--white);outline:none;transition:border-color .18s;appearance:none;cursor:pointer}
+.f-select:focus{border-color:#3f4323}
+.f-err{display:none;font-size:.78rem;color:var(--red);margin-top:.5rem}
+
+/* PROGRESS */
+.progress-wrap{margin-bottom:2rem}
+.progress-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.progress-lbl{font-size:.75rem;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--g400)}
+.progress-count{font-size:.75rem;font-weight:600;color:var(--navy)}
+.progress-track{height:3px;background:var(--g200);border-radius:2px;overflow:hidden}
+.progress-fill{height:100%;background:linear-gradient(90deg,#3f4323,var(--olive));border-radius:2px;transition:width .4s cubic-bezier(.4,0,.2,1)}
+
+/* QUESTION */
+.block-tag{display:inline-block;font-size:.68rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:#3f4323;background:var(--olive-lite);padding:4px 10px;border-radius:20px;margin-bottom:1.25rem}
+.q-text{font-family:'DM Serif Display',serif;font-size:clamp(1.15rem,3vw,1.45rem);line-height:1.35;color:var(--navy);margin-bottom:.6rem}
+.q-hint{font-size:.78rem;color:var(--g400);font-style:italic;line-height:1.5;margin-bottom:.5rem}
+.q-note{font-size:.75rem;color:var(--g400);margin-bottom:1.5rem;padding:.6rem .9rem;background:var(--g100);border-radius:8px;line-height:1.5}
+.opts{display:flex;flex-direction:column;gap:10px;margin-bottom:2rem}
+.opt{padding:1rem 1.25rem;border:1.5px solid var(--g200);border-radius:10px;cursor:pointer;font-size:.9rem;font-family:'DM Sans',sans-serif;color:var(--g600);background:var(--white);text-align:left;transition:all .18s;line-height:1.45;display:flex;align-items:center;gap:12px}
+.opt:hover{border-color:#3f4323;color:var(--navy);background:var(--olive-lite)}
+.opt.sel{border-color:#3f4323;color:var(--navy-dark);background:var(--olive-lite);border-width:1.5px;font-weight:500}
+.opt-radio{width:18px;height:18px;border-radius:50%;border:2px solid var(--g200);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .18s}
+.opt.sel .opt-radio{border-color:#3f4323;background:#3f4323}
+.opt.sel .opt-radio::after{content:'';width:6px;height:6px;border-radius:50%;background:#fff}
+.nav-row{display:flex;gap:10px}
+.btn-g{padding:.7rem 1.4rem;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:.88rem;font-weight:500;cursor:pointer;transition:all .18s;border:1.5px solid var(--g200);background:var(--white);color:var(--g600)}
+.btn-g:hover:not(:disabled){border-color:var(--navy);color:var(--navy)}
+.btn-g:disabled{opacity:.35;cursor:not-allowed}
+
+/* RESULT */
+.a-hdr{border-radius:16px;padding:1.75rem;margin-bottom:1.5rem;position:relative;overflow:hidden}
+.a-hdr::before{content:'';position:absolute;top:-30px;right:-30px;width:140px;height:140px;border-radius:50%;background:rgba(255,255,255,.08)}
+.a-ey{font-size:.68rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.7);margin-bottom:.5rem}
+.a-ttl{font-family:'DM Serif Display',serif;font-size:1.7rem;color:#fff;margin-bottom:.4rem;line-height:1.2}
+.a-sub{font-size:.85rem;color:rgba(255,255,255,.6);margin-bottom:1.1rem}
+.a-diag{font-size:.9rem;line-height:1.65;color:rgba(255,255,255,.8);border-left:2px solid rgba(255,255,255,.3);padding-left:1rem}
+.stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:1.25rem}
+.stat-card{background:var(--white);border:1px solid var(--g200);border-radius:10px;padding:1rem;text-align:center}
+.stat-num{font-family:'DM Serif Display',serif;font-size:1.8rem;line-height:1;margin-bottom:.25rem}
+.stat-lbl{font-size:.7rem;color:var(--g400);font-weight:500;line-height:1.4}
+.score-wrap{background:var(--white);border:1px solid var(--g200);border-radius:14px;padding:1.25rem;margin-bottom:1.25rem}
+.score-hdr{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px}
+.score-lbl{font-size:.75rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--g400)}
+.score-val{font-size:.85rem;font-weight:600;color:var(--navy)}
+.score-track{height:10px;background:var(--g200);border-radius:5px;overflow:hidden}
+.score-fill{height:100%;border-radius:5px;transition:width .8s cubic-bezier(.4,0,.2,1)}
+.score-foot{display:flex;justify-content:space-between;margin-top:5px;font-size:.68rem;color:var(--g400)}
+.sec-head{font-size:.7rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--g400);margin-bottom:.9rem;margin-top:1.5rem;display:flex;align-items:center;gap:8px}
+.sec-head::after{content:'';flex:1;height:1px;background:var(--g200)}
+.block-scores{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:1.25rem}
+.bs-card{background:var(--white);border:1px solid var(--g200);border-radius:10px;padding:1rem;text-align:center}
+.bs-num{font-family:'DM Serif Display',serif;font-size:1.6rem;color:var(--navy);line-height:1;margin-bottom:.25rem}
+.bs-lbl{font-size:.7rem;color:var(--g400);font-weight:500;line-height:1.3}
+.bs-bar{height:3px;background:var(--g200);border-radius:2px;overflow:hidden;margin-top:.5rem}
+.bs-fill{height:100%;border-radius:2px;transition:width .8s ease}
+.action-list{display:flex;flex-direction:column;gap:8px}
+.action-card{background:var(--white);border:1px solid var(--g200);border-radius:10px;padding:1rem 1.1rem;display:flex;gap:12px;align-items:flex-start}
+.action-num{width:26px;height:26px;border-radius:7px;background:var(--olive-lite);color:#3f4323;font-size:.75rem;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.action-ttl{font-size:.87rem;font-weight:600;color:var(--navy);margin-bottom:3px}
+.action-dsc{font-size:.8rem;color:var(--g600);line-height:1.5}
+.matrix-wrap{background:var(--white);border:1px solid var(--g200);border-radius:12px;overflow:hidden;margin-bottom:.5rem}
+.matrix-row{padding:1rem 1.25rem;border-bottom:1px solid var(--g200)}
+.matrix-row:last-child{border-bottom:none}
+.matrix-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+.matrix-area{font-size:.85rem;font-weight:600;color:var(--navy)}
+.matrix-tags{display:flex;gap:6px;align-items:center}
+.tag{font-size:.65rem;font-weight:600;padding:3px 8px;border-radius:20px}
+.tag-red{background:var(--red-lite);color:var(--red)}
+.tag-amber{background:var(--amber-lite);color:var(--amber)}
+.tag-green{background:var(--green-lite);color:var(--green)}
+.matrix-stars{font-size:.75rem;color:#3f4323;letter-spacing:2px}
+.matrix-action{font-size:.78rem;color:var(--g600);line-height:1.5}
+.matrix-pct-bar{height:3px;background:var(--g200);border-radius:2px;overflow:hidden;margin:8px 0 6px}
+.matrix-pct-fill{height:100%;border-radius:2px;transition:width .8s ease}
+.cta-box{background:var(--navy);border-radius:14px;padding:1.5rem;margin-top:1.5rem}
+.cta-ttl{font-family:'DM Serif Display',serif;font-size:1.1rem;color:#fff;margin-bottom:.5rem}
+.cta-dsc{font-size:.83rem;color:rgba(255,255,255,.65);line-height:1.6;margin-bottom:1rem}
+.cta-btns{display:flex;gap:10px;flex-wrap:wrap}
+.btn-cs{padding:.65rem 1.3rem;background:transparent;color:rgba(255,255,255,.65);border:1px solid rgba(255,255,255,.2);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:.83rem;cursor:pointer;transition:all .18s}
+.btn-cs:hover{border-color:rgba(255,255,255,.5);color:#fff}
+.footer{width:100%;padding:1.5rem 2rem;text-align:center;font-size:.72rem;color:var(--g400);border-top:1px solid var(--g200);margin-top:auto}
+@media(max-width:520px){.level-grid,.stat-grid,.block-scores{grid-template-columns:1fr}.wrap{padding:1.5rem 1.25rem 3rem}.cta-btns{flex-direction:column}.field-row{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header style="width:100%;background:#3f4323;padding:.85rem 2rem;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100">
+  <div style="display:flex;align-items:center;gap:.75rem">
+    <div style="width:32px;height:32px;border-radius:8px;background:rgba(247,244,239,.12);border:1px solid rgba(247,244,239,.2);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+      <span style="font-family:'DM Serif Display',serif;font-size:.8rem;font-weight:600;color:#f7f4ef">OS</span>
+    </div>
+    <span style="font-family:'DM Serif Display',serif;font-size:1.1rem;font-weight:300;color:#f7f4ef;letter-spacing:-.01em">Operaciones <span style="color:#c7cca8">Saludables</span></span>
+  </div>
+  <span style="font-size:.6rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:rgba(199,204,168,.5)">Módulo 2 · Diagnóstico de Delegación</span>
+</header>
+<main class="wrap">
+
+  <!-- FORM -->
+  <div class="screen active" id="s-form">
+    
+    <h1 class="page-title">¿Sabés delegar<br>— o solo estás<br><em>soltando tareas?</em></h1>
+    <p class="page-desc">Hay una diferencia enorme entre pasarle algo a alguien y delegarlo correctamente. Este diagnóstico mide si tenés el sistema para que la delegación realmente funcione.</p>
+    <div class="level-grid">
+      <div class="level-card"><div class="level-dot" style="background:var(--red)"></div><div class="level-name">Sin sistema</div><div class="level-desc">Delegás por impulso y termina volviendo a vos</div></div>
+      <div class="level-card"><div class="level-dot" style="background:var(--amber)"></div><div class="level-name">Empezando</div><div class="level-desc">Delegás algo pero sin proceso ni control real</div></div>
+      <div class="level-card"><div class="level-dot" style="background:var(--green)"></div><div class="level-name">Con sistema</div><div class="level-desc">Delegás con proceso, resultado y monitoreo</div></div>
+    </div>
+    <div class="form-wrap">
+      <p class="form-title">Antes de empezar, contanos sobre vos</p>
+      <div class="field"><label class="field-label">Nombre completo <span>*</span></label><input class="f-input" id="f-nombre" type="text" placeholder="Tu nombre y apellido"/></div>
+      <div class="field"><label class="field-label">Email <span>*</span></label><input class="f-input" id="f-email" type="email" placeholder="tu@email.com"/></div>
+      <div class="field-row">
+        <div class="field"><label class="field-label">Área / Profesión <span>*</span></label><div class="select-wrap"><select class="f-select" id="f-prof"><option value="">Seleccioná</option><option>Psicología y Salud Mental</option><option>Medicina y Especialidades</option><option>Nutrición y Alimentación</option><option>Rehabilitación y Terapias Corporales</option><option>Odontología</option><option>Medicina Estética / Integrativa</option><option>Enfermería y Apoyo Sanitario</option><option>Medicina Veterinaria</option><option>Lenguaje y Comunicación</option><option>Otros</option></select></div></div>
+        <div class="field"><label class="field-label">Tipo de práctica <span>*</span></label><div class="select-wrap"><select class="f-select" id="f-tipo"><option value="">Seleccioná</option><option>Trabajo de forma independiente</option><option>Tengo centro o clínica propia</option><option>Ambas situaciones</option></select></div></div>
+      </div>
+      <div class="field"><label class="field-label">¿Tenés colaboradores actualmente? <span>*</span></label><div class="select-wrap"><select class="f-select" id="f-equipo"><option value="">Seleccioná</option><option>Sí, al menos uno</option><option>A veces, de forma eventual</option><option>No, trabajo solo/a</option></select></div></div>
+    </div>
+    <p class="f-err" id="f-err">Completá todos los campos para continuar.</p>
+    <button class="btn-p" onclick="submitForm()">Empezar diagnóstico <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8h10M9 4l4 4-4 4"/></svg></button>
+  </div>
+
+  <!-- QUESTIONS -->
+  <div class="screen" id="s-questions">
+    <div class="progress-wrap">
+      <div class="progress-top"><span class="progress-lbl" id="block-lbl">Bloque 1</span><span class="progress-count" id="q-count">1 / 15</span></div>
+      <div class="progress-track"><div class="progress-fill" id="prog-fill" style="width:0%"></div></div>
+    </div>
+    <span class="block-tag" id="block-tag">¿Qué delegar?</span>
+    <h2 class="q-text" id="q-text"></h2>
+    <p class="q-hint" id="q-hint"></p>
+    <p class="q-note" id="q-note"></p>
+    <div class="opts" id="opts"></div>
+    <div class="nav-row">
+      <button class="btn-g" id="btn-back" onclick="goBack()">← Atrás</button>
+      <button class="btn-p" id="btn-next" onclick="goNext()" disabled>Siguiente →</button>
+    </div>
+  </div>
+
+  <!-- RESULT -->
+  <div class="screen" id="s-result"></div>
+</main>
+<footer style="width:100%;background:#3f4323;padding:1.25rem 2rem;display:flex;align-items:center;justify-content:center;gap:.75rem;margin-top:auto">
+  <span style="font-size:.65rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:rgba(199,204,168,.6)">Operaciones Saludables — una iniciativa de <span style="color:#c7cca8">Negocios Saludables</span> y <span style="color:#c7cca8">Assistify</span></span>
+</footer>
+
+<script>
+var userData = {};
+var BLOCKS = [
+  { label:"Bloque 1 — ¿Qué delegar?", tag:"¿Qué delegar?", questions:[
+    { text:"¿Tenés identificadas las tareas que no deberían estar en tu agenda?",
+      hint:"Pensá en las últimas semanas — ¿cuántas veces hiciste algo que otra persona podría hacer con instrucciones claras?",
+      note:null,
+      opts:["Sí, tengo un listado claro de qué es mío y qué es delegable","Más o menos, tengo idea pero nunca lo formalicé","No, hago todo por inercia sin haberlo analizado"],
+      pts:[3,2,1] },
+    { text:"¿Sabés cuánto tiempo por semana dedicás a tareas que otra persona podría ejecutar?",
+      hint:"El el inventario de tareas que completaste al inicio de este módulo te da este número exacto.",
+      note:null,
+      opts:["Sí, lo medí o lo tengo estimado con precisión","Tengo una idea aproximada pero no lo medí","No lo sé — nunca lo analicé"],
+      pts:[3,2,1] },
+    { text:"Cuando pensás en incorporar a alguien, ¿tenés claro qué tareas le asignarías?",
+      hint:"Puede ser una secretaria, asistente, setter o cualquier colaborador.",
+      note:null,
+      opts:["Sí, tengo el listado de tareas y el perfil que necesito","Más o menos, sé que necesito ayuda pero no definí exactamente qué","No, la idea de contratar me genera más dudas que certezas"],
+      pts:[3,2,1] },
+    { text:"¿Distinguís claramente entre lo que SOLO vos podés hacer y lo que podría hacer otra persona?",
+      hint:"Muchas veces lo que parece que solo vos podés hacer, lo puede ejecutar alguien más — con tu criterio formalizado. La clave es pasar ese criterio de tu cabeza a un documento.",
+      note:"📌 Las tareas clínicas no se incluyen en este análisis.",
+      opts:["Sí, tengo esa separación clara","A veces — me cuesta separar lo clínico de lo administrativo","No, siento que casi todo requiere mi criterio"],
+      pts:[3,2,1] },
+    { text:"¿Alguna vez hiciste un listado completo de todo lo que hacés en una semana y lo clasificaste?",
+      hint:null,
+      note:null,
+      opts:["Sí, lo hice y me ayudó a identificar qué delegar","Lo intenté pero no lo terminé o no lo usé","Nunca lo hice"],
+      pts:[3,2,1] },
+  ]},
+  { label:"Bloque 2 — ¿Cómo delegar?", tag:"¿Cómo delegar?", questions:[
+    { text:"Cuando delegás una tarea, ¿explicás exactamente qué resultado esperás y en qué plazo?",
+      hint:"Pensá en la última vez que delegaste algo — ¿la persona sabía exactamente qué resultado esperás?",
+      note:null,
+      opts:["Siempre — lo dejo por escrito o lo digo con claridad antes de empezar","A veces — depende de la tarea o del momento","Rara vez — espero que la persona deduzca qué necesito sin que yo lo haya explicado"],
+      pts:[3,2,1] },
+    { text:"¿Tenés al menos un proceso documentado — paso a paso — para una tarea que delegaste o querés delegar?",
+      hint:null,
+      note:null,
+      opts:["Sí, tengo varios documentados y actualizados","Tengo algo, pero está desactualizado o incompleto","No, todo está en mi cabeza"],
+      pts:[3,2,1] },
+    { text:"Cuando alguien nuevo empieza a ayudarte, ¿cómo son sus primeros días?",
+      hint:null,
+      note:null,
+      opts:["Tiene un proceso de incorporación claro: qué hace, cómo, con qué herramientas","Le explico las cosas de a poco según van surgiendo","Es bastante improvisado — aprende sobre la marcha"],
+      pts:[3,2,1] },
+    { text:"¿La persona que te ayuda puede ejecutar sus tareas sin preguntarte para cada cosa?",
+      hint:null,
+      note:null,
+      opts:["Sí, es bastante autónoma y me consulta solo lo importante","Me consulta bastante, pero es manejable","Me consulta todo — soy el primer paso de cualquier decisión"],
+      pts:[3,2,1] },
+    { text:"Cuando algo delegado sale mal, ¿qué hacés primero?",
+      hint:"La primera pregunta siempre es '¿fui claro/a en las instrucciones?' — no '¿esta persona sirve?'",
+      note:null,
+      opts:["Reviso si el proceso era claro o si faltaba especificar algo","Corrijo a la persona y le explico de nuevo","Lo retomo yo y lo hago directamente"],
+      pts:[3,2,1] },
+  ]},
+  { label:"Bloque 3 — ¿Cómo controlar?", tag:"Control sin microgestión", questions:[
+    { text:"¿Tenés una frecuencia definida para revisar el trabajo delegado?",
+      hint:null,
+      note:null,
+      opts:["Sí, tengo un sistema claro: reviso X tarea cada Y días","Reviso cuando me acuerdo o cuando hay un problema","No tengo un sistema — o estoy encima todo el tiempo"],
+      pts:[3,2,1] },
+    { text:"¿Sabés exactamente cuál es el resultado esperado de cada tarea delegada, sin revisar el detalle?",
+      hint:null,
+      note:null,
+      opts:["Sí, tengo indicadores claros para cada tarea","Para algunas sí, para otras no","No, me guío por percepción o sensación general"],
+      pts:[3,2,1] },
+    { text:"¿Podés detectar rápido cuando algo delegado no está funcionando, sin necesitar revisarlo todo?",
+      hint:null,
+      note:null,
+      opts:["Sí, tengo señales claras que me alertan","A veces — me entero cuando ya hay un problema","No — me entero cuando el problema ya lleva un tiempo sin resolverse"],
+      pts:[3,2,1] },
+    { text:"Si te ausentás una semana, ¿las tareas delegadas se ejecutan correctamente sin tu intervención?",
+      hint:null,
+      note:null,
+      opts:["Sí, el sistema funciona sin mí","Más o menos — hay cosas que igual me consultan","No — necesito estar disponible para que funcione"],
+      pts:[3,2,1] },
+    { text:"¿Usás alguna herramienta (documento, sheet, video) para que la persona consulte cómo hacer su tarea?",
+      hint:null,
+      note:null,
+      opts:["Sí, tengo materiales de referencia disponibles","Tengo algo pero está incompleto o no lo usa nadie","No — las instrucciones son verbales y en el momento"],
+      pts:[3,2,1] },
+  ]},
+];
+
+var ALL_Q = [];
+BLOCKS.forEach(function(b,bi){ b.questions.forEach(function(q,qi){ ALL_Q.push({...q,blockLabel:b.label,blockTag:b.tag,bi:bi,qi:qi}); }); });
+
+var current = 0;
+var answers = new Array(15).fill(null);
+var blockScores = [0,0,0];
+
+function go(id){ document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active');}); document.getElementById(id).classList.add('active'); window.scrollTo({top:0,behavior:'smooth'}); }
+
+function submitForm(){
+  var n=document.getElementById('f-nombre').value.trim();
+  var e=document.getElementById('f-email').value.trim();
+  var p=document.getElementById('f-prof').value;
+  var t=document.getElementById('f-tipo').value;
+  var eq=document.getElementById('f-equipo').value;
+  var err=document.getElementById('f-err');
+  if(!n||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e)||!p||!t||!eq){err.style.display='block';return;}
+  err.style.display='none';
+  userData={nombre:n,email:e,profesion:p,tipo:t,equipo:eq,fecha:new Date().toLocaleDateString('es-AR')};
+  current=0; answers=new Array(15).fill(null); blockScores=[0,0,0];
+  renderQ(); go('s-questions');
+}
+
+function renderQ(){
+  var q=ALL_Q[current];
+  var pct=Math.round((current/15)*100);
+  document.getElementById('block-lbl').textContent=q.blockLabel;
+  document.getElementById('block-tag').textContent=q.blockTag;
+  document.getElementById('q-count').textContent=(current+1)+' / 15';
+  document.getElementById('prog-fill').style.width=pct+'%';
+  document.getElementById('q-text').textContent=q.text;
+  var hEl=document.getElementById('q-hint');
+  hEl.textContent=q.hint||''; hEl.style.display=q.hint?'block':'none';
+  var nEl=document.getElementById('q-note');
+  nEl.textContent=q.note||''; nEl.style.display=q.note?'block':'none';
+  document.getElementById('btn-back').style.display=current===0?'none':'inline-flex';
+  document.getElementById('btn-next').textContent=current===14?'Ver mi resultado →':'Siguiente →';
+  document.getElementById('btn-next').disabled=answers[current]===null;
+  var container=document.getElementById('opts');
+  container.innerHTML=q.opts.map(function(o,i){
+    return '<button class="opt'+(answers[current]===i?' sel':'')+'" onclick="selectOpt('+i+')"><span class="opt-radio"></span>'+o+'</button>';
+  }).join('');
+}
+
+function selectOpt(i){
+  answers[current]=i;
+  document.querySelectorAll('.opt').forEach(function(el,idx){el.classList.toggle('sel',idx===i);});
+  document.getElementById('btn-next').disabled=false;
+}
+
+function goNext(){
+  if(answers[current]===null)return;
+  var q=ALL_Q[current];
+  blockScores[q.bi]+=q.pts[answers[current]];
+  current++;
+  if(current===15){buildResult();go('s-result');}
+  else renderQ();
+}
+
+function goBack(){
+  if(current===0)return;
+  var prev=ALL_Q[current-1];
+  if(answers[current-1]!==null)blockScores[prev.bi]-=prev.pts[answers[current-1]];
+  current--; renderQ();
+}
+
+function getResult(total){
+  if(total<=24)return{
+    level:'Sin sistema de delegación',eyebrow:'Nivel detectado · 15–24 pts',barColor:'#e24b4a',bg:'#e24b4a',
+    diag:'Estás soltando tareas sin proceso. La persona que te ayuda depende de vos para casi todo — y cuando algo sale mal, terminás haciéndolo vos. No es un problema de la persona. Es un problema de sistema.',
+    actions:[
+      {t:'Documentá 1 proceso esta semana',d:'Elegí la tarea operativa que más te consume y escribí el paso a paso completo: qué se hace, cómo, con qué herramienta y qué resultado esperás. Solo 1 tarea. Ese documento es la base para delegarla correctamente.'},
+      {t:'Definí qué es "bien hecho" para esa tarea',d:'Antes de delegarla, escribí cuál es el resultado aceptable. Sin ese criterio, la persona nunca va a poder cumplir tus expectativas — porque no las conoce.'},
+      {t:'Establecé cómo vas a controlar sin microgestionar',d:'Definí cuándo y cómo vas a revisar esa tarea: todos los viernes a las 10am, por ejemplo. Eso es control. Estar encima cada vez que se ejecuta es microgestión.'},
+    ]
+  };
+  if(total<=34)return{
+    level:'Delegación incompleta',eyebrow:'Nivel detectado · 25–34 pts',barColor:'#ba7517',bg:'#ba7517',
+    diag:'Ya delegás algunas cosas, pero sin el respaldo de procesos claros ni un sistema de control. Eso genera inconsistencia — a veces funciona, a veces no, y no sabés exactamente por qué.',
+    actions:[
+      {t:'Documentá los procesos que ya delegaste',d:'Si algo está funcionando, documentalo. Si la persona que lo hace se va, el proceso se va con ella. Ese documento protege lo que construiste.'},
+      {t:'Definí el resultado esperado de cada tarea delegada',d:'Para cada cosa que delegaste, escribí qué es "bien hecho". Sin ese criterio, estás evaluando a ojo — y eso lleva al micromanagement.'},
+      {t:'Creá un sistema de monitoreo con frecuencia fija',d:'Elegí 1 o 2 indicadores por tarea delegada que te digan si está funcionando. Revisalos en un momento fijo de la semana — sin necesitar revisar el detalle.'},
+    ]
+  };
+  return{
+    level:'Delegación con sistema',eyebrow:'Nivel detectado · 35–45 pts',barColor:'#0f6e56',bg:'#0f6e56',
+    diag:'Tenés la base. Tu equipo puede funcionar con autonomía porque les diste proceso, claridad y herramientas. El siguiente paso es optimizar lo que funciona y escalar.',
+    actions:[
+      {t:'Identificá qué procesos todavía no están documentados',d:'Aunque delegás bien, probablemente haya tareas que siguen dependiendo de que vos estés disponible para consultas. Cerrá esos huecos esta semana.'},
+      {t:'Revisá si tus sistemas de control siguen siendo eficientes',d:'Un buen sistema de monitoreo debería llevarte menos de 30 minutos por semana. Si te lleva más, es señal de que algo se puede simplificar.'},
+      {t:'Pensá en qué más podés delegar',d:'Con el sistema funcionando, tu próxima pregunta es: ¿qué más de lo que hago yo podría hacer alguien más? Usá el el inventario de tareas de este módulo para identificarlo.'},
+    ]
+  };
+}
+
+function getMatrix(bs){
+  var labels=['¿Qué delegar?','¿Cómo delegar?','Control sin microgestión'];
+  var details=[
+    {low:'Hacer el listado de tareas delegables — es el punto de partida de todo lo demás.',mid:'Formalizar la identificación de tareas delegables y armar el perfil de la persona que necesitás.',high:'Optimizar la selección de tareas y escalar lo que ya funciona.'},
+    {low:'Documentar 1 proceso paso a paso esta semana — con resultado esperado y herramientas.',mid:'Completar la documentación de todos los procesos delegados y armar un onboarding básico.',high:'Auditar y actualizar los procesos existentes para que escalen.'},
+    {low:'Definir una frecuencia fija de revisión para cada tarea delegada.',mid:'Pasar del control manual a indicadores claros que te digan si algo funciona sin revisarlo todo.',high:'Optimizar el sistema de monitoreo para que sea más rápido y más eficiente.'},
+  ];
+  return bs.map(function(s,i){
+    var pct=Math.round((s/15)*100);
+    var impact=pct<50?'Prioridad alta':pct<75?'Prioridad media':'Optimización';
+    var impactClass=pct<50?'tag-red':pct<75?'tag-amber':'tag-green';
+    var stars=pct<50?'★★★':pct<75?'★★':'★';
+    var action=pct<50?details[i].low:pct<75?details[i].mid:details[i].high;
+    var barColor=pct<50?'#e24b4a':pct<75?'#ba7517':'#0f6e56';
+    return{area:labels[i],pct:pct,impact:impact,impactClass:impactClass,stars:stars,action:action,barColor:barColor};
+  }).sort(function(a,b){return a.pct-b.pct;});
+}
+
+function buildResult(){
+  var total=answers.reduce(function(s,a,i){return s+(a!==null?ALL_Q[i].pts[a]:0);},0);
+  var r=getResult(total);
+  var matrix=getMatrix([...blockScores]);
+  var scorePct=Math.round(((total-15)/30)*100);
+  var blockNames=['¿Qué delegar?','¿Cómo delegar?','Control'];
+  var html='';
+
+  html+='<div class="a-hdr" style="background:'+r.bg+'">';
+  html+='<p class="a-ey">'+r.eyebrow+'</p>';
+  html+='<h2 class="a-ttl">'+r.level+'</h2>';
+  html+='<p class="a-sub">'+total+' puntos sobre 45</p>';
+  html+='<p class="a-diag">'+r.diag+'</p></div>';
+
+  html+='<div class="score-wrap">';
+  html+='<div class="score-hdr"><span class="score-lbl">Puntaje total</span><span class="score-val">'+total+' / 45</span></div>';
+  html+='<div class="score-track"><div class="score-fill" id="main-bar" style="width:0%;background:'+r.barColor+'"></div></div>';
+  html+='<div class="score-foot"><span>Sin sistema (15)</span><span>Con sistema (45)</span></div></div>';
+
+  html+='<div class="block-scores">';
+  blockScores.forEach(function(s,i){
+    var pct=Math.round((s/15)*100);
+    var col=pct<50?'#e24b4a':pct<75?'#ba7517':'#0f6e56';
+    html+='<div class="bs-card"><div class="bs-lbl">'+blockNames[i]+'</div><div class="bs-num" style="color:'+col+'">'+s+'<span style="font-size:.9rem;color:#9c9a94">/15</span></div><div class="bs-bar"><div class="bs-fill" style="width:0%;background:'+col+'" data-w="'+pct+'"></div></div></div>';
+  });
+  html+='</div>';
+
+  html+='<p class="sec-head">Tus 3 acciones prioritarias</p><div class="action-list">';
+  r.actions.forEach(function(a,i){
+    html+='<div class="action-card"><div class="action-num">'+(i+1)+'</div><div><div class="action-ttl">'+a.t+'</div><div class="action-dsc">'+a.d+'</div></div></div>';
+  });
+  html+='</div>';
+
+  html+='<p class="sec-head">Matriz de priorización por área</p>';
+  html+='<p style="font-size:.78rem;color:var(--g600);line-height:1.6;margin-bottom:.9rem;padding:.75rem 1rem;background:var(--g100);border-radius:8px">';
+  html+='Esta matriz muestra las <strong>3 áreas del diagnóstico</strong> ordenadas según cuánto margen de mejora tenés en cada una. ';
+  html+='El orden y las estrellas (★★★) se calculan automáticamente a partir de tus respuestas — el área donde más bajo puntaste aparece primero y es tu prioridad inmediata.</p>';
+  html+='<div class="matrix-wrap">';
+  matrix.forEach(function(m){
+    html+='<div class="matrix-row"><div class="matrix-top"><span class="matrix-area">'+m.area+'</span><div class="matrix-tags"><span class="tag '+m.impactClass+'">'+m.impact+'</span><span class="matrix-stars">'+m.stars+'</span></div></div>';
+    html+='<div class="matrix-pct-bar"><div class="matrix-pct-fill" style="width:0%;background:'+m.barColor+'" data-w="'+m.pct+'"></div></div>';
+    html+='<div class="matrix-action">'+m.action+'</div></div>';
+  });
+  html+='</div>';
+
+  html+='<div class="cta-box"><p class="cta-ttl">¿Tenés dudas sobre tu resultado?</p><p class="cta-dsc">Este diagnóstico es el punto de partida del Módulo 2. En tu próxima sesión con tu consultor podés profundizar cualquier punto y empezar a trabajar en los cambios concretos.</p><div class="cta-btns"><button class="btn-cs" onclick="restart()">Hacer de nuevo</button></div></div>';
+
+  document.getElementById('s-result').innerHTML=html;
+  go('s-result');
+  setTimeout(function(){
+    document.getElementById('main-bar').style.width=scorePct+'%';
+    document.querySelectorAll('[data-w]').forEach(function(el){el.style.width=el.getAttribute('data-w')+'%';});
+  },200);
+}
+
+function restart(){ current=0; answers=new Array(15).fill(null); blockScores=[0,0,0]; go('s-form'); }
+
+// Guardar en Supabase al mostrar resultados
+const originalShowResult = showResult;
+showResult = async function() {
+  originalShowResult();
+
+  // Guardar después de mostrar resultados
+  setTimeout(async () => {
+    if (!userData || !userData.email || !userData.nombre) return;
+
+    const total = blockScores.reduce((a, b) => a + b, 0);
+    const nivel = total < 30 ? 'sin_sistema' : (total < 38 ? 'incompleta' : 'con_sistema');
+
+    const respuestas = {
+      datos_usuario: {
+        profesion: userData.prof,
+        tipo_practica: userData.tipo,
+        tiene_equipo: userData.equipo
+      },
+      respuestas_preguntas: answers.map((answerIndex, i) => ({
+        pregunta_num: i + 1,
+        bloque: questions[i].block,
+        respuesta_index: answerIndex,
+        puntos: questions[i].pts[answerIndex]
+      })),
+      puntajes: {
+        total,
+        bloque_que_delegar: blockScores[0],
+        bloque_como_delegar: blockScores[1],
+        bloque_control: blockScores[2],
+        nivel
+      }
+    };
+
+    const resultado = await guardarFormulario('diagnostico_delegacion', userData.email, userData.nombre, respuestas);
+    if (resultado.success) {
+      console.log('✅ Diagnóstico de delegación guardado');
+    }
+  }, 500);
+};
+</script>
+
+<!-- Cargar Supabase y cliente de formularios -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/api/config.js"></script>
+<script src="/src/js/formularios-client.js"></script>
+
+</body>
+</html>

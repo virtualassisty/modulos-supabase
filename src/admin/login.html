@@ -245,8 +245,12 @@ function handleCredentialResponse(response) {
 
     console.log('User signed in:', userEmail);
 
-    // Check if email is allowed
-    if (userEmail === googleConfig.allowedEmail) {
+    // Check if email is allowed (support both single email and array)
+    const allowedEmails = Array.isArray(googleConfig.allowedEmails)
+      ? googleConfig.allowedEmails
+      : [googleConfig.allowedEmail];
+
+    if (allowedEmails.includes(userEmail)) {
       // Store session
       const session = {
         email: userEmail,
@@ -264,7 +268,10 @@ function handleCredentialResponse(response) {
 
     } else {
       showLoading(false);
-      showError(`Acceso denegado. Solo ${googleConfig.allowedEmail} puede acceder.`);
+      const allowedList = Array.isArray(googleConfig.allowedEmails)
+        ? googleConfig.allowedEmails.join(', ')
+        : googleConfig.allowedEmail;
+      showError(`Acceso denegado. Solo usuarios autorizados pueden acceder.`);
 
       // Sign out from Google
       if (typeof google !== 'undefined' && google.accounts) {

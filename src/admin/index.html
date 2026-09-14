@@ -438,7 +438,12 @@ function checkAuthentication() {
     }
 
     // Verify email
-    if (data.email !== 'virtualassist@assistify365.com') {
+    const allowedEmails = [
+      'virtualassist@assistify365.com',
+      'emilia@assistify365.com'
+    ];
+
+    if (!allowedEmails.includes(data.email)) {
       console.error('❌ Unauthorized email. Redirecting to login...');
       localStorage.removeItem('admin_session');
       window.location.href = '/admin-panel-auth.html';

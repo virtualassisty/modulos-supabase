@@ -41,7 +41,7 @@
 2. **Configurar información de la app**
    - App name: "Panel Admin - Operaciones Saludables"
    - User support email: virtualassist@assistify365.com
-   - Developer contact: virtualassist@assistify365.com
+   - Developer contact: virtualassist@assistify365.com o emilia@assistify365.com
 
 3. **Scopes**
    - Solo necesitas:
@@ -50,7 +50,7 @@
      - `openid`
 
 4. **Test users** (si es External)
-   - Agregar: virtualassist@assistify365.com
+   - Agregar: virtualassist@assistify365.com y emilia@assistify365.com
 
 ## Paso 3: Configurar Variable de Entorno en Vercel
 
@@ -73,7 +73,7 @@
    - URL: https://modulos-theta.vercel.app/admin-panel-auth.html
 
 2. **Click en "Iniciar sesión con Google"**
-   - Selecciona la cuenta: virtualassist@assistify365.com
+   - Selecciona la cuenta: virtualassist@assistify365.com (o emilia@assistify365.com)
    - Acepta los permisos
 
 3. **Verificar acceso**
@@ -145,9 +145,11 @@
 
 ## Notas Importantes
 
-1. **Email único permitido**: `virtualassist@assistify365.com`
-   - Hardcodeado en el código
-   - Para cambiar: editar `admin-panel-auth.html` y `admin-panel.html`
+1. **Emails autorizados**:
+   - `virtualassist@assistify365.com`
+   - `emilia@assistify365.com`
+   - Hardcodeados en: `api/oauth-config.js`, `src/admin/login.html` y `src/admin/index.html`
+   - Para agregar más: editar el array `allowedEmails` en estos archivos
 
 2. **Duración de sesión**: 24 horas
    - Después se requiere re-login
@@ -172,7 +174,9 @@
 - La URL debe coincidir exactamente (con o sin trailing slash)
 
 ### Usuario no puede acceder
-- Verifica que el email sea exactamente: `virtualassist@assistify365.com`
+- Verifica que el email esté en la lista de emails autorizados:
+  - `virtualassist@assistify365.com`
+  - `emilia@assistify365.com`
 - Verifica que el usuario esté en "Test users" si la app está en modo Testing
 
 ## Comandos Útiles

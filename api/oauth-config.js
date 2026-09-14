@@ -41,6 +41,9 @@ export default function handler(req, res) {
 
   res.status(200).json({
     clientId: clientId,
-    allowedEmail: 'virtualassist@assistify365.com'
+    allowedEmails: [
+      'virtualassist@assistify365.com',
+      'emilia@assistify365.com'
+    ]
   });
 }

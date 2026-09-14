@@ -336,7 +336,7 @@ async function authenticateWithServer(credential, accessToken) {
       }));
 
       showLoading(false);
-      window.location.href = '/admin';
+      window.location.href = '/admin-panel-auth.html';
       return;
     }
 
@@ -371,7 +371,7 @@ async function authenticateWithServer(credential, accessToken) {
 
       // Redirect to admin panel
       showLoading(false);
-      window.location.href = '/admin';
+      window.location.href = '/admin-panel-auth.html';
     } else {
       throw new Error('Respuesta inválida del servidor');
     }
@@ -429,7 +429,7 @@ function checkExistingSession() {
       const maxAge = 24 * 60 * 60 * 1000; // 24 hours
       if (Date.now() - data.timestamp < maxAge) {
         console.log('✅ Valid session found. Redirecting...');
-        window.location.href = '/admin';
+        window.location.href = '/admin-panel-auth.html';
         return true;
       } else {
         // Session expired

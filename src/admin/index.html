@@ -548,52 +548,33 @@ pre {
 
 <script>
 // ═══════════════════════════════════════════════════════════════════════════
-//                        AUTHENTICATION CHECK
+//                        AUTHENTICATION CHECK (SERVER-SIDE)
 // ═══════════════════════════════════════════════════════════════════════════
 
-function checkAuthentication() {
-  const session = localStorage.getItem('admin_session');
-
-  if (!session) {
-    console.warn('⚠️ No session found. Redirecting to login...');
-    window.location.href = '/admin-panel-auth.html'; // Rewrite maneja la ruta
-    return false;
-  }
-
+async function checkAuthentication() {
   try {
-    const data = JSON.parse(session);
+    // ✅ VERIFICAR SESIÓN EN EL SERVIDOR (cookie httpOnly)
+    const response = await fetch('/api/auth/verify', {
+      credentials: 'include' // Incluir cookies
+    });
 
-    // Check if session is not too old (24 hours)
-    const maxAge = 24 * 60 * 60 * 1000; // 24 hours
-    if (Date.now() - data.timestamp > maxAge) {
-      console.warn('⚠️ Session expired. Redirecting to login...');
-      localStorage.removeItem('admin_session');
+    const data = await response.json();
+
+    if (!response.ok || !data.authenticated) {
+      console.warn('⚠️ No hay sesión válida. Redirigiendo a login...');
       window.location.href = '/admin-panel-auth.html';
       return false;
     }
 
-    // Verify email
-    const allowedEmails = [
-      'virtualassist@assistify365.com',
-      'emilia@assistify365.com'
-    ];
+    console.log('✅ Autenticado como:', data.user.email);
 
-    if (!allowedEmails.includes(data.email)) {
-      console.error('❌ Unauthorized email. Redirecting to login...');
-      localStorage.removeItem('admin_session');
-      window.location.href = '/admin-panel-auth.html';
-      return false;
-    }
-
-    console.log('✅ Authenticated as:', data.email);
-
-    // Add user info to header
+    // Agregar info del usuario al header
     const header = document.querySelector('header');
     const userInfo = document.createElement('div');
     userInfo.style.cssText = 'display: flex; align-items: center; gap: 0.75rem;';
     userInfo.innerHTML = `
-      <span style="font-size: 0.85rem; color: rgba(255,255,255,0.7);">${data.name}</span>
-      <img src="${data.picture}" alt="${data.name}" style="width: 32px; height: 32px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.2);">
+      <span style="font-size: 0.85rem; color: rgba(255,255,255,0.7);">${data.user.name}</span>
+      <img src="${data.user.picture}" alt="${data.user.name}" style="width: 32px; height: 32px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.2);">
       <button onclick="logout()" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; padding: 0.5rem 1rem; border-radius: 6px; cursor: pointer; font-size: 0.85rem; font-family: inherit;">Cerrar sesión</button>
     `;
     header.appendChild(userInfo);
@@ -601,44 +582,77 @@ function checkAuthentication() {
     return true;
 
   } catch (error) {
-    console.error('❌ Error checking session:', error);
-    localStorage.removeItem('admin_session');
+    console.error('❌ Error verificando sesión:', error);
     window.location.href = '/admin-panel-auth.html';
     return false;
   }
 }
 
-function logout() {
-  localStorage.removeItem('admin_session');
-  window.location.href = '/admin-panel-auth.html'; // Rewrite maneja la ruta
+async function logout() {
+  try {
+    // ✅ CERRAR SESIÓN EN EL SERVIDOR (eliminar cookie httpOnly)
+    await fetch('/api/auth/logout', {
+      method: 'POST',
+      credentials: 'include'
+    });
+
+    // Limpiar localStorage (solo info de UI)
+    localStorage.removeItem('admin_user_info');
+
+    window.location.href = '/admin-panel-auth.html';
+
+  } catch (error) {
+    console.error('❌ Error en logout:', error);
+    // Redirigir de todas formas
+    window.location.href = '/admin-panel-auth.html';
+  }
 }
 
-// Check authentication before loading data
-if (!checkAuthentication()) {
-  throw new Error('Authentication required');
-}
+// Check authentication before loading data (async IIFE)
+(async function() {
+  const authenticated = await checkAuthentication();
+  if (!authenticated) {
+    throw new Error('Authentication required');
+  }
+
+  // Una vez autenticado, cargar los datos
+  cargarRespuestas();
+})();
 
 // ═══════════════════════════════════════════════════════════════════════════
 
-// Inicializar Supabase
-const supabaseAdmin = supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY);
+// ✅ YA NO NECESITAMOS cliente Supabase directo - usamos API autenticada
+// const supabaseAdmin = supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY);
 
 let allRespuestas = [];
 let currentRespuesta = null;
 
-// Cargar respuestas al iniciar
+// ✅ Cargar respuestas desde API autenticada (servidor verifica sesión)
 async function cargarRespuestas() {
   try {
-    const { data, error } = await supabaseAdmin
-      .from('respuestas_formularios')
-      .select('*')
-      .order('created_at', { ascending: false });
+    const response = await fetch('/api/admin/respuestas', {
+      credentials: 'include' // Incluir cookies de sesión
+    });
 
-    if (error) throw error;
+    if (!response.ok) {
+      if (response.status === 401) {
+        // Sesión expirada
+        console.warn('⚠️ Sesión expirada. Redirigiendo a login...');
+        window.location.href = '/admin-panel-auth.html';
+        return;
+      }
+      throw new Error(`Error ${response.status}: ${response.statusText}`);
+    }
 
-    allRespuestas = data;
-    renderizarTabla(data);
-    actualizarEstadisticas(data);
+    const result = await response.json();
+
+    if (!result.success || !result.data) {
+      throw new Error('Respuesta inválida del servidor');
+    }
+
+    allRespuestas = result.data;
+    renderizarTabla(result.data);
+    actualizarEstadisticas(result.data);
 
   } catch (error) {
     console.error('Error al cargar respuestas:', error);

@@ -248,26 +248,11 @@ function initializeGoogleSignIn() {
   console.log('✅ Google Sign-In initialized');
 }
 
-// Fetch user info using access token
+// Fetch user info using access token and authenticate with server
 async function fetchUserInfo(accessToken) {
   try {
-    const response = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
-      headers: {
-        'Authorization': `Bearer ${accessToken}`
-      }
-    });
-
-    if (!response.ok) {
-      throw new Error('Failed to fetch user info');
-    }
-
-    const userInfo = await response.json();
-
-    // Process the user info
-    handleCredentialResponse({
-      credential: null,
-      userInfo: userInfo
-    });
+    // ✅ ENVIAR access_token al servidor para verificación
+    await authenticateWithServer(null, accessToken);
 
   } catch (error) {
     console.error('Error fetching user info:', error);
@@ -276,63 +261,61 @@ async function fetchUserInfo(accessToken) {
   }
 }
 
+// ✅ NUEVA FUNCIÓN: Autenticar con el servidor (verificación server-side)
+async function authenticateWithServer(credential, accessToken) {
+  try {
+    const response = await fetch('/api/auth/login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        credential: credential,
+        access_token: accessToken
+      }),
+      credentials: 'include' // Importante: incluir cookies en la request
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.message || 'Error en autenticación');
+    }
+
+    if (data.success && data.user) {
+      console.log('✅ Autenticación exitosa:', data.user.email);
+
+      // Ya NO guardamos en localStorage - la sesión está en httpOnly cookie
+      // Solo guardamos info de UI (opcional, no crítica para seguridad)
+      localStorage.setItem('admin_user_info', JSON.stringify({
+        name: data.user.name,
+        picture: data.user.picture
+      }));
+
+      // Redirect to admin panel
+      showLoading(false);
+      window.location.href = '/admin';
+    } else {
+      throw new Error('Respuesta inválida del servidor');
+    }
+
+  } catch (error) {
+    showLoading(false);
+    console.error('❌ Error en autenticación:', error);
+    showError(error.message || 'Error al autenticar. Intenta nuevamente.');
+  }
+}
+
 // Handle Google Sign-In response
-function handleCredentialResponse(response) {
+async function handleCredentialResponse(response) {
   showLoading(true);
 
   try {
-    let userEmail, userName, userPicture;
-
-    // Handle both JWT credential and userInfo object
+    // ✅ ENVIAR JWT CREDENTIAL AL SERVIDOR para verificación
     if (response.credential) {
-      // Decode JWT token (simple base64 decode, no verification needed for email)
-      const payload = JSON.parse(atob(response.credential.split('.')[1]));
-      userEmail = payload.email;
-      userName = payload.name;
-      userPicture = payload.picture;
-    } else if (response.userInfo) {
-      // Direct userInfo from OAuth2 flow
-      userEmail = response.userInfo.email;
-      userName = response.userInfo.name;
-      userPicture = response.userInfo.picture;
+      await authenticateWithServer(response.credential, null);
     } else {
-      throw new Error('Invalid response format');
-    }
-
-    console.log('User signed in:', userEmail);
-
-    // Check if email is allowed (support both single email and array)
-    const allowedEmails = Array.isArray(googleConfig.allowedEmails)
-      ? googleConfig.allowedEmails
-      : [googleConfig.allowedEmail];
-
-    if (allowedEmails.includes(userEmail)) {
-      // Store session
-      const session = {
-        email: userEmail,
-        name: userName,
-        picture: userPicture,
-        timestamp: Date.now()
-      };
-
-      localStorage.setItem('admin_session', JSON.stringify(session));
-
-      // Redirect to admin panel
-      console.log('✅ Access granted. Redirecting...');
-      showLoading(false);
-      window.location.href = '/admin';
-
-    } else {
-      showLoading(false);
-      const allowedList = Array.isArray(googleConfig.allowedEmails)
-        ? googleConfig.allowedEmails.join(', ')
-        : googleConfig.allowedEmail;
-      showError(`Acceso denegado. Solo usuarios autorizados pueden acceder.`);
-
-      // Sign out from Google
-      if (typeof google !== 'undefined' && google.accounts) {
-        google.accounts.id.disableAutoSelect();
-      }
+      throw new Error('No se recibió credential de Google');
     }
 
   } catch (error) {

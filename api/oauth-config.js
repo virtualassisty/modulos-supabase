@@ -39,11 +39,8 @@ export default function handler(req, res) {
     });
   }
 
+  // ✅ NO EXPONER allowedEmails - eso debe estar solo en /api/auth/login
   res.status(200).json({
-    clientId: clientId,
-    allowedEmails: [
-      'virtualassist@assistify365.com',
-      'emilia@assistify365.com'
-    ]
+    clientId: clientId
   });
 }

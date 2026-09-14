@@ -77,12 +77,23 @@ Ver **[URLS.md](URLS.md)** para la lista completa de todas las URLs del proyecto
 6. `inventario_semanal` - Inventario Semanal
 7. `diagnostico_delegacion` - Diagnóstico de Delegación
 
-## 🔐 Autenticación
+## 🔐 Autenticación (Server-Side Segura)
 
-El panel admin usa **Google OAuth** con acceso restringido a:
-- Email permitido: `virtualassist@assistify365.com`
-- Sesión: 24 horas
-- Ver: `docs/OAUTH_SETUP.md` para configuración
+El panel admin implementa **autenticación server-side** con:
+- ✅ Verificación de JWT de Google en el servidor
+- ✅ Sesiones con cookies httpOnly (no accesibles desde JavaScript)
+- ✅ Middleware de autenticación en todas las APIs admin
+- ✅ Proxy autenticado a Supabase con SERVICE_ROLE_KEY
+
+**Emails autorizados:**
+- `virtualassist@assistify365.com`
+- `emilia@assistify365.com`
+
+**Duración de sesión:** 24 horas
+
+📚 **Documentación completa:**
+- [docs/SECURITY.md](./docs/SECURITY.md) - Arquitectura de seguridad
+- [docs/SETUP.md](./docs/SETUP.md) - Guía de configuración
 
 ## 🚀 Deployment
 
@@ -99,8 +110,16 @@ vercel env ls
 ```
 
 ### Variables de Entorno Requeridas
-- `GOOGLE_OAUTH_CLIENT_ID` - Client ID de Google OAuth
-- Supabase credentials (en `/api/config.js`)
+
+| Variable | Descripción | Crítico |
+|----------|-------------|---------|
+| `SUPABASE_URL` | URL del proyecto Supabase | ✅ |
+| `SUPABASE_ANON_KEY` | Anon key (público) | ✅ |
+| `SUPABASE_SERVICE_KEY` | Service role key (privado) | 🔒 |
+| `GOOGLE_OAUTH_CLIENT_ID` | Client ID de Google OAuth | ✅ |
+| `JWT_SECRET` | Secret para firmar sesiones | 🔒 |
+
+Ver: [.env.example](./.env.example)
 
 ## 📖 Documentación
 

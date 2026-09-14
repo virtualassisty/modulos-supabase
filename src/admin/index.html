@@ -661,6 +661,23 @@ async function logout() {
   }
 }
 
+// Detectar bucle de redirección en el dashboard
+let dashboardRedirectCount = parseInt(sessionStorage.getItem('dashboard_redirect_count') || '0');
+if (dashboardRedirectCount > 3) {
+  console.error('❌ BUCLE DE REDIRECCIÓN DETECTADO EN DASHBOARD');
+  alert('Se detectó un bucle de redirección. Limpiando localStorage y redirigiendo al login...');
+  localStorage.clear();
+  sessionStorage.clear();
+  window.location.href = '/admin/login';
+  throw new Error('Loop detected');
+}
+sessionStorage.setItem('dashboard_redirect_count', String(dashboardRedirectCount + 1));
+
+// Limpiar el contador después de 5 segundos (significa que cargó correctamente)
+setTimeout(() => {
+  sessionStorage.removeItem('dashboard_redirect_count');
+}, 5000);
+
 // Check authentication before loading data (async IIFE)
 (async function() {
   const authenticated = await checkAuthentication();

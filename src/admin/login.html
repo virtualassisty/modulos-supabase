@@ -172,6 +172,14 @@ h1 {
     <strong>ℹ️ Información:</strong><br>
     Solo el usuario autorizado puede acceder al panel de administración.
   </div>
+
+  <div class="info-box" style="margin-top: 1rem; background: #fff0f0; border: 1px solid var(--red);">
+    <strong>🐛 Debug:</strong><br>
+    ¿Tienes problemas de redirección en bucle?
+    <button onclick="limpiarTodo()" style="margin-top: 0.5rem; padding: 0.5rem 1rem; background: var(--red); color: white; border: none; border-radius: 6px; cursor: pointer; font-family: inherit; font-size: 0.85rem;">
+      Limpiar localStorage y recargar
+    </button>
+  </div>
 </div>
 
 <!-- Google Sign-In Library -->
@@ -420,6 +428,11 @@ function showLoading(show) {
 
 // Check if already logged in
 function checkExistingSession() {
+  // DEBUGGING: Ver qué hay en localStorage
+  console.log('🔍 Verificando sesiones en localStorage...');
+  console.log('admin_session:', localStorage.getItem('admin_session'));
+  console.log('admin_session_dev:', localStorage.getItem('admin_session_dev'));
+
   // Check for production session (server-side)
   const session = localStorage.getItem('admin_session');
 
@@ -434,22 +447,55 @@ function checkExistingSession() {
 
       // Check if session is not too old (24 hours)
       const maxAge = 24 * 60 * 60 * 1000; // 24 hours
-      if (Date.now() - data.timestamp < maxAge) {
+      const edad = Date.now() - data.timestamp;
+      console.log(`⏰ Edad de la sesión: ${Math.round(edad / 1000 / 60)} minutos`);
+
+      if (edad < maxAge) {
         console.log('✅ Valid session found. Redirecting to dashboard...');
         // Redirect to dashboard (not login)
         window.location.href = '/admin';
         return true;
       } else {
         // Session expired
+        console.log('⏰ Sesión expirada, limpiando...');
         localStorage.removeItem('admin_session');
         localStorage.removeItem('admin_session_dev');
       }
     } catch (e) {
+      console.error('❌ Error parseando sesión:', e);
       localStorage.removeItem('admin_session');
       localStorage.removeItem('admin_session_dev');
     }
   }
+
+  console.log('ℹ️ No hay sesión válida, mostrando login');
   return false;
+}
+
+// Función de emergencia para limpiar todo
+function limpiarTodo() {
+  console.log('🧹 Limpiando localStorage...');
+  localStorage.clear();
+  console.log('✅ localStorage limpiado');
+  alert('localStorage limpiado. La página se recargará.');
+  window.location.reload();
+}
+
+// Detectar bucle de redirección
+let redirectCount = parseInt(sessionStorage.getItem('login_redirect_count') || '0');
+if (redirectCount > 3) {
+  console.error('❌ BUCLE DE REDIRECCIÓN DETECTADO');
+  alert('Se detectó un bucle de redirección. Limpiando localStorage automáticamente...');
+  localStorage.clear();
+  sessionStorage.removeItem('login_redirect_count');
+  window.location.reload();
+} else {
+  sessionStorage.setItem('login_redirect_count', String(redirectCount + 1));
+
+  // Limpiar el contador después de 5 segundos (significa que no hubo bucle)
+  setTimeout(() => {
+    sessionStorage.removeItem('login_redirect_count');
+  }, 5000);
 }
 
 // Initialize

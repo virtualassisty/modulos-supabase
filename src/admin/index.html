@@ -265,6 +265,23 @@ tbody tr:last-child td {
   font-size: 0.95rem;
 }
 
+.answer-value a {
+  transition: all 0.2s;
+}
+
+.answer-value a:hover {
+  opacity: 0.8;
+  text-decoration: underline;
+}
+
+.answer-value ul {
+  list-style-type: disc;
+}
+
+.answer-value li {
+  padding: 0.15rem 0;
+}
+
 .metadata-section {
   margin-top: 1.5rem;
   padding-top: 1.5rem;
@@ -352,10 +369,29 @@ tbody tr:last-child td {
   background: white;
   border-radius: 12px;
   padding: 2rem;
-  max-width: 800px;
-  max-height: 80vh;
+  max-width: 900px;
+  width: 90%;
+  max-height: 85vh;
   overflow-y: auto;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+.modal-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.modal-content::-webkit-scrollbar-track {
+  background: var(--gray-100);
+  border-radius: 4px;
+}
+
+.modal-content::-webkit-scrollbar-thumb {
+  background: var(--gray-400);
+  border-radius: 4px;
+}
+
+.modal-content::-webkit-scrollbar-thumb:hover {
+  background: var(--gray-600);
 }
 
 .modal-header {
@@ -763,15 +799,8 @@ function verRespuesta(respuesta) {
       .replace(/^./, str => str.toUpperCase())
       .trim();
 
-    // Formatear el valor
-    let displayValue = value;
-    if (typeof value === 'object' && value !== null) {
-      displayValue = JSON.stringify(value, null, 2);
-    } else if (typeof value === 'boolean') {
-      displayValue = value ? '✓ Sí' : '✗ No';
-    } else if (value === null || value === undefined || value === '') {
-      displayValue = '<em style="color: var(--gray-400);">Sin respuesta</em>';
-    }
+    // Formatear el valor de manera visual
+    let displayValue = formatearValor(value);
 
     html += `
       <div class="answer-item">
@@ -815,6 +844,128 @@ function verRespuesta(respuesta) {
 
   content.innerHTML = html;
   modal.classList.add('active');
+}
+
+// Formatear valores de manera visual y legible
+function formatearValor(value) {
+  // Valores vacíos
+  if (value === null || value === undefined || value === '') {
+    return '<em style="color: var(--gray-400);">Sin respuesta</em>';
+  }
+
+  // Booleanos
+  if (typeof value === 'boolean') {
+    return value
+      ? '<span style="color: var(--teal); font-weight: 600;">✓ Sí</span>'
+      : '<span style="color: var(--gray-400);">✗ No</span>';
+  }
+
+  // Números
+  if (typeof value === 'number') {
+    return `<strong>${value.toLocaleString('es-AR')}</strong>`;
+  }
+
+  // Arrays
+  if (Array.isArray(value)) {
+    if (value.length === 0) {
+      return '<em style="color: var(--gray-400);">Lista vacía</em>';
+    }
+
+    // Si son strings simples, mostrar como lista con bullets
+    if (value.every(v => typeof v === 'string' || typeof v === 'number')) {
+      return '<ul style="margin: 0.5rem 0; padding-left: 1.5rem; line-height: 1.8;">' +
+        value.map(v => `<li>${v}</li>`).join('') +
+        '</ul>';
+    }
+
+    // Si son objetos, mostrar cada uno en una tarjeta
+    return '<div style="display: flex; flex-direction: column; gap: 0.75rem; margin-top: 0.5rem;">' +
+      value.map((item, idx) => {
+        if (typeof item === 'object' && item !== null) {
+          const entries = Object.entries(item)
+            .map(([k, v]) => {
+              const label = k.replace(/_/g, ' ').replace(/([A-Z])/g, ' $1').trim();
+              return `<div style="margin-bottom: 0.25rem;"><strong>${label}:</strong> ${formatearValor(v)}</div>`;
+            })
+            .join('');
+
+          return `<div style="background: white; padding: 0.75rem; border-radius: 6px; border: 1px solid var(--gray-200);">
+            <div style="font-weight: 600; color: var(--navy); margin-bottom: 0.5rem;">Item ${idx + 1}</div>
+            ${entries}
+          </div>`;
+        }
+        return `<div>• ${item}</div>`;
+      }).join('') +
+      '</div>';
+  }
+
+  // Objetos
+  if (typeof value === 'object' && value !== null) {
+    const entries = Object.entries(value)
+      .map(([k, v]) => {
+        const label = k.replace(/_/g, ' ').replace(/([A-Z])/g, ' $1').trim();
+        return `<div style="margin-bottom: 0.5rem;">
+          <span style="font-weight: 600; color: var(--navy);">${label}:</span>
+          <span>${formatearValor(v)}</span>
+        </div>`;
+      })
+      .join('');
+
+    return `<div style="background: white; padding: 0.75rem; border-radius: 6px; border: 1px solid var(--gray-200); margin-top: 0.5rem;">
+      ${entries}
+    </div>`;
+  }
+
+  // Strings - detectar URLs, emails, números de teléfono
+  if (typeof value === 'string') {
+    // URL
+    if (value.match(/^https?:\/\//)) {
+      return `<a href="${value}" target="_blank" style="color: var(--teal); text-decoration: none; font-weight: 500;">
+        🔗 ${value}
+      </a>`;
+    }
+
+    // Email
+    if (value.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
+      return `<a href="mailto:${value}" style="color: var(--teal); text-decoration: none; font-weight: 500;">
+        ✉️ ${value}
+      </a>`;
+    }
+
+    // Teléfono
+    if (value.match(/^[\d\s\-\+\(\)]+$/) && value.replace(/\D/g, '').length >= 8) {
+      return `<a href="tel:${value}" style="color: var(--navy); font-weight: 500;">
+        📞 ${value}
+      </a>`;
+    }
+
+    // Fecha (detectar formato ISO)
+    if (value.match(/^\d{4}-\d{2}-\d{2}/)) {
+      try {
+        const date = new Date(value);
+        if (!isNaN(date.getTime())) {
+          return `<span style="font-weight: 500;">📅 ${date.toLocaleString('es-AR', {
+            day: '2-digit',
+            month: 'long',
+            year: 'numeric',
+            hour: date.toISOString().includes('T') ? '2-digit' : undefined,
+            minute: date.toISOString().includes('T') ? '2-digit' : undefined
+          })}</span>`;
+        }
+      } catch (e) {}
+    }
+
+    // Texto largo (más de 100 caracteres) - agregar saltos de línea
+    if (value.length > 100) {
+      return `<div style="line-height: 1.6; white-space: pre-wrap;">${value}</div>`;
+    }
+
+    // Texto normal
+    return value;
+  }
+
+  // Fallback
+  return String(value);
 }
 
 function cerrarModal() {

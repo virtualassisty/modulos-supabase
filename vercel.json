@@ -1,10 +1,4 @@
 {
-  "outputDirectory": ".",
-  "functions": {
-    "api/**/*.js": {
-      "includeFiles": "node_modules/**"
-    }
-  },
   "redirects": [
     {
       "source": "/src/js/:path*",

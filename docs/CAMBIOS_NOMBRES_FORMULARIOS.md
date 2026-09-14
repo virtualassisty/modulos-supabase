@@ -73,17 +73,32 @@ Ahora cuando filtras o ves las respuestas en el panel de admin, verás nombres m
 
 ---
 
+## Nuevas Rutas (URLs Descriptivas)
+
+Se agregaron nuevas rutas más descriptivas manteniendo las antiguas como legacy:
+
+| Formulario | URL Nueva (Recomendada) | URL Legacy (Funcional) |
+|------------|-------------------------|------------------------|
+| Panel Admin | `/recurso-gratuito-negocios` | `/admin` |
+| Paso 1 | `/recurso-gratuito-negocios-paso1` | `/paso1` |
+| Paso 2 | `/recurso-gratuito-negocios-paso2` | `/paso2` |
+| OS | `/recurso-gratuito-os` | `/operaciones-saludables` |
+
+**Ventaja:** Las URLs nuevas son auto-descriptivas y más fáciles de compartir en clases.
+
+---
+
 ## Archivos Modificados
 
 1. `/src/admin/index.html` - 4 ubicaciones actualizadas
-2. `/docs/URLS resumen.md` - Referencias actualizadas
+2. `/docs/URLS resumen.md` - Completamente reestructurado con las nuevas URLs
+3. `/vercel.json` - Se agregaron las nuevas rutas manteniendo las antiguas
 
 ## Archivos NO Modificados (correcto)
 
 - `/src/forms/assistify/paso1.html` - Mantiene ID `diagnostico_paso1`
 - `/src/forms/assistify/paso2.html` - Mantiene ID `diagnostico_paso2`
 - `/src/forms/assistify/operaciones-saludables.html` - Mantiene ID `operaciones_saludables`
-- `vercel.json` - Rutas sin cambios
 - Base de datos Supabase - IDs sin cambios
 
 ---

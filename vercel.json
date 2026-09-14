@@ -59,6 +59,10 @@
       "destination": "/index.html"
     },
     {
+      "source": "/recurso-gratuito-negocios",
+      "destination": "/src/admin/index.html"
+    },
+    {
       "source": "/admin",
       "destination": "/src/admin/index.html"
     },
@@ -71,12 +75,24 @@
       "destination": "/src/admin/login.html"
     },
     {
+      "source": "/recurso-gratuito-negocios-paso1",
+      "destination": "/src/forms/assistify/paso1.html"
+    },
+    {
       "source": "/paso1",
       "destination": "/src/forms/assistify/paso1.html"
     },
     {
+      "source": "/recurso-gratuito-negocios-paso2",
+      "destination": "/src/forms/assistify/paso2.html"
+    },
+    {
       "source": "/paso2",
       "destination": "/src/forms/assistify/paso2.html"
+    },
+    {
+      "source": "/recurso-gratuito-os",
+      "destination": "/src/forms/assistify/operaciones-saludables.html"
     },
     {
       "source": "/operaciones-saludables",

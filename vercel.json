@@ -1,5 +1,6 @@
 {
-  "buildCommand": null,
+  "installCommand": "npm install",
+  "buildCommand": "echo 'No build needed'",
   "outputDirectory": ".",
   "redirects": [
     {

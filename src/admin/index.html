@@ -68,7 +68,7 @@ h1 {
   border-radius: 10px;
   margin-bottom: 1.5rem;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 1rem;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
@@ -158,14 +158,25 @@ th {
   letter-spacing: 0.05em;
 }
 
+tbody tr {
+  transition: all 0.2s;
+}
+
+tbody tr:hover {
+  background: var(--gray-100);
+  transform: scale(1.01);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
 td {
   padding: 1rem;
   border-bottom: 1px solid var(--gray-200);
   font-size: 0.9rem;
+  vertical-align: middle;
 }
 
-tr:hover {
-  background: var(--gray-100);
+tbody tr:last-child td {
+  border-bottom: none;
 }
 
 .badge {
@@ -209,6 +220,80 @@ tr:hover {
 
 .json-preview:hover {
   color: var(--teal);
+}
+
+.view-btn {
+  background: var(--teal);
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.view-btn:hover {
+  background: #00a882;
+  transform: translateY(-1px);
+}
+
+.answer-grid {
+  display: grid;
+  gap: 1.25rem;
+  margin-top: 1rem;
+}
+
+.answer-item {
+  background: var(--gray-100);
+  padding: 1rem;
+  border-radius: 8px;
+  border-left: 3px solid var(--teal);
+}
+
+.answer-label {
+  font-weight: 600;
+  color: var(--navy);
+  margin-bottom: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.answer-value {
+  color: var(--gray-600);
+  line-height: 1.6;
+  font-size: 0.95rem;
+}
+
+.metadata-section {
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 2px solid var(--gray-200);
+}
+
+.metadata-title {
+  font-weight: 600;
+  color: var(--navy);
+  margin-bottom: 1rem;
+  font-size: 1rem;
+}
+
+.export-btn {
+  background: var(--olive);
+  color: white;
+  border: none;
+  padding: 0.6rem 1.25rem;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-left: 1rem;
+  transition: all 0.2s;
+}
+
+.export-btn:hover {
+  background: #5a6832;
+  transform: translateY(-1px);
 }
 
 .loading {
@@ -356,24 +441,35 @@ pre {
         </optgroup>
       </select>
     </div>
-    <div class="filter-group" style="display: flex; align-items: flex-end;">
-      <button class="btn" onclick="aplicarFiltros()">Filtrar</button>
+    <div class="filter-group">
+      <label class="filter-label">Fecha desde</label>
+      <input type="date" id="filter-fecha-desde" class="filter-input">
+    </div>
+    <div class="filter-group">
+      <label class="filter-label">Fecha hasta</label>
+      <input type="date" id="filter-fecha-hasta" class="filter-input">
+    </div>
+    <div class="filter-group" style="display: flex; align-items: flex-end; gap: 0.5rem;">
+      <button class="btn" onclick="limpiarFiltros()" style="background: var(--gray-400);">Limpiar</button>
     </div>
   </div>
 
-  <div class="stats">
-    <div class="stat-card">
-      <div class="stat-label">Total respuestas</div>
-      <div class="stat-value" id="stat-total">-</div>
+  <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 2rem; gap: 1rem;">
+    <div class="stats" style="flex: 1;">
+      <div class="stat-card">
+        <div class="stat-label">Total respuestas</div>
+        <div class="stat-value" id="stat-total">-</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Últimas 24h</div>
+        <div class="stat-value" id="stat-recent">-</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Usuarios únicos</div>
+        <div class="stat-value" id="stat-users">-</div>
+      </div>
     </div>
-    <div class="stat-card">
-      <div class="stat-label">Últimas 24h</div>
-      <div class="stat-value" id="stat-recent">-</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-label">Usuarios únicos</div>
-      <div class="stat-value" id="stat-users">-</div>
-    </div>
+    <button class="btn" onclick="exportarCSV()" style="white-space: nowrap; align-self: center;">📊 Exportar a CSV</button>
   </div>
 
   <div class="table-wrapper">
@@ -400,10 +496,13 @@ pre {
 <div class="modal" id="json-modal">
   <div class="modal-content">
     <div class="modal-header">
-      <h2 class="modal-title">Respuestas completas</h2>
-      <button class="close-btn" onclick="cerrarModal()">×</button>
+      <h2 class="modal-title" id="modal-title">Respuestas completas</h2>
+      <div>
+        <button class="export-btn" onclick="exportarRespuesta()">📥 Exportar JSON</button>
+        <button class="close-btn" onclick="cerrarModal()">×</button>
+      </div>
     </div>
-    <pre id="json-content"></pre>
+    <div id="json-content"></div>
   </div>
 </div>
 
@@ -489,6 +588,7 @@ if (!checkAuthentication()) {
 const supabaseAdmin = supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY);
 
 let allRespuestas = [];
+let currentRespuesta = null;
 
 // Cargar respuestas al iniciar
 async function cargarRespuestas() {
@@ -557,16 +657,16 @@ function renderizarTabla(respuestas) {
       'diagnostico_delegacion': 'Diagnóstico de Delegación'
     }[r.formulario_id] || r.formulario_id;
 
-    const jsonPreview = JSON.stringify(r.respuestas).substring(0, 50) + '...';
+    const numRespuestas = Object.keys(r.respuestas || {}).length;
 
     return `
       <tr>
         <td>${fecha}</td>
         <td><span class="badge ${badgeClass}">${nombreFormulario}</span></td>
-        <td>${r.nombre}</td>
-        <td>${r.email}</td>
+        <td><strong>${r.nombre}</strong></td>
+        <td style="color: var(--gray-600); font-size: 0.85rem;">${r.email}</td>
         <td>
-          <span class="json-preview" onclick='verJSON(${JSON.stringify(r.respuestas).replace(/'/g, "\\'")})'>${jsonPreview}</span>
+          <button class="view-btn" onclick='verRespuesta(${JSON.stringify(r).replace(/'/g, "\\'")})'>${numRespuestas} respuestas</button>
         </td>
       </tr>
     `;
@@ -590,35 +690,264 @@ function aplicarFiltros() {
   const nombreFiltro = document.getElementById('filter-nombre').value.toLowerCase();
   const emailFiltro = document.getElementById('filter-email').value.toLowerCase();
   const tipoFiltro = document.getElementById('filter-tipo').value;
+  const fechaDesde = document.getElementById('filter-fecha-desde').value;
+  const fechaHasta = document.getElementById('filter-fecha-hasta').value;
 
   const filtradas = allRespuestas.filter(r => {
     const matchNombre = !nombreFiltro || r.nombre.toLowerCase().includes(nombreFiltro);
     const matchEmail = !emailFiltro || r.email.toLowerCase().includes(emailFiltro);
     const matchTipo = !tipoFiltro || r.formulario_id === tipoFiltro;
 
-    return matchNombre && matchEmail && matchTipo;
+    // Filtro de fecha
+    let matchFecha = true;
+    const fechaRespuesta = new Date(r.created_at);
+    fechaRespuesta.setHours(0, 0, 0, 0);
+
+    if (fechaDesde) {
+      const desde = new Date(fechaDesde);
+      desde.setHours(0, 0, 0, 0);
+      matchFecha = matchFecha && fechaRespuesta >= desde;
+    }
+
+    if (fechaHasta) {
+      const hasta = new Date(fechaHasta);
+      hasta.setHours(23, 59, 59, 999);
+      matchFecha = matchFecha && fechaRespuesta <= hasta;
+    }
+
+    return matchNombre && matchEmail && matchTipo && matchFecha;
   });
 
   renderizarTabla(filtradas);
   actualizarEstadisticas(filtradas);
 }
 
-// Ver JSON completo en modal
-function verJSON(respuestas) {
+// Limpiar filtros
+function limpiarFiltros() {
+  document.getElementById('filter-nombre').value = '';
+  document.getElementById('filter-email').value = '';
+  document.getElementById('filter-tipo').value = '';
+  document.getElementById('filter-fecha-desde').value = '';
+  document.getElementById('filter-fecha-hasta').value = '';
+  aplicarFiltros();
+}
+
+// Ver respuesta completa en modal
+function verRespuesta(respuesta) {
+  currentRespuesta = respuesta;
   const modal = document.getElementById('json-modal');
   const content = document.getElementById('json-content');
-  content.textContent = JSON.stringify(respuestas, null, 2);
+  const title = document.getElementById('modal-title');
+
+  // Actualizar título
+  const nombreFormulario = {
+    'diagnostico_paso1': 'Diagnóstico Paso 1',
+    'diagnostico_paso2': 'Diagnóstico Paso 2',
+    'operaciones_saludables': 'Operaciones Saludables',
+    'diagnostico_financiero': 'Diagnóstico Financiero',
+    'diagnostico_roles': 'Diagnóstico de Roles',
+    'inventario_semanal': 'Inventario Semanal',
+    'diagnostico_delegacion': 'Diagnóstico de Delegación'
+  }[respuesta.formulario_id] || respuesta.formulario_id;
+
+  title.textContent = `${nombreFormulario} — ${respuesta.nombre}`;
+
+  // Formatear respuestas de manera legible
+  let html = '<div class="answer-grid">';
+
+  for (const [key, value] of Object.entries(respuesta.respuestas || {})) {
+    // Formatear la clave (convertir snake_case o camelCase a título)
+    const label = key
+      .replace(/_/g, ' ')
+      .replace(/([A-Z])/g, ' $1')
+      .replace(/^./, str => str.toUpperCase())
+      .trim();
+
+    // Formatear el valor
+    let displayValue = value;
+    if (typeof value === 'object' && value !== null) {
+      displayValue = JSON.stringify(value, null, 2);
+    } else if (typeof value === 'boolean') {
+      displayValue = value ? '✓ Sí' : '✗ No';
+    } else if (value === null || value === undefined || value === '') {
+      displayValue = '<em style="color: var(--gray-400);">Sin respuesta</em>';
+    }
+
+    html += `
+      <div class="answer-item">
+        <div class="answer-label">${label}</div>
+        <div class="answer-value">${displayValue}</div>
+      </div>
+    `;
+  }
+
+  html += '</div>';
+
+  // Agregar metadata
+  const fecha = new Date(respuesta.created_at).toLocaleString('es-AR', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit'
+  });
+
+  html += `
+    <div class="metadata-section">
+      <div class="metadata-title">📋 Información del envío</div>
+      <div class="answer-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
+        <div class="answer-item">
+          <div class="answer-label">Email</div>
+          <div class="answer-value">${respuesta.email}</div>
+        </div>
+        <div class="answer-item">
+          <div class="answer-label">Fecha de envío</div>
+          <div class="answer-value">${fecha}</div>
+        </div>
+        <div class="answer-item">
+          <div class="answer-label">ID de respuesta</div>
+          <div class="answer-value" style="font-family: monospace; font-size: 0.8rem;">${respuesta.id}</div>
+        </div>
+      </div>
+    </div>
+  `;
+
+  content.innerHTML = html;
   modal.classList.add('active');
 }
 
 function cerrarModal() {
   document.getElementById('json-modal').classList.remove('active');
+  currentRespuesta = null;
+}
+
+// Exportar respuesta como JSON
+function exportarRespuesta() {
+  if (!currentRespuesta) return;
+
+  const dataStr = JSON.stringify(currentRespuesta, null, 2);
+  const dataBlob = new Blob([dataStr], { type: 'application/json' });
+
+  const url = URL.createObjectURL(dataBlob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = `respuesta-${currentRespuesta.formulario_id}-${currentRespuesta.id}.json`;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+}
+
+// Exportar todas las respuestas filtradas a CSV
+function exportarCSV() {
+  const nombreFiltro = document.getElementById('filter-nombre').value.toLowerCase();
+  const emailFiltro = document.getElementById('filter-email').value.toLowerCase();
+  const tipoFiltro = document.getElementById('filter-tipo').value;
+  const fechaDesde = document.getElementById('filter-fecha-desde').value;
+  const fechaHasta = document.getElementById('filter-fecha-hasta').value;
+
+  const filtradas = allRespuestas.filter(r => {
+    const matchNombre = !nombreFiltro || r.nombre.toLowerCase().includes(nombreFiltro);
+    const matchEmail = !emailFiltro || r.email.toLowerCase().includes(emailFiltro);
+    const matchTipo = !tipoFiltro || r.formulario_id === tipoFiltro;
+
+    let matchFecha = true;
+    const fechaRespuesta = new Date(r.created_at);
+    fechaRespuesta.setHours(0, 0, 0, 0);
+
+    if (fechaDesde) {
+      const desde = new Date(fechaDesde);
+      desde.setHours(0, 0, 0, 0);
+      matchFecha = matchFecha && fechaRespuesta >= desde;
+    }
+
+    if (fechaHasta) {
+      const hasta = new Date(fechaHasta);
+      hasta.setHours(23, 59, 59, 999);
+      matchFecha = matchFecha && fechaRespuesta <= hasta;
+    }
+
+    return matchNombre && matchEmail && matchTipo && matchFecha;
+  });
+
+  if (filtradas.length === 0) {
+    alert('No hay respuestas para exportar con los filtros actuales.');
+    return;
+  }
+
+  // Obtener todas las columnas únicas de las respuestas
+  const allKeys = new Set();
+  filtradas.forEach(r => {
+    Object.keys(r.respuestas || {}).forEach(key => allKeys.add(key));
+  });
+
+  // Crear encabezados
+  const headers = ['Fecha', 'Formulario', 'Nombre', 'Email', ...Array.from(allKeys)];
+
+  // Crear filas
+  const rows = filtradas.map(r => {
+    const nombreFormulario = {
+      'diagnostico_paso1': 'Diagnóstico Paso 1',
+      'diagnostico_paso2': 'Diagnóstico Paso 2',
+      'operaciones_saludables': 'Operaciones Saludables',
+      'diagnostico_financiero': 'Diagnóstico Financiero',
+      'diagnostico_roles': 'Diagnóstico de Roles',
+      'inventario_semanal': 'Inventario Semanal',
+      'diagnostico_delegacion': 'Diagnóstico de Delegación'
+    }[r.formulario_id] || r.formulario_id;
+
+    const fecha = new Date(r.created_at).toLocaleString('es-AR');
+
+    const row = [
+      fecha,
+      nombreFormulario,
+      r.nombre,
+      r.email
+    ];
+
+    // Agregar valores de respuestas
+    allKeys.forEach(key => {
+      const value = r.respuestas[key];
+      if (typeof value === 'object' && value !== null) {
+        row.push(JSON.stringify(value));
+      } else if (typeof value === 'boolean') {
+        row.push(value ? 'Sí' : 'No');
+      } else {
+        row.push(value || '');
+      }
+    });
+
+    return row;
+  });
+
+  // Convertir a CSV
+  const csvContent = [
+    headers.map(h => `"${h}"`).join(','),
+    ...rows.map(row => row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(','))
+  ].join('\n');
+
+  // Descargar archivo
+  const blob = new Blob(['\ufeff' + csvContent], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+
+  const fecha = new Date().toISOString().split('T')[0];
+  link.download = `respuestas-formularios-${fecha}.csv`;
+
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
 }
 
 // Event listeners
 document.getElementById('filter-nombre').addEventListener('input', aplicarFiltros);
 document.getElementById('filter-email').addEventListener('input', aplicarFiltros);
 document.getElementById('filter-tipo').addEventListener('change', aplicarFiltros);
+document.getElementById('filter-fecha-desde').addEventListener('change', aplicarFiltros);
+document.getElementById('filter-fecha-hasta').addEventListener('change', aplicarFiltros);
 
 // Cerrar modal con ESC o click fuera
 document.getElementById('json-modal').addEventListener('click', (e) => {

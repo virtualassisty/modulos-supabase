@@ -1,7 +1,10 @@
 {
-  "installCommand": "npm install",
-  "buildCommand": "echo 'No build needed'",
   "outputDirectory": ".",
+  "functions": {
+    "api/**/*.js": {
+      "includeFiles": "node_modules/**"
+    }
+  },
   "redirects": [
     {
       "source": "/src/js/:path*",

@@ -466,10 +466,10 @@ function restart(){ current=0; answers=new Array(15).fill(null); blockScores=[0,
 
 <script>
 // Guardar en Supabase al mostrar resultados
-window.addEventListener('DOMContentLoaded', () => {
-  const originalShowResult = showResult;
-  showResult = async function() {
-    originalShowResult();
+(function() {
+  const originalBuildResult = buildResult;
+  buildResult = async function() {
+    originalBuildResult();
 
     // Guardar después de mostrar resultados
     setTimeout(async () => {
@@ -486,9 +486,9 @@ window.addEventListener('DOMContentLoaded', () => {
         },
         respuestas_preguntas: answers.map((answerIndex, i) => ({
           pregunta_num: i + 1,
-          bloque: questions[i].block,
+          bloque: ALL_Q[i].block,
           respuesta_index: answerIndex,
-          puntos: questions[i].pts[answerIndex]
+          puntos: ALL_Q[i].pts[answerIndex]
         })),
         puntajes: {
           total,
@@ -505,7 +505,7 @@ window.addEventListener('DOMContentLoaded', () => {
       }
     }, 500);
   };
-});
+})();
 </script>
 
 </body>

@@ -656,13 +656,13 @@ async function guardarInventario() {
 
 <script>
 // Llamar automáticamente al cargar resultados
-window.addEventListener('DOMContentLoaded', () => {
-  const originalShowResults = window.showResults || (() => {});
-  window.showResults = function() {
-    originalShowResults();
+(function() {
+  const originalBuildAnalysis = buildAnalysis;
+  buildAnalysis = async function() {
+    originalBuildAnalysis();
     setTimeout(() => guardarInventario(), 1000);
   };
-});
+})();
 </script>
 
 </body>

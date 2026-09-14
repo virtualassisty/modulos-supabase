@@ -207,6 +207,13 @@ function initializeGoogleSignIn() {
     return;
   }
 
+  // Wait for Google Identity Services library to load
+  if (typeof google === 'undefined' || !google.accounts) {
+    console.log('⏳ Waiting for Google Identity Services to load...');
+    setTimeout(initializeGoogleSignIn, 100);
+    return;
+  }
+
   // Initialize Google Identity Services
   google.accounts.id.initialize({
     client_id: googleConfig.clientId,
@@ -260,7 +267,9 @@ function handleCredentialResponse(response) {
       showError(`Acceso denegado. Solo ${googleConfig.allowedEmail} puede acceder.`);
 
       // Sign out from Google
-      google.accounts.id.disableAutoSelect();
+      if (typeof google !== 'undefined' && google.accounts) {
+        google.accounts.id.disableAutoSelect();
+      }
     }
 
   } catch (error) {

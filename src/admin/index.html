@@ -465,9 +465,9 @@ pre {
       <select id="filter-tipo" class="filter-select">
         <option value="">Todos los formularios</option>
         <optgroup label="Assistify (Sistema Antiguo)">
-          <option value="diagnostico_paso1">Diagnóstico Paso 1</option>
-          <option value="diagnostico_paso2">Diagnóstico Paso 2</option>
-          <option value="operaciones_saludables">Operaciones Saludables</option>
+          <option value="diagnostico_paso1">Recurso gratuito negocios – Paso 1</option>
+          <option value="diagnostico_paso2">Recurso gratuito negocios – Paso 2</option>
+          <option value="operaciones_saludables">Recurso gratuito OS</option>
         </optgroup>
         <optgroup label="Entregables (Sistema Nuevo)">
           <option value="diagnostico_financiero">Diagnóstico Financiero</option>
@@ -683,9 +683,9 @@ function renderizarTabla(respuestas) {
     const badgeClass = `badge-${r.formulario_id.split('_')[1] || r.formulario_id}`;
     const nombreFormulario = {
       // Formularios antiguos (Assistify)
-      'diagnostico_paso1': 'Diagnóstico Paso 1',
-      'diagnostico_paso2': 'Diagnóstico Paso 2',
-      'operaciones_saludables': 'Operaciones Saludables',
+      'diagnostico_paso1': 'Recurso gratuito negocios – Paso 1',
+      'diagnostico_paso2': 'Recurso gratuito negocios – Paso 2',
+      'operaciones_saludables': 'Recurso gratuito OS',
       // Formularios nuevos (Entregables)
       'diagnostico_financiero': 'Diagnóstico Financiero',
       'diagnostico_roles': 'Diagnóstico de Roles',
@@ -777,9 +777,9 @@ function verRespuesta(respuesta) {
 
   // Actualizar título
   const nombreFormulario = {
-    'diagnostico_paso1': 'Diagnóstico Paso 1',
-    'diagnostico_paso2': 'Diagnóstico Paso 2',
-    'operaciones_saludables': 'Operaciones Saludables',
+    'diagnostico_paso1': 'Recurso gratuito negocios – Paso 1',
+    'diagnostico_paso2': 'Recurso gratuito negocios – Paso 2',
+    'operaciones_saludables': 'Recurso gratuito OS',
     'diagnostico_financiero': 'Diagnóstico Financiero',
     'diagnostico_roles': 'Diagnóstico de Roles',
     'inventario_semanal': 'Inventario Semanal',
@@ -1039,9 +1039,9 @@ function exportarCSV() {
   // Crear filas
   const rows = filtradas.map(r => {
     const nombreFormulario = {
-      'diagnostico_paso1': 'Diagnóstico Paso 1',
-      'diagnostico_paso2': 'Diagnóstico Paso 2',
-      'operaciones_saludables': 'Operaciones Saludables',
+      'diagnostico_paso1': 'Recurso gratuito negocios – Paso 1',
+      'diagnostico_paso2': 'Recurso gratuito negocios – Paso 2',
+      'operaciones_saludables': 'Recurso gratuito OS',
       'diagnostico_financiero': 'Diagnóstico Financiero',
       'diagnostico_roles': 'Diagnóstico de Roles',
       'inventario_semanal': 'Inventario Semanal',

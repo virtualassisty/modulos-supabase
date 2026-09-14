@@ -420,23 +420,33 @@ function showLoading(show) {
 
 // Check if already logged in
 function checkExistingSession() {
+  // Check for production session (server-side)
   const session = localStorage.getItem('admin_session');
-  if (session) {
+
+  // Check for dev session
+  const devSession = localStorage.getItem('admin_session_dev');
+
+  const sessionData = session || devSession;
+
+  if (sessionData) {
     try {
-      const data = JSON.parse(session);
+      const data = JSON.parse(sessionData);
 
       // Check if session is not too old (24 hours)
       const maxAge = 24 * 60 * 60 * 1000; // 24 hours
       if (Date.now() - data.timestamp < maxAge) {
-        console.log('✅ Valid session found. Redirecting...');
+        console.log('✅ Valid session found. Redirecting to dashboard...');
+        // Redirect to dashboard (not login)
         window.location.href = '/admin';
         return true;
       } else {
         // Session expired
         localStorage.removeItem('admin_session');
+        localStorage.removeItem('admin_session_dev');
       }
     } catch (e) {
       localStorage.removeItem('admin_session');
+      localStorage.removeItem('admin_session_dev');
     }
   }
   return false;

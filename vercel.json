@@ -59,11 +59,11 @@
       "destination": "/index.html"
     },
     {
-      "source": "/admin-panel-auth.html",
-      "destination": "/src/admin/login.html"
+      "source": "/admin",
+      "destination": "/src/admin/index.html"
     },
     {
-      "source": "/admin",
+      "source": "/admin/login",
       "destination": "/src/admin/login.html"
     },
     {

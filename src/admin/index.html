@@ -566,7 +566,7 @@ async function checkAuthentication() {
       const session = localStorage.getItem('admin_session_dev');
       if (!session) {
         console.warn('⚠️ No hay sesión dev. Redirigiendo a login...');
-        window.location.href = '/admin-panel-auth.html';
+        window.location.href = '/admin/login';
         return false;
       }
 
@@ -577,7 +577,7 @@ async function checkAuthentication() {
       if (Date.now() - data.timestamp > maxAge) {
         console.warn('⚠️ Sesión dev expirada');
         localStorage.removeItem('admin_session_dev');
-        window.location.href = '/admin-panel-auth.html';
+        window.location.href = '/admin/login';
         return false;
       }
 
@@ -606,7 +606,7 @@ async function checkAuthentication() {
 
     if (!response.ok || !data.authenticated) {
       console.warn('⚠️ No hay sesión válida. Redirigiendo a login...');
-      window.location.href = '/admin-panel-auth.html';
+      window.location.href = '/admin/login';
       return false;
     }
 
@@ -627,7 +627,7 @@ async function checkAuthentication() {
 
   } catch (error) {
     console.error('❌ Error verificando sesión:', error);
-    window.location.href = '/admin-panel-auth.html';
+    window.location.href = '/admin/login';
     return false;
   }
 }
@@ -639,7 +639,7 @@ async function logout() {
       console.log('🔓 Cerrando sesión dev...');
       localStorage.removeItem('admin_session_dev');
       localStorage.removeItem('admin_user_info');
-      window.location.href = '/admin-panel-auth.html';
+      window.location.href = '/admin/login';
       return;
     }
 
@@ -652,12 +652,12 @@ async function logout() {
     // Limpiar localStorage (solo info de UI)
     localStorage.removeItem('admin_user_info');
 
-    window.location.href = '/admin-panel-auth.html';
+    window.location.href = '/admin/login';
 
   } catch (error) {
     console.error('❌ Error en logout:', error);
     // Redirigir de todas formas
-    window.location.href = '/admin-panel-auth.html';
+    window.location.href = '/admin/login';
   }
 }
 
@@ -723,7 +723,7 @@ async function cargarRespuestas() {
       if (response.status === 401) {
         // Sesión expirada
         console.warn('⚠️ Sesión expirada. Redirigiendo a login...');
-        window.location.href = '/admin-panel-auth.html';
+        window.location.href = '/admin/login';
         return;
       }
       throw new Error(`Error ${response.status}: ${response.statusText}`);

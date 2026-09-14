@@ -460,6 +460,7 @@ function submitForm() {
 
 let answers = new Array(15).fill(null);
 let blockScores = [0, 0, 0];
+let current = 0;
 
 function getResult(total) {
   if (total <= 24) return {
@@ -569,7 +570,7 @@ function goBack() {
   current--; renderQuestion();
 }
 
-function renderResult() {
+async function renderResult() {
   const total = answers.reduce((s, a, i) => s + (a !== null ? ALL_Q[i].pts[a] : 0), 0);
   const r = getResult(total);
   const matrix = getMatrix([...blockScores]);
@@ -664,35 +665,44 @@ function renderResult() {
     },
     respuestas_preguntas: answers.map((answerIndex, i) => ({
       pregunta_num: i + 1,
-      bloque: questions[i].block,
+      bloque: ALL_Q[i].blockTag,
       respuesta_index: answerIndex,
-      respuesta_texto: questions[i].opts[answerIndex],
-      puntos: questions[i].pts[answerIndex]
+      respuesta_texto: ALL_Q[i].opts[answerIndex],
+      puntos: ALL_Q[i].pts[answerIndex]
     })),
     puntajes: {
       total: total,
       bloque_delegacion: blockScores[0],
       bloque_control: blockScores[1],
       bloque_mentalidad: blockScores[2],
-      nivel: nivel.toLowerCase()
+      nivel: r.level.toLowerCase()
     },
     acciones_prioritarias: r.actions.map(a => ({ title: a.title, desc: a.desc }))
   };
 
-  const resultado = await guardarFormulario('diagnostico_roles', userData.email, userData.nombre, respuestas);
+  // Verificar si existe la función guardarFormulario
+  if (typeof guardarFormulario === 'function') {
+    try {
+      const resultado = await guardarFormulario('diagnostico_roles', userData.email, userData.nombre, respuestas);
 
-  if (!resultado.success) {
-    console.warn('No se pudo guardar:', resultado.error);
+      if (!resultado.success) {
+        console.warn('No se pudo guardar:', resultado.error);
+      } else {
+        console.log('✅ Diagnóstico de roles guardado con ID:', resultado.data.id);
+      }
+    } catch (error) {
+      console.error('Error al guardar:', error);
+    }
   } else {
-    console.log('✅ Diagnóstico de roles guardado con ID:', resultado.data.id);
+    console.warn('⚠️ La función guardarFormulario no está disponible');
   }
 }
 </script>
 
 <!-- Cargar Supabase y cliente de formularios -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="/api/config.js"></script>
-<script src="/src/js/formularios-client.js"></script>
+<script src="../../../../api/config.js"></script>
+<script src="../../../js/formularios-client.js"></script>
 
 </body>
 </html>

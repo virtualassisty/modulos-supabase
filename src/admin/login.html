@@ -180,9 +180,30 @@ h1 {
 <script>
 let googleConfig = null;
 
+// Detectar si estamos en desarrollo local
+const isLocalDev = window.location.hostname === 'localhost' ||
+                  window.location.hostname === '127.0.0.1' ||
+                  window.location.protocol === 'file:';
+
 // Load OAuth config from API
 async function loadOAuthConfig() {
   try {
+    // En desarrollo local, usar configuración hardcoded
+    if (isLocalDev) {
+      console.warn('⚠️ Modo desarrollo local detectado');
+      console.warn('💡 Para producción, usa: vercel dev');
+
+      // Configuración de desarrollo (reemplazar con tu Client ID real)
+      googleConfig = {
+        clientId: '1019622012963-j1271bhffc9qrtrktr9k56slasqmkc74.apps.googleusercontent.com'
+      };
+
+      console.log('✅ OAuth config cargado (modo dev)');
+      initializeGoogleSignIn();
+      return;
+    }
+
+    // En producción/Vercel, cargar desde API
     const response = await fetch('/api/oauth-config');
     const data = await response.json();
 
@@ -264,6 +285,62 @@ async function fetchUserInfo(accessToken) {
 // ✅ NUEVA FUNCIÓN: Autenticar con el servidor (verificación server-side)
 async function authenticateWithServer(credential, accessToken) {
   try {
+    // ⚠️ MODO DESARROLLO LOCAL: Solo verificar email del payload
+    if (isLocalDev) {
+      console.warn('⚠️ AUTENTICACIÓN EN MODO DESARROLLO');
+      console.warn('⚠️ Esto NO es seguro - solo para testing local');
+      console.warn('💡 Para producción, usa: vercel dev');
+
+      // Decodificar JWT en cliente (SOLO para dev local)
+      let userEmail, userName, userPicture;
+
+      if (credential) {
+        const payload = JSON.parse(atob(credential.split('.')[1]));
+        userEmail = payload.email;
+        userName = payload.name;
+        userPicture = payload.picture;
+      } else if (accessToken) {
+        // Obtener info de Google
+        const response = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+          headers: { 'Authorization': `Bearer ${accessToken}` }
+        });
+        const userInfo = await response.json();
+        userEmail = userInfo.email;
+        userName = userInfo.name;
+        userPicture = userInfo.picture;
+      }
+
+      // Verificar email permitido (en dev local)
+      const allowedEmails = [
+        'virtualassist@assistify365.com',
+        'emilia@assistify365.com'
+      ];
+
+      if (!allowedEmails.includes(userEmail)) {
+        throw new Error('Tu email no tiene permisos de administrador');
+      }
+
+      console.log('✅ Dev login:', userEmail);
+
+      // Guardar en localStorage (solo dev)
+      localStorage.setItem('admin_session_dev', JSON.stringify({
+        email: userEmail,
+        name: userName,
+        picture: userPicture,
+        timestamp: Date.now()
+      }));
+
+      localStorage.setItem('admin_user_info', JSON.stringify({
+        name: userName,
+        picture: userPicture
+      }));
+
+      showLoading(false);
+      window.location.href = '/admin';
+      return;
+    }
+
+    // ✅ MODO PRODUCCIÓN: Verificación server-side
     const response = await fetch('/api/auth/login', {
       method: 'POST',
       headers: {

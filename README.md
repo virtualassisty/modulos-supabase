@@ -128,16 +128,30 @@ Ver: [.env.example](./.env.example)
 
 ## 🔧 Desarrollo Local
 
-```bash
-# Instalar Vercel CLI
-npm i -g vercel
+### Opción 1: Vercel Dev (Recomendado - autenticación real)
 
-# Pull variables de entorno
+```bash
+# Instalar dependencias
+npm install
+
+# Descargar variables de entorno
 vercel env pull
 
-# Servir localmente
+# Iniciar servidor con funciones serverless
 vercel dev
 ```
+
+Abrir: http://localhost:3000
+
+### Opción 2: Servidor Simple (Solo UI)
+
+```bash
+npx serve .
+```
+
+⚠️ **Modo dev automático:** La autenticación funciona en el cliente (NO seguro, solo testing).
+
+📚 **Guía completa:** [docs/DEV_LOCAL.md](./docs/DEV_LOCAL.md)
 
 ## 📊 Estado del Proyecto
 

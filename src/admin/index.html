@@ -551,9 +551,53 @@ pre {
 //                        AUTHENTICATION CHECK (SERVER-SIDE)
 // ═══════════════════════════════════════════════════════════════════════════
 
+// Detectar modo desarrollo local
+const isLocalDev = window.location.hostname === 'localhost' ||
+                  window.location.hostname === '127.0.0.1' ||
+                  window.location.protocol === 'file:';
+
 async function checkAuthentication() {
   try {
-    // ✅ VERIFICAR SESIÓN EN EL SERVIDOR (cookie httpOnly)
+    // ⚠️ MODO DESARROLLO LOCAL
+    if (isLocalDev) {
+      console.warn('⚠️ Modo desarrollo local - verificación en cliente');
+      console.warn('💡 Para producción, usa: vercel dev');
+
+      const session = localStorage.getItem('admin_session_dev');
+      if (!session) {
+        console.warn('⚠️ No hay sesión dev. Redirigiendo a login...');
+        window.location.href = '/admin-panel-auth.html';
+        return false;
+      }
+
+      const data = JSON.parse(session);
+
+      // Verificar expiración (24 horas)
+      const maxAge = 24 * 60 * 60 * 1000;
+      if (Date.now() - data.timestamp > maxAge) {
+        console.warn('⚠️ Sesión dev expirada');
+        localStorage.removeItem('admin_session_dev');
+        window.location.href = '/admin-panel-auth.html';
+        return false;
+      }
+
+      console.log('✅ Dev session:', data.email);
+
+      // Agregar info del usuario al header
+      const header = document.querySelector('header');
+      const userInfo = document.createElement('div');
+      userInfo.style.cssText = 'display: flex; align-items: center; gap: 0.75rem;';
+      userInfo.innerHTML = `
+        <span style="font-size: 0.85rem; color: rgba(255,255,255,0.7);">${data.name}</span>
+        <img src="${data.picture}" alt="${data.name}" style="width: 32px; height: 32px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.2);">
+        <button onclick="logout()" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; padding: 0.5rem 1rem; border-radius: 6px; cursor: pointer; font-size: 0.85rem; font-family: inherit;">Cerrar sesión</button>
+      `;
+      header.appendChild(userInfo);
+
+      return true;
+    }
+
+    // ✅ MODO PRODUCCIÓN: VERIFICAR SESIÓN EN EL SERVIDOR (cookie httpOnly)
     const response = await fetch('/api/auth/verify', {
       credentials: 'include' // Incluir cookies
     });
@@ -590,7 +634,16 @@ async function checkAuthentication() {
 
 async function logout() {
   try {
-    // ✅ CERRAR SESIÓN EN EL SERVIDOR (eliminar cookie httpOnly)
+    // ⚠️ MODO DESARROLLO LOCAL
+    if (isLocalDev) {
+      console.log('🔓 Cerrando sesión dev...');
+      localStorage.removeItem('admin_session_dev');
+      localStorage.removeItem('admin_user_info');
+      window.location.href = '/admin-panel-auth.html';
+      return;
+    }
+
+    // ✅ MODO PRODUCCIÓN: CERRAR SESIÓN EN EL SERVIDOR (eliminar cookie httpOnly)
     await fetch('/api/auth/logout', {
       method: 'POST',
       credentials: 'include'
@@ -630,6 +683,38 @@ let currentRespuesta = null;
 // ✅ Cargar respuestas desde API autenticada (servidor verifica sesión)
 async function cargarRespuestas() {
   try {
+    // ⚠️ MODO DESARROLLO LOCAL: Usar Supabase directo
+    if (isLocalDev) {
+      console.warn('⚠️ Modo dev: Cargando datos desde Supabase directo');
+      console.warn('💡 Para producción, usa: vercel dev');
+
+      // Cargar Supabase config
+      await loadScript('/api/config');
+
+      if (!window.SUPABASE_URL || !window.SUPABASE_ANON_KEY) {
+        throw new Error('Supabase no configurado en /api/config');
+      }
+
+      // Crear cliente Supabase
+      const supabase = window.supabase.createClient(
+        window.SUPABASE_URL,
+        window.SUPABASE_ANON_KEY
+      );
+
+      const { data, error } = await supabase
+        .from('respuestas_formularios')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+
+      allRespuestas = data;
+      renderizarTabla(data);
+      actualizarEstadisticas(data);
+      return;
+    }
+
+    // ✅ MODO PRODUCCIÓN: API autenticada
     const response = await fetch('/api/admin/respuestas', {
       credentials: 'include' // Incluir cookies de sesión
     });
@@ -664,6 +749,17 @@ async function cargarRespuestas() {
       </tr>
     `;
   }
+}
+
+// Helper para cargar scripts dinámicamente
+function loadScript(src) {
+  return new Promise((resolve, reject) => {
+    const script = document.createElement('script');
+    script.src = src;
+    script.onload = resolve;
+    script.onerror = reject;
+    document.head.appendChild(script);
+  });
 }
 
 // Renderizar tabla

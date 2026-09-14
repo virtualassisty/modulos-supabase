@@ -214,10 +214,37 @@ body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--navy-d
     <div style="background:var(--clinical-lite);border:1px solid #c5cce0;border-radius:10px;padding:.9rem 1.1rem;margin-bottom:1.75rem;font-size:.82rem;color:var(--clinical);line-height:1.6">
       📌 <strong style="color:var(--navy)">Nota:</strong> Las horas de consulta con pacientes no se analizan en la distribución — son el núcleo de tu trabajo y no están en discusión. El análisis se enfoca en todo lo que hacés <em>además</em> de atender.
     </div>
-    <button class="btn-p" onclick="go('s-tasks')">
+    <button class="btn-p" onclick="go('s-user')">
       Empezar inventario
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
     </button>
+  </div>
+
+  <!-- USER DATA -->
+  <div class="screen" id="s-user">
+    <p class="eyebrow">Tus datos</p>
+    <h2 style="font-family:'DM Serif Display',serif;font-size:1.6rem;color:var(--navy);margin-bottom:.5rem">Antes de empezar</h2>
+    <p style="font-size:.88rem;color:var(--g600);margin-bottom:1.5rem;line-height:1.6">Para guardarte los resultados y que puedas revisarlos después.</p>
+
+    <div class="form-wrap">
+      <div class="field">
+        <label class="field-label">Nombre completo <span>*</span></label>
+        <input type="text" id="user-name" class="f-input" placeholder="Ej: María Fernández" required>
+      </div>
+      <div class="field">
+        <label class="field-label">Email <span>*</span></label>
+        <input type="email" id="user-email" class="f-input" placeholder="tu@email.com" required>
+      </div>
+      <p class="f-err" id="user-err">Por favor completá todos los campos</p>
+    </div>
+
+    <div class="nav-row">
+      <button class="btn-g" onclick="go('s-intro')">← Atrás</button>
+      <button class="btn-p" onclick="validateUser()">
+        Continuar
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
+      </button>
+    </div>
   </div>
 
   <!-- TASKS -->
@@ -307,6 +334,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--navy-d
 <script>
 var tasks = [];
 var isClinical = null; // tracks current form state
+var userData = { nombre: '', email: '' }; // user data for saving
 
 function go(id) {
   document.querySelectorAll('.screen').forEach(function(s){ s.classList.remove('active'); });
@@ -619,15 +647,38 @@ function buildAnalysis() {
   }, 200);
 }
 
-function restart() { tasks = []; isClinical = null; renderList(); go('s-intro'); }
+function validateUser() {
+  const nombre = document.getElementById('user-name').value.trim();
+  const email = document.getElementById('user-email').value.trim();
+  const err = document.getElementById('user-err');
+
+  if (!nombre || !email) {
+    err.style.display = 'block';
+    return;
+  }
+
+  // Simple email validation
+  if (!email.includes('@') || !email.includes('.')) {
+    err.textContent = 'Por favor ingresá un email válido';
+    err.style.display = 'block';
+    return;
+  }
+
+  err.style.display = 'none';
+  userData.nombre = nombre;
+  userData.email = email;
+  go('s-tasks');
+}
+
+function restart() { tasks = []; isClinical = null; userData = { nombre: '', email: '' }; renderList(); go('s-intro'); }
 renderList();
 
 // Guardar en Supabase al ver resultados
 async function guardarInventario() {
-  const nombre = prompt('¿Cuál es tu nombre completo?');
-  const email = prompt('¿Cuál es tu email?');
-
-  if (!nombre || !email) return;
+  if (!userData.nombre || !userData.email) {
+    console.warn('⚠️ No hay datos de usuario para guardar');
+    return;
+  }
 
   const totalHs = tasks.reduce((sum, t) => sum + (parseFloat(t.horas) || 0), 0);
   const clinicaHs = tasks.filter(t => t.cat === 'clinica').reduce((s, t) => s + parseFloat(t.horas), 0);
@@ -642,7 +693,7 @@ async function guardarInventario() {
     }
   };
 
-  const resultado = await guardarFormulario('inventario_semanal', email, nombre, respuestas);
+  const resultado = await guardarFormulario('inventario_semanal', userData.email, userData.nombre, respuestas);
   if (resultado.success) {
     console.log('✅ Inventario guardado');
   }

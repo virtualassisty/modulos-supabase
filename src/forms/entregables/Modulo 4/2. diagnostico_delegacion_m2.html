@@ -457,52 +457,56 @@ function buildResult(){
 }
 
 function restart(){ current=0; answers=new Array(15).fill(null); blockScores=[0,0,0]; go('s-form'); }
-
-// Guardar en Supabase al mostrar resultados
-const originalShowResult = showResult;
-showResult = async function() {
-  originalShowResult();
-
-  // Guardar después de mostrar resultados
-  setTimeout(async () => {
-    if (!userData || !userData.email || !userData.nombre) return;
-
-    const total = blockScores.reduce((a, b) => a + b, 0);
-    const nivel = total < 30 ? 'sin_sistema' : (total < 38 ? 'incompleta' : 'con_sistema');
-
-    const respuestas = {
-      datos_usuario: {
-        profesion: userData.prof,
-        tipo_practica: userData.tipo,
-        tiene_equipo: userData.equipo
-      },
-      respuestas_preguntas: answers.map((answerIndex, i) => ({
-        pregunta_num: i + 1,
-        bloque: questions[i].block,
-        respuesta_index: answerIndex,
-        puntos: questions[i].pts[answerIndex]
-      })),
-      puntajes: {
-        total,
-        bloque_que_delegar: blockScores[0],
-        bloque_como_delegar: blockScores[1],
-        bloque_control: blockScores[2],
-        nivel
-      }
-    };
-
-    const resultado = await guardarFormulario('diagnostico_delegacion', userData.email, userData.nombre, respuestas);
-    if (resultado.success) {
-      console.log('✅ Diagnóstico de delegación guardado');
-    }
-  }, 500);
-};
 </script>
 
 <!-- Cargar Supabase y cliente de formularios -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="/api/config.js"></script>
 <script src="/src/js/formularios-client.js?v=2"></script>
+
+<script>
+// Guardar en Supabase al mostrar resultados
+window.addEventListener('DOMContentLoaded', () => {
+  const originalShowResult = showResult;
+  showResult = async function() {
+    originalShowResult();
+
+    // Guardar después de mostrar resultados
+    setTimeout(async () => {
+      if (!userData || !userData.email || !userData.nombre) return;
+
+      const total = blockScores.reduce((a, b) => a + b, 0);
+      const nivel = total < 30 ? 'sin_sistema' : (total < 38 ? 'incompleta' : 'con_sistema');
+
+      const respuestas = {
+        datos_usuario: {
+          profesion: userData.prof,
+          tipo_practica: userData.tipo,
+          tiene_equipo: userData.equipo
+        },
+        respuestas_preguntas: answers.map((answerIndex, i) => ({
+          pregunta_num: i + 1,
+          bloque: questions[i].block,
+          respuesta_index: answerIndex,
+          puntos: questions[i].pts[answerIndex]
+        })),
+        puntajes: {
+          total,
+          bloque_que_delegar: blockScores[0],
+          bloque_como_delegar: blockScores[1],
+          bloque_control: blockScores[2],
+          nivel
+        }
+      };
+
+      const resultado = await guardarFormulario('diagnostico_delegacion', userData.email, userData.nombre, respuestas);
+      if (resultado.success) {
+        console.log('✅ Diagnóstico de delegación guardado');
+      }
+    }, 500);
+  };
+});
+</script>
 
 </body>
 </html>

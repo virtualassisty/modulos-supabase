@@ -647,19 +647,23 @@ async function guardarInventario() {
     console.log('✅ Inventario guardado');
   }
 }
-
-// Llamar automáticamente al cargar resultados
-const originalShowResults = window.showResults || (() => {});
-window.showResults = function() {
-  originalShowResults();
-  setTimeout(() => guardarInventario(), 1000);
-};
 </script>
 
 <!-- Cargar Supabase y cliente de formularios -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="/api/config.js"></script>
 <script src="/src/js/formularios-client.js?v=2"></script>
+
+<script>
+// Llamar automáticamente al cargar resultados
+window.addEventListener('DOMContentLoaded', () => {
+  const originalShowResults = window.showResults || (() => {});
+  window.showResults = function() {
+    originalShowResults();
+    setTimeout(() => guardarInventario(), 1000);
+  };
+});
+</script>
 
 </body>
 </html>

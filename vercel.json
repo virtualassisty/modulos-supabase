@@ -63,6 +63,10 @@
       "destination": "/src/admin/login.html"
     },
     {
+      "source": "/admin",
+      "destination": "/src/admin/login.html"
+    },
+    {
       "source": "/recurso-gratuito-negocios-paso1",
       "destination": "/src/forms/assistify/paso1.html"
     },

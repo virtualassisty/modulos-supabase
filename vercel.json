@@ -1,11 +1,6 @@
 {
   "redirects": [
     {
-      "source": "/src/js/:path*",
-      "destination": "/",
-      "permanent": false
-    },
-    {
       "source": "/.env.local",
       "destination": "/",
       "permanent": false

@@ -5,6 +5,11 @@ node_modules/
 
 # Testing
 coverage/
+tests
+test-results
+.env.test.example
+playwright.config.js
+TESTING.md
 
 # Production
 build/

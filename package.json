@@ -5,7 +5,13 @@
   "main": "index.html",
   "scripts": {
     "dev": "npx serve .",
-    "deploy": "vercel --prod"
+    "deploy": "vercel --prod",
+    "test": "playwright test",
+    "test:headed": "playwright test --headed",
+    "test:ui": "playwright test --ui",
+    "test:debug": "HEADLESS=false playwright test --debug",
+    "test:report": "playwright show-report test-results/html-report",
+    "test:cleanup": "node tests/cleanup-test-data.js"
   },
   "keywords": [
     "diagnosticos",
@@ -13,5 +19,9 @@
     "supabase"
   ],
   "author": "Assistify",
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "@playwright/test": "^1.63.0",
+    "@supabase/supabase-js": "^2.116.0"
+  }
 }

@@ -701,8 +701,37 @@ async function renderResult() {
 
 <!-- Cargar Supabase y cliente de formularios -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="../../../../api/config.js"></script>
-<script src="/src/js/formularios-client.js?v=2"></script>
+<script>
+  // Cargar configuración según el entorno y luego el cliente de formularios
+  (function() {
+    const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    const configScript = document.createElement('script');
+    configScript.src = isLocal ? '/public/config-dev.js' : '/api/config.js';
+
+    // Cuando la configuración se carga, cargar el cliente de formularios
+    configScript.onload = function() {
+      const clientScript = document.createElement('script');
+      clientScript.src = '/src/js/formularios-client.js?v=2';
+      document.head.appendChild(clientScript);
+    };
+
+    // Si falla en local, intentar con /api/config.js (por si usa vercel dev)
+    configScript.onerror = function() {
+      if (isLocal) {
+        const fallbackScript = document.createElement('script');
+        fallbackScript.src = '/api/config.js';
+        fallbackScript.onload = function() {
+          const clientScript = document.createElement('script');
+          clientScript.src = '/src/js/formularios-client.js?v=2';
+          document.head.appendChild(clientScript);
+        };
+        document.head.appendChild(fallbackScript);
+      }
+    };
+
+    document.head.appendChild(configScript);
+  })();
+</script>
 
 </body>
 </html>

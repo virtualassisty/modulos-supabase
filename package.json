@@ -4,7 +4,9 @@
   "description": "Diagnósticos interactivos con Supabase - Assistify",
   "main": "index.html",
   "scripts": {
+    "predev": "node scripts/generate-config.js",
     "dev": "npx serve .",
+    "dev:vercel": "vercel dev",
     "deploy": "vercel --prod",
     "test": "playwright test",
     "test:headed": "playwright test --headed",

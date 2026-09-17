@@ -90,6 +90,10 @@
     {
       "source": "/generador-busqueda",
       "destination": "/src/forms/entregables/Modulo 5/app_contratacion_m4.html"
+    },
+    {
+      "source": "/banco-mensajes",
+      "destination": "/src/forms/entregables/Modulo 6/banco_mensajes_p6.html"
     }
   ],
   "headers": [

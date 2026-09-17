@@ -174,7 +174,7 @@
     </div>
     <span style="font-family:'DM Serif Display',serif;font-size:1.1rem;font-weight:300;color:#f7f4ef;letter-spacing:-.01em">Operaciones <span style="color:#c7cca8">Saludables</span></span>
   </div>
-  <span style="font-size:.6rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:rgba(199,204,168,.5)">Módulo 1 · Diagnóstico de Rol</span>
+  <span style="font-size:.6rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:rgba(199,204,168,.5)">Paso 1 · Diagnóstico de Rol</span>
 </header>
 
 <main class="container">
@@ -641,7 +641,7 @@ async function renderResult() {
 
     <div class="cta-box">
       <p class="cta-title">¿Tenés dudas sobre tu resultado?</p>
-      <p class="cta-desc">Este diagnóstico es el punto de partida del Módulo 1. En tu próxima sesión con tu consultor podés profundizar cualquier punto, revisar tus acciones prioritarias y empezar a trabajar en los cambios concretos.</p>
+      <p class="cta-desc">Este diagnóstico es el punto de partida del Paso 1. En tu próxima sesión con tu consultor podés profundizar cualquier punto, revisar tus acciones prioritarias y empezar a trabajar en los cambios concretos.</p>
       <div class="cta-btns">
         <button class="btn-cta-secondary" onclick="startDiag()">Hacer el diagnóstico de nuevo</button>
       </div>
@@ -701,37 +701,8 @@ async function renderResult() {
 
 <!-- Cargar Supabase y cliente de formularios -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script>
-  // Cargar configuración según el entorno y luego el cliente de formularios
-  (function() {
-    const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-    const configScript = document.createElement('script');
-    configScript.src = isLocal ? '/public/config-dev.js' : '/api/config.js';
-
-    // Cuando la configuración se carga, cargar el cliente de formularios
-    configScript.onload = function() {
-      const clientScript = document.createElement('script');
-      clientScript.src = '/src/js/formularios-client.js?v=2';
-      document.head.appendChild(clientScript);
-    };
-
-    // Si falla en local, intentar con /api/config.js (por si usa vercel dev)
-    configScript.onerror = function() {
-      if (isLocal) {
-        const fallbackScript = document.createElement('script');
-        fallbackScript.src = '/api/config.js';
-        fallbackScript.onload = function() {
-          const clientScript = document.createElement('script');
-          clientScript.src = '/src/js/formularios-client.js?v=2';
-          document.head.appendChild(clientScript);
-        };
-        document.head.appendChild(fallbackScript);
-      }
-    };
-
-    document.head.appendChild(configScript);
-  })();
-</script>
+<script src="../../../../api/config.js"></script>
+<script src="/src/js/formularios-client.js?v=2"></script>
 
 </body>
 </html>

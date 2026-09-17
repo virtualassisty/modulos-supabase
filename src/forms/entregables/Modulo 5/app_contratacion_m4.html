@@ -9,7 +9,6 @@
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
   --navy:#1e2d5a;--navy-d:#151f3e;--navy-l:#2a3d7a;
-  --teal:#00c9a0;--teal-d:#00a882;--teal-l:#e6faf6;
   --olive:#6b7a3a;--olive-m:#3f4323;--olive-l:#f2f4e8;
   --cream:#f7f4ef;--white:#fff;
   --g100:#f5f5f3;--g200:#e8e6e0;--g400:#9c9a94;--g600:#5c5a56;
@@ -20,19 +19,20 @@
 html{scroll-behavior:smooth}
 body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--navy-d);min-height:100vh;display:flex;flex-direction:column;align-items:center}
 
-.hdr{width:100%;background:var(--navy);padding:1rem 2rem;display:flex;align-items:center;justify-content:space-between}
-.hdr-logo{font-family:'DM Serif Display',serif;font-size:1.1rem;color:#fff}
-.hdr-logo span{color:var(--teal)}
-.hdr-tag{font-size:.7rem;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.45)}
+.hdr{width:100%;background:var(--olive-m);padding:1rem 2rem;display:flex;align-items:center;justify-content:space-between}
+.hdr-left{display:flex;align-items:center;gap:12px}
+.hdr-badge{font-size:.65rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;background:var(--olive);color:#fff;padding:4px 10px;border-radius:6px}
+.hdr-logo{font-family:'DM Serif Display',serif;font-size:1.05rem;color:#fff}
+.hdr-tag{font-size:.7rem;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.55)}
 
 .wrap{width:100%;max-width:700px;padding:2.5rem 2rem 4rem}
 .screen{display:none}
 .screen.active{display:block;animation:fadeIn .3s ease}
 @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 
-.eyebrow{font-size:.7rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--teal-d);margin-bottom:1rem}
+.eyebrow{font-size:.7rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--olive-m);margin-bottom:1rem}
 .page-title{font-family:'DM Serif Display',serif;font-size:clamp(1.8rem,4vw,2.4rem);line-height:1.15;color:var(--navy);margin-bottom:1rem}
-.page-title em{font-style:italic;color:var(--teal-d)}
+.page-title em{font-style:italic;color:var(--olive-m)}
 .page-desc{font-size:.95rem;line-height:1.7;color:var(--g600);margin-bottom:2rem;max-width:520px}
 
 /* Steps indicator */
@@ -44,40 +44,40 @@ body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--navy-d
 /* Form */
 .form-card{background:var(--white);border:1px solid var(--g200);border-radius:16px;padding:1.75rem;margin-bottom:1.25rem}
 .fc-title{font-family:'DM Serif Display',serif;font-size:1.15rem;color:var(--navy);margin-bottom:1.25rem;display:flex;align-items:center;gap:10px}
-.fc-title .badge{font-family:'DM Sans',sans-serif;font-size:.68rem;font-weight:600;background:var(--teal-l);color:var(--teal-d);padding:3px 10px;border-radius:20px}
+.fc-title .badge{font-family:'DM Sans',sans-serif;font-size:.68rem;font-weight:600;background:var(--olive-l);color:var(--olive-m);padding:3px 10px;border-radius:20px}
 .field{margin-bottom:1.1rem}
 .field-label{font-size:.75rem;font-weight:600;color:var(--navy);letter-spacing:.03em;margin-bottom:6px;display:block}
-.field-label span{color:var(--teal-d)}
+.field-label span{color:var(--olive-m)}
 .field-hint{font-size:.72rem;color:var(--g400);font-style:italic;margin-bottom:6px;display:block}
 .f-input{padding:.7rem 1rem;border:1.5px solid var(--g200);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:.9rem;color:var(--navy-d);background:var(--white);outline:none;transition:border-color .18s;width:100%}
-.f-input:focus{border-color:var(--teal-d)}
+.f-input:focus{border-color:var(--olive-m)}
 .f-input::placeholder{color:var(--g400)}
 .f-textarea{resize:vertical;min-height:80px;line-height:1.5}
 .field-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .select-wrap{position:relative}
 .select-wrap::after{content:'';position:absolute;right:12px;top:50%;transform:translateY(-50%);width:0;height:0;border-left:4px solid transparent;border-right:4px solid transparent;border-top:5px solid var(--g400);pointer-events:none}
 .f-select{width:100%;padding:.7rem 2rem .7rem 1rem;border:1.5px solid var(--g200);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:.9rem;color:var(--navy-d);background:var(--white);outline:none;transition:border-color .18s;appearance:none;cursor:pointer}
-.f-select:focus{border-color:var(--teal-d)}
+.f-select:focus{border-color:var(--olive-m)}
 
 /* Skill chips */
 .skills-wrap{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
 .skill-chip{padding:.45rem .9rem;border:1.5px solid var(--g200);border-radius:20px;font-size:.78rem;font-weight:500;cursor:pointer;background:var(--white);color:var(--g600);transition:all .18s;user-select:none}
 .skill-chip:hover{border-color:var(--navy);color:var(--navy)}
-.skill-chip.on{border-color:var(--teal-d);background:var(--teal-l);color:var(--navy-d)}
+.skill-chip.on{border-color:var(--olive-m);background:var(--olive-l);color:var(--navy-d)}
 
 /* Buttons */
 .btn-p{display:inline-flex;align-items:center;gap:10px;background:var(--navy);color:#fff;border:none;border-radius:10px;padding:.9rem 1.75rem;font-family:'DM Sans',sans-serif;font-size:.95rem;font-weight:500;cursor:pointer;transition:background .2s,transform .15s}
 .btn-p:hover{background:var(--navy-l);transform:translateY(-1px)}
 .btn-g{padding:.7rem 1.4rem;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:.88rem;font-weight:500;cursor:pointer;transition:all .18s;border:1.5px solid var(--g200);background:var(--white);color:var(--g600)}
 .btn-g:hover{border-color:var(--navy);color:var(--navy)}
-.btn-copy{display:inline-flex;align-items:center;gap:8px;padding:.65rem 1.25rem;background:var(--teal);border:none;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:.82rem;font-weight:600;color:var(--navy-d);cursor:pointer;transition:all .18s}
-.btn-copy:hover{background:var(--teal-d);color:#fff}
+.btn-copy{display:inline-flex;align-items:center;gap:8px;padding:.65rem 1.25rem;background:var(--olive);border:none;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:.82rem;font-weight:600;color:#fff;cursor:pointer;transition:all .18s}
+.btn-copy:hover{background:var(--olive-m);color:#fff}
 .btn-copy.copied{background:var(--green-l);color:var(--green)}
 .nav-row{display:flex;gap:10px;margin-top:1.5rem;justify-content:space-between;align-items:center}
 
 /* Result: aviso */
 .aviso-box{background:var(--navy-d);border-radius:14px;padding:1.5rem;margin-bottom:1.25rem;position:relative}
-.aviso-label{font-size:.68rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--teal);margin-bottom:1rem}
+.aviso-label{font-size:.68rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--olive);margin-bottom:1rem}
 .aviso-text{font-family:'DM Sans',sans-serif;font-size:.9rem;line-height:1.75;color:rgba(255,255,255,.85);white-space:pre-line}
 .aviso-actions{display:flex;gap:10px;margin-top:1.1rem;flex-wrap:wrap}
 .aviso-tip{font-size:.75rem;color:rgba(255,255,255,.45);margin-top:.75rem;font-style:italic}
@@ -86,7 +86,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--navy-d
 .q-section{margin-bottom:1.5rem}
 .q-section-title{font-size:.7rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--g400);margin-bottom:.75rem;padding-bottom:.5rem;border-bottom:1px solid var(--g200)}
 .q-item{background:var(--white);border:1px solid var(--g200);border-radius:10px;padding:1rem 1.1rem;margin-bottom:8px}
-.q-num{font-size:.65rem;font-weight:600;color:var(--teal-d);background:var(--teal-l);padding:2px 8px;border-radius:10px;display:inline-block;margin-bottom:.4rem}
+.q-num{font-size:.65rem;font-weight:600;color:var(--olive-m);background:var(--olive-l);padding:2px 8px;border-radius:10px;display:inline-block;margin-bottom:.4rem}
 .q-text{font-size:.88rem;font-weight:600;color:var(--navy);margin-bottom:.5rem}
 .q-opts{display:flex;flex-direction:column;gap:4px}
 .q-opt{font-size:.78rem;color:var(--g600);padding:4px 0;display:flex;align-items:center;gap:8px}
@@ -99,7 +99,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--navy-d
 .inst-step{font-size:.8rem;color:var(--g600);line-height:1.5;display:flex;gap:10px;align-items:flex-start}
 .inst-step-num{width:20px;height:20px;border-radius:6px;background:var(--olive-m);color:#fff;font-size:.65rem;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
 
-.footer{width:100%;padding:1.5rem 2rem;text-align:center;font-size:.72rem;color:var(--g400);border-top:1px solid var(--g200);margin-top:auto}
+.footer{width:100%;padding:1.5rem 2rem;text-align:center;font-size:.72rem;color:rgba(255,255,255,.55);background:var(--olive-m);margin-top:auto}
 
 @media(max-width:520px){
   .field-row{grid-template-columns:1fr}
@@ -109,8 +109,11 @@ body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--navy-d
 </head>
 <body>
 <header class="hdr">
-  <span class="hdr-logo">Negocios <span>Saludables</span></span>
-  <span class="hdr-tag">Paso 5 — Contratación Inteligente</span>
+  <div class="hdr-left">
+    <span class="hdr-badge">OS</span>
+    <span class="hdr-logo">Operaciones Saludables</span>
+  </div>
+  <span class="hdr-tag">Paso 5 · Contratación Inteligente</span>
 </header>
 <main class="wrap">
 
@@ -156,7 +159,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--navy-d
           <select class="f-select" id="rol-tipo" onchange="onRolChange()">
             <option value="">Seleccioná el rol</option>
             <option value="secretaria">Secretaria / Asistente administrativa</option>
-            <option value="administrativo">Administrativo/a part-time</option>
+            <option value="administrativo">Administrativo/a</option>
             <option value="setter">Setter / Comunicación y calificación</option>
             <option value="contenido">Asistente de contenido</option>
             <option value="personalizado">Otro rol (personalizado)</option>
@@ -281,7 +284,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--navy-d
 
     <div style="background:var(--navy);border-radius:14px;padding:1.4rem;text-align:center;margin-bottom:1.5rem">
       <p style="font-family:'DM Serif Display',serif;font-size:1.1rem;color:#fff;margin-bottom:.4rem">¿Tenés las preguntas listas?</p>
-      <p style="font-size:.82rem;color:rgba(255,255,255,.6);line-height:1.6">El siguiente paso es preparar las preguntas para la entrevista. Las encontrás en la pestaña <strong style="color:var(--teal)">'Guía de Entrevista'</strong> del Google Sheet de este módulo.</p>
+      <p style="font-size:.82rem;color:rgba(255,255,255,.6);line-height:1.6">El siguiente paso es preparar las preguntas para la entrevista. Las encontrás en la pestaña <strong style="color:var(--olive)">'Guía de Entrevista'</strong> del Google Sheet de este módulo.</p>
     </div>
 
     <div class="nav-row">
@@ -291,7 +294,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--navy-d
   </div>
 
 </main>
-<footer class="footer">Programa Negocios Saludables · Kit de Herramientas Operativas</footer>
+<footer class="footer">Operaciones Saludables — una iniciativa de Negocios Saludables y Assistify</footer>
 
 <script>
 // ── DATA ─────────────────────────────────────────────────────────────────────

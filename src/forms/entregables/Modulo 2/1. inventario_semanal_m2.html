@@ -611,22 +611,21 @@ function buildAnalysis() {
     html += '<p style="font-size:.75rem;color:#9c9a94;margin-top:.6rem;font-style:italic">Si delegás estas tareas, liberás aprox. <strong style="color:#1e2d5a">'+libH.toFixed(1)+' horas</strong> por semana.</p>';
   }
 
-  // Next steps
-  html += '<p class="sec-head">Tus próximos 3 pasos</p>';
-  var steps = [
-    {t:'Elegí UNA tarea ejecutora y documentá cómo se hace', d:'Escribí el proceso paso a paso: qué, cómo, cuándo, resultado esperado. Es lo único que necesitás para poder delegarla correctamente.'},
-    {t:'Definí a quién le vas a pasar esa tarea esta semana', d:'No tiene que ser perfecto. La idea es empezar a soltar aunque sea una cosa. La próxima semana, una más.'},
-    {t:'Bloqueá tiempo estratégico en tu agenda', d:'Las horas que liberaste van a estrategia. Agendalo como si fuera una consulta — o lo va a desplazar lo urgente.'}
-  ];
-  steps.forEach(function(s, i) {
-    html += '<div class="step-card"><div class="step-num">'+(i+1)+'</div>';
-    html += '<div><div class="step-ttl">'+s.t+'</div><div class="step-dsc">'+s.d+'</div></div></div>';
-  });
+  // // Next steps
+  // html += '<p class="sec-head">Tus próximos 3 pasos</p>';
+  // var steps = [
+  //   {t:'Elegí UNA tarea ejecutora y documentá cómo se hace', d:'Escribí el proceso paso a paso: qué, cómo, cuándo, resultado esperado. Es lo único que necesitás para poder delegarla correctamente.'},
+  //   {t:'Definí a quién le vas a pasar esa tarea esta semana', d:'No tiene que ser perfecto. La idea es empezar a soltar aunque sea una cosa. La próxima semana, una más.'},
+  //   {t:'Bloqueá tiempo estratégico en tu agenda', d:'Las horas que liberaste van a estrategia. Agendalo como si fuera una consulta — o lo va a desplazar lo urgente.'}
+  // ];
+  // steps.forEach(function(s, i) {
+  //   html += '<div class="step-card"><div class="step-num">'+(i+1)+'</div>';
+  //   html += '<div><div class="step-ttl">'+s.t+'</div><div class="step-dsc">'+s.d+'</div></div></div>';
+  // });
 
-  // CTA
-  html += '<div class="cta-box"><p class="cta-ttl">¿Tenés dudas sobre tu resultado?</p>';
-  html += '<p class="cta-dsc">Este inventario es una herramienta del Paso 2. En tu próxima sesión con tu consultor podés profundizar cualquier punto y empezar a trabajar en los cambios concretos.</p>';
-  html += '<div class="cta-btns"><button class="btn-cs" onclick="restart()">Hacer de nuevo</button></div></div>';
+  // // CTA
+  // html += '<p class="cta-dsc">Este inventario es una herramienta del Paso 2. En tu próxima sesión con tu consultor podés profundizar cualquier punto y empezar a trabajar en los cambios concretos.</p>';
+  // html += '<div class="cta-btns"><button class="btn-cs" onclick="restart()">Hacer de nuevo</button></div></div>';
 
   document.getElementById('s-analysis').innerHTML = html;
   go('s-analysis');

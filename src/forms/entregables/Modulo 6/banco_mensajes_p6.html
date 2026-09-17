@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Banco de Mensajes — Operaciones Saludables</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --navy: #1e2d5a;
+  --navy-d: #151f3e;
+  --olive: #3f4323;
+  --olive-l: #6b7a3a;
+  --green-l: #c7cca8;
+  --cream: #f7f4ef;
+  --cream-d: #eef0e8;
+  --white: #ffffff;
+  --g100: #f5f5f3;
+  --g200: #e8e6e0;
+  --g400: #9c9a94;
+  --g600: #5c5a56;
+}
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--cream);
+  color: var(--navy-d);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* HEADER */
+.hdr {
+  background: var(--olive);
+  padding: .9rem 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.hdr-left { display: flex; align-items: center; gap: .75rem; }
+.hdr-badge {
+  width: 32px; height: 32px;
+  border-radius: 8px;
+  background: rgba(247,244,239,.12);
+  border: 1px solid rgba(247,244,239,.2);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'DM Serif Display', serif;
+  font-size: .85rem; font-weight: 600;
+  color: var(--cream);
+}
+.hdr-name {
+  font-family: 'DM Serif Display', serif;
+  font-size: 1.1rem; font-weight: 300;
+  color: var(--cream); letter-spacing: -.01em;
+}
+.hdr-name span { color: var(--green-l); }
+.hdr-tag {
+  font-size: .6rem; font-weight: 600;
+  letter-spacing: .1em; text-transform: uppercase;
+  color: rgba(199,204,168,.5);
+}
+
+/* MAIN */
+.wrap { max-width: 720px; margin: 0 auto; padding: 2.5rem 1.5rem 5rem; width: 100%; }
+
+.intro { margin-bottom: 2rem; }
+.intro h1 {
+  font-family: 'DM Serif Display', serif;
+  font-size: 1.9rem; font-weight: 300;
+  color: var(--navy); line-height: 1.15;
+  margin-bottom: .5rem;
+}
+.intro p { font-size: .88rem; color: var(--g600); line-height: 1.7; }
+
+/* CATEGORY TABS */
+.cats {
+  display: flex; flex-wrap: wrap; gap: .5rem;
+  margin-bottom: 1.75rem;
+}
+.cat-btn {
+  padding: .5rem 1rem;
+  border-radius: 20px;
+  border: 1.5px solid var(--g200);
+  background: var(--white);
+  font-family: 'DM Sans', sans-serif;
+  font-size: .78rem; font-weight: 500;
+  color: var(--g600);
+  cursor: pointer;
+  transition: all .15s;
+  white-space: nowrap;
+}
+.cat-btn:hover { border-color: var(--olive-l); color: var(--olive); }
+.cat-btn.active {
+  background: var(--olive);
+  border-color: var(--olive);
+  color: var(--white);
+}
+
+/* SITUATION LIST */
+.situations { display: flex; flex-direction: column; gap: .75rem; margin-bottom: 1.5rem; }
+.sit-btn {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: .9rem 1.1rem;
+  background: var(--white);
+  border: 1.5px solid var(--g200);
+  border-radius: 10px;
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  font-size: .88rem; font-weight: 500;
+  color: var(--navy);
+  text-align: left;
+  transition: all .15s;
+}
+.sit-btn:hover { border-color: var(--olive-l); }
+.sit-btn.active { border-color: var(--olive); background: var(--cream-d); }
+.sit-arrow { font-size: .75rem; color: var(--g400); transition: transform .2s; }
+.sit-btn.active .sit-arrow { transform: rotate(90deg); color: var(--olive); }
+
+/* MESSAGE CARD */
+.msg-card {
+  background: var(--white);
+  border: 1.5px solid var(--g200);
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 1.5rem;
+  animation: slideDown .2s ease;
+}
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.msg-header {
+  background: var(--navy);
+  padding: .75rem 1.25rem;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.msg-meta { display: flex; gap: 1rem; }
+.msg-meta-item { font-size: .7rem; color: rgba(255,255,255,.6); }
+.msg-meta-item span { color: var(--green-l); font-weight: 600; }
+
+.msg-body { padding: 1.25rem; }
+.msg-label {
+  font-size: .65rem; font-weight: 600;
+  letter-spacing: .1em; text-transform: uppercase;
+  color: var(--g400); margin-bottom: .5rem;
+  display: block;
+}
+.msg-text {
+  font-size: .92rem; line-height: 1.75;
+  color: var(--navy-d);
+  background: var(--g100);
+  border-radius: 8px;
+  padding: 1rem 1.1rem;
+  border-left: 3px solid var(--olive);
+  white-space: pre-wrap;
+}
+.msg-field {
+  background: rgba(107,122,58,.12);
+  color: var(--olive);
+  font-weight: 600;
+  border-radius: 3px;
+  padding: 0 3px;
+}
+
+.copy-btn {
+  display: flex; align-items: center; gap: .4rem;
+  margin-top: .75rem;
+  padding: .55rem 1rem;
+  background: var(--olive);
+  color: var(--white);
+  border: none;
+  border-radius: 8px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: .8rem; font-weight: 600;
+  cursor: pointer;
+  transition: background .15s;
+}
+.copy-btn:hover { background: var(--navy); }
+.copy-btn.copied { background: #0f6e56; }
+
+.divider { height: 1px; background: var(--g200); margin: 1rem 0; }
+
+.detail-row {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: .75rem; margin-top: .75rem;
+}
+.detail-box {
+  border-radius: 8px;
+  padding: .75rem .9rem;
+}
+.detail-box.personalizar { background: rgba(107,122,58,.07); }
+.detail-box.excepcion { background: rgba(226,75,74,.06); }
+.detail-box-title {
+  font-size: .68rem; font-weight: 600;
+  margin-bottom: .4rem; display: block;
+}
+.detail-box.personalizar .detail-box-title { color: var(--olive); }
+.detail-box.excepcion .detail-box-title { color: #c0392b; }
+.detail-box p { font-size: .78rem; line-height: 1.6; color: var(--g600); }
+
+/* EMPTY STATE */
+.empty {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: var(--g400);
+  font-size: .88rem;
+}
+
+/* FOOTER */
+footer {
+  background: var(--olive);
+  padding: 1.25rem 2rem;
+  text-align: center;
+  font-size: .65rem; font-weight: 600;
+  letter-spacing: .08em; text-transform: uppercase;
+  color: rgba(199,204,168,.55);
+  margin-top: auto;
+}
+
+@media (max-width: 480px) {
+  .wrap { padding: 1.5rem 1rem 4rem; }
+  .detail-row { grid-template-columns: 1fr; }
+  .hdr { padding: .75rem 1rem; }
+}
+</style>
+</head>
+<body>
+
+<header class="hdr">
+  <div class="hdr-left">
+    <div class="hdr-badge">OS</div>
+    <span class="hdr-name">Operaciones <span>Saludables</span></span>
+  </div>
+  <span class="hdr-tag">Paso 6 · Banco de Mensajes</span>
+</header>
+
+<main class="wrap">
+  <div class="intro">
+    <h1>Banco de<br>Mensajes</h1>
+    <p>Elegí la categoría y la situación para ver el mensaje base listo para copiar. Reemplazá los campos <strong style="color:var(--olive)">resaltados</strong> con los datos de tu práctica.</p>
+  </div>
+
+  <div class="cats" id="cats"></div>
+  <div class="situations" id="situations"></div>
+  <div id="msgCard"></div>
+</main>
+
+<footer>Operaciones Saludables — una iniciativa de Negocios Saludables y Assistify</footer>
+
+<script>
+const data = {
+  "📅 Gestión de agenda": [
+    {
+      sit: "Confirmación de turno",
+      canal: "WhatsApp",
+      quien: "Asistente / Secretaria",
+      cuando: "24hs antes del turno",
+      msg: "Hola [Nombre] 😊 Te recuerdo tu turno con [Profesional] mañana [día] a las [hora] en [dirección / modalidad online]. ¿Confirmás? Si necesitás reprogramar, avisanos con al menos 24hs de anticipación.",
+      personalizar: "Nombre del paciente, nombre del profesional, día, hora, lugar o modalidad.",
+      excepcion: "Si cancela con menos de 24hs: aplicar política de cancelación. Si no responde en 2hs: llamar."
+    },
+    {
+      sit: "Recordatorio de turno",
+      canal: "WhatsApp",
+      quien: "Asistente / Secretaria",
+      cuando: "Mismo día, a la mañana",
+      msg: "Hola [Nombre] 👋 Hoy tenés turno con [Profesional] a las [hora]. Te esperamos en [dirección / modalidad online]. Cualquier consulta, escribinos acá.",
+      personalizar: "Nombre del paciente, hora, lugar o modalidad.",
+      excepcion: "Si avisa que no puede venir: reprogramar según disponibilidad y registrar en la planilla."
+    },
+    {
+      sit: "Cancelación o reprogramación",
+      canal: "WhatsApp",
+      quien: "Asistente / Secretaria",
+      cuando: "Dentro de las 2hs de recibir el aviso",
+      msg: "Hola [Nombre], recibimos tu mensaje. Sin problema, te buscamos un nuevo turno. ¿Tenés preferencia de día u horario? [Si aplica política de cancelación: 'Te comentamos que cancelaciones con menos de 24hs requieren [condición].'.]",
+      personalizar: "Nombre del paciente, condición de cancelación si aplica.",
+      excepcion: "Si no responde para reprogramar: intentar al día siguiente. Si es segunda cancelación: escalar al profesional."
+    }
+  ],
+  "🔄 Seguimiento post-consulta": [
+    {
+      sit: "Seguimiento a los 7 días",
+      canal: "WhatsApp",
+      quien: "Asistente / Secretaria",
+      cuando: "7 días después de la consulta",
+      msg: "Hola [Nombre] 😊 Hace una semana tuviste tu consulta con [Profesional]. ¿Cómo estás? ¿Pudiste aplicar las indicaciones? Si tenés alguna duda o querés coordinar el próximo turno, escribinos acá.",
+      personalizar: "Nombre del paciente, nombre del profesional.",
+      excepcion: "Si hace preguntas médicas: 'Esa consulta te la confirma directamente [Profesional]. Te responde a la brevedad.' → Derivar."
+    },
+    {
+      sit: "Re-agendamiento de tratamiento",
+      canal: "WhatsApp",
+      quien: "Asistente / Secretaria",
+      cuando: "Cuando el tratamiento requiere sesiones de seguimiento",
+      msg: "Hola [Nombre] 👋 Te escribimos para recordarte que tu tratamiento incluye [cantidad] sesiones de seguimiento. La próxima la podemos coordinar para la semana que viene. ¿Cuándo te queda mejor?",
+      personalizar: "Nombre del paciente, cantidad de sesiones pendientes.",
+      excepcion: "Si dice que no quiere continuar: no insistir. Registrar y avisar al profesional."
+    }
+  ],
+  "💬 Consultas entrantes": [
+    {
+      sit: "Primera consulta por WhatsApp o Instagram",
+      canal: "WhatsApp / Instagram DM",
+      quien: "Asistente / Secretaria",
+      cuando: "Dentro de las 2hs hábiles",
+      msg: "Hola [Nombre], gracias por escribirnos 😊 Soy [nombre de quien responde], asistente de [Profesional]. Contame, ¿en qué te puedo ayudar? Para darte la mejor orientación, ¿podés contarme brevemente qué estás buscando?",
+      personalizar: "Nombre del paciente, nombre de quien responde, nombre del profesional.",
+      excepcion: "Si hace preguntas médicas antes de tener turno: 'Esa consulta la responde [Profesional] en la primera consulta. ¿Coordinamos un turno?' Si insiste: derivar al profesional."
+    }
+  ],
+  "💰 Cobros y pagos": [
+    {
+      sit: "Primer recordatorio de cobro pendiente",
+      canal: "WhatsApp",
+      quien: "Asistente / Secretaria",
+      cuando: "7 días después de la consulta sin pago",
+      msg: "Hola [Nombre], te escribimos para recordarte que tenemos pendiente el pago de tu consulta del [fecha] por [monto]. Podés realizarlo por [medios de pago disponibles]. Cualquier consulta, avisanos.",
+      personalizar: "Nombre del paciente, fecha, monto, medios de pago disponibles.",
+      excepcion: "Si dice que ya pagó: verificar en la planilla antes de responder. Si no responde en 48hs: pasar al segundo recordatorio."
+    },
+    {
+      sit: "Segundo recordatorio de cobro",
+      canal: "WhatsApp + llamada si no responde",
+      quien: "Asistente / Secretaria",
+      cuando: "15 días sin pago registrado",
+      msg: "Hola [Nombre], te escribimos nuevamente por el pago pendiente de tu consulta del [fecha] por [monto]. Si necesitás coordinar una forma de pago, contanos. Estamos para ayudarte.",
+      personalizar: "Nombre del paciente, fecha, monto.",
+      excepcion: "Si no responde: escalar al profesional. No insistir más de 2 veces sin escalar."
+    }
+  ],
+  "👥 Gestión de equipo interno": [
+    {
+      sit: "Recordatorio de reunión de equipo",
+      canal: "WhatsApp grupal / individual",
+      quien: "Dueño / Coordinador",
+      cuando: "24hs antes de la reunión",
+      msg: "Hola equipo 👋 Les recuerdo que mañana [día] a las [hora] tenemos nuestra reunión de equipo en [lugar / modalidad]. Por favor confirmen asistencia. Temario: [puntos principales a tratar].",
+      personalizar: "Día, hora, lugar o modalidad, temario.",
+      excepcion: "Si alguien no puede asistir: definir si la reunión se reprograma o se pasa el resumen por escrito."
+    },
+    {
+      sit: "Confirmación de guardia o turno de trabajo",
+      canal: "WhatsApp",
+      quien: "Dueño / Coordinador",
+      cuando: "48hs antes del turno",
+      msg: "Hola [Nombre], te confirmo que el [día] cubrís el turno de [horario]. Si tenés algún inconveniente, avisame antes del [fecha límite para reorganizar].",
+      personalizar: "Nombre del colaborador, día, horario, fecha límite para avisar cambios.",
+      excepcion: "Si no puede: buscar reemplazo o reorganizar la cobertura con anticipación."
+    },
+    {
+      sit: "Aviso de cambio de agenda o procedimiento",
+      canal: "WhatsApp grupal",
+      quien: "Dueño / Coordinador",
+      cuando: "Con la mayor anticipación posible",
+      msg: "Hola equipo, les informo un cambio importante: [descripción del cambio]. Esto aplica a partir del [fecha]. Si tienen dudas, consúltenme antes de ese día para que podamos resolverlo con tiempo.",
+      personalizar: "Descripción del cambio, fecha desde la que aplica.",
+      excepcion: "Si el cambio genera dudas o resistencia: agendar una conversación individual antes de la fecha de implementación."
+    }
+  ],
+  "🏥 Obras sociales y administración": [
+    {
+      sit: "Consulta de cobertura antes del turno",
+      canal: "WhatsApp / Teléfono",
+      quien: "Asistente / Secretaria",
+      cuando: "Al momento de coordinar el turno",
+      msg: "Hola [Nombre], para poder confirmar tu turno, necesitamos verificar tu cobertura. ¿Podés decirme tu obra social y número de afiliado? Una vez que lo chequeemos, te confirmamos el turno.",
+      personalizar: "Nombre del paciente.",
+      excepcion: "Si la obra social no tiene cobertura para la práctica: informar el valor particular antes de que el paciente confirme el turno."
+    },
+    {
+      sit: "Aviso de documentación pendiente",
+      canal: "WhatsApp",
+      quien: "Asistente / Secretaria",
+      cuando: "Con al menos 48hs de anticipación al turno",
+      msg: "Hola [Nombre], para tu turno del [día] necesitamos que traigas [documentación requerida]. Sin esta documentación no podemos realizar la práctica. Cualquier duda, escribinos acá.",
+      personalizar: "Nombre del paciente, día del turno, documentación requerida.",
+      excepcion: "Si el paciente no puede conseguirla a tiempo: evaluar si el turno se reprograma o si se puede avanzar igualmente."
+    }
+  ]
+};
+
+const cats = Object.keys(data);
+let activeCat = cats[0];
+let activeSit = null;
+
+function renderCats() {
+  const el = document.getElementById('cats');
+  el.innerHTML = cats.map(c => `
+    <button class="cat-btn${c === activeCat ? ' active' : ''}" onclick="selectCat('${c}')">${c}</button>
+  `).join('');
+}
+
+function renderSits() {
+  const el = document.getElementById('situations');
+  const items = data[activeCat];
+  el.innerHTML = items.map((item, i) => `
+    <button class="sit-btn${activeSit === i ? ' active' : ''}" onclick="selectSit(${i})">
+      <span>${item.sit}</span>
+      <span class="sit-arrow">›</span>
+    </button>
+  `).join('');
+}
+
+function renderMsg() {
+  const el = document.getElementById('msgCard');
+  if (activeSit === null) { el.innerHTML = ''; return; }
+  const item = data[activeCat][activeSit];
+  const msgHtml = item.msg.replace(/\[([^\]]+)\]/g, '<span class="msg-field">[$1]</span>');
+  el.innerHTML = `
+    <div class="msg-card">
+      <div class="msg-header">
+        <div class="msg-meta">
+          <div class="msg-meta-item">Canal <span>${item.canal}</span></div>
+          <div class="msg-meta-item">Quién <span>${item.quien}</span></div>
+          <div class="msg-meta-item">Cuándo <span>${item.cuando}</span></div>
+        </div>
+      </div>
+      <div class="msg-body">
+        <span class="msg-label">Mensaje base</span>
+        <div class="msg-text">${msgHtml}</div>
+        <button class="copy-btn" id="copyBtn" onclick="copyMsg()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+          Copiar mensaje
+        </button>
+        <div class="divider"></div>
+        <div class="detail-row">
+          <div class="detail-box personalizar">
+            <span class="detail-box-title">✏️ Qué personalizar</span>
+            <p>${item.personalizar}</p>
+          </div>
+          <div class="detail-box excepcion">
+            <span class="detail-box-title">⚠️ Si responde algo inesperado</span>
+            <p>${item.excepcion}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function selectCat(cat) {
+  activeCat = cat;
+  activeSit = null;
+  renderCats();
+  renderSits();
+  renderMsg();
+}
+
+function selectSit(i) {
+  activeSit = activeSit === i ? null : i;
+  renderSits();
+  renderMsg();
+  if (activeSit !== null) {
+    setTimeout(() => {
+      document.getElementById('msgCard').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }, 50);
+  }
+}
+
+function copyMsg() {
+  const item = data[activeCat][activeSit];
+  navigator.clipboard.writeText(item.msg).then(() => {
+    const btn = document.getElementById('copyBtn');
+    btn.classList.add('copied');
+    btn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 11 4 18"/></svg> ¡Copiado!`;
+    setTimeout(() => {
+      btn.classList.remove('copied');
+      btn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg> Copiar mensaje`;
+    }, 2000);
+  });
+}
+
+renderCats();
+renderSits();
+</script>
+</body>
+</html>

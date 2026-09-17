@@ -149,7 +149,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--navy-d
     </div>
     <span style="font-family:'DM Serif Display',serif;font-size:1.1rem;font-weight:300;color:#f7f4ef;letter-spacing:-.01em">Operaciones <span style="color:#c7cca8">Saludables</span></span>
   </div>
-  <span style="font-size:.6rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:rgba(199,204,168,.5)">Paso 4 · Diagnóstico de Delegación</span>
+  <span style="font-size:.6rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:rgba(199,204,168,.5)">Paso 4 · Dirigir el negocio</span>
 </header>
 <main class="wrap">
 
@@ -434,19 +434,19 @@ function buildResult(){
   });
   html+='</div>';
 
-  html+='<p class="sec-head">Matriz de priorización por área</p>';
-  html+='<p style="font-size:.78rem;color:var(--g600);line-height:1.6;margin-bottom:.9rem;padding:.75rem 1rem;background:var(--g100);border-radius:8px">';
-  html+='Esta matriz muestra las <strong>3 áreas del diagnóstico</strong> ordenadas según cuánto margen de mejora tenés en cada una. ';
-  html+='El orden y las estrellas (★★★) se calculan automáticamente a partir de tus respuestas — el área donde más bajo puntaste aparece primero y es tu prioridad inmediata.</p>';
-  html+='<div class="matrix-wrap">';
-  matrix.forEach(function(m){
-    html+='<div class="matrix-row"><div class="matrix-top"><span class="matrix-area">'+m.area+'</span><div class="matrix-tags"><span class="tag '+m.impactClass+'">'+m.impact+'</span><span class="matrix-stars">'+m.stars+'</span></div></div>';
-    html+='<div class="matrix-pct-bar"><div class="matrix-pct-fill" style="width:0%;background:'+m.barColor+'" data-w="'+m.pct+'"></div></div>';
-    html+='<div class="matrix-action">'+m.action+'</div></div>';
-  });
-  html+='</div>';
+  // html+='<p class="sec-head">Matriz de priorización por área</p>';
+  // html+='<p style="font-size:.78rem;color:var(--g600);line-height:1.6;margin-bottom:.9rem;padding:.75rem 1rem;background:var(--g100);border-radius:8px">';
+  // html+='Esta matriz muestra las <strong>3 áreas del diagnóstico</strong> ordenadas según cuánto margen de mejora tenés en cada una. ';
+  // html+='El orden y las estrellas (★★★) se calculan automáticamente a partir de tus respuestas — el área donde más bajo puntaste aparece primero y es tu prioridad inmediata.</p>';
+  // html+='<div class="matrix-wrap">';
+  // matrix.forEach(function(m){
+  //   html+='<div class="matrix-row"><div class="matrix-top"><span class="matrix-area">'+m.area+'</span><div class="matrix-tags"><span class="tag '+m.impactClass+'">'+m.impact+'</span><span class="matrix-stars">'+m.stars+'</span></div></div>';
+  //   html+='<div class="matrix-pct-bar"><div class="matrix-pct-fill" style="width:0%;background:'+m.barColor+'" data-w="'+m.pct+'"></div></div>';
+  //   html+='<div class="matrix-action">'+m.action+'</div></div>';
+  // });
+  // html+='</div>';
 
-  html+='<div class="cta-box"><p class="cta-ttl">¿Tenés dudas sobre tu resultado?</p><p class="cta-dsc">Este diagnóstico es el punto de partida del próximo módulo. En tu próxima sesión con tu consultor podés profundizar cualquier punto y empezar a trabajar en los cambios concretos.</p><div class="cta-btns"><button class="btn-cs" onclick="restart()">Hacer de nuevo</button></div></div>';
+  // html+='<div class="cta-box"><p class="cta-ttl">¿Tenés dudas sobre tu resultado?</p><p class="cta-dsc">Este diagnóstico es el punto de partida del próximo módulo. En tu próxima sesión con tu consultor podés profundizar cualquier punto y empezar a trabajar en los cambios concretos.</p><div class="cta-btns"><button class="btn-cs" onclick="restart()">Hacer de nuevo</button></div></div>';
 
   document.getElementById('s-result').innerHTML=html;
   go('s-result');
